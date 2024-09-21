@@ -1,5 +1,7 @@
 # PatientInsight
 
+![Banner Placeholder](assets/BannerImg.webp)
+
 **PatientInsight** is an advanced AI-driven tool designed to provide patients with meaningful insights into their medical reports and prescriptions. By simplifying complex data, it enhances the user experience and helps doctors prioritize urgent cases efficiently.
 
 ## Overview
@@ -19,8 +21,6 @@ Key features include:
 3. **Prescription Explanations**: Breaks down medication information into understandable terms for patients.
 4. **Interactive Dashboard**: Provides a visual representation of patient data and insights.
 5. **Integration with EHR**: Seamless integration with existing electronic health records systems for doctors.
-
-![Banner Placeholder](assets/BannerImg.webp)
 
 ## Installation
 
