@@ -1,7 +1,8 @@
 # Data files
 data/raw/PMC-Patients.csv
 data/processed/PMC-Patients_preprocessed.csv
-disease_symptom_data.csv
+disease_symptom_data.csv 
+#will see about disease_symptom_data.csv later
 
 # DVC files
 .dvc/tmp
