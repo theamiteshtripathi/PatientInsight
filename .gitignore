@@ -5,3 +5,5 @@ data/raw/PMC-Patients.csv
 .env
 rough.txt
 src/data/__pycache__/
+.dvc/tmp/
+.env
