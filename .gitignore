@@ -1,4 +1,7 @@
 node_modules
-.env
 data/processed/PMC-Patients_preprocessed.csv
 data/raw/PMC-Patients.csv
+.dvc/tmp/
+.env
+rough.txt
+src/data/__pycache__/
