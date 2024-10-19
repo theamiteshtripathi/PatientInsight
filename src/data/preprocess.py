@@ -1,5 +1,14 @@
+import os
+from dotenv import load_dotenv
 import pandas as pd
 import json
+
+# Load environment variables
+load_dotenv()
+
+# Access AWS credentials
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
 def preprocess_pmc_patients(input_path, output_path):
     # Read the CSV file

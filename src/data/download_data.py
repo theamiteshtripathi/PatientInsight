@@ -1,5 +1,13 @@
 from datasets import load_dataset
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Access AWS credentials
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
 def download_pmc_patients_dataset(output_dir):
     os.makedirs(output_dir, exist_ok=True)

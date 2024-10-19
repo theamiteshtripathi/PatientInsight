@@ -1,7 +1,15 @@
 import unittest
 import pandas as pd
 import os
+from dotenv import load_dotenv
 from src.data.preprocess import preprocess_pmc_patients
+
+# Load environment variables
+load_dotenv()
+
+# Access AWS credentials
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
 class TestDataPreprocess(unittest.TestCase):
     def test_preprocess_pmc_patients(self):
@@ -20,4 +28,3 @@ class TestDataPreprocess(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

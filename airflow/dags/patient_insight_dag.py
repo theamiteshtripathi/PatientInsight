@@ -3,6 +3,14 @@ from airflow.operators.python_operator import PythonOperator
 from datetime import datetime, timedelta
 import sys
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Access AWS credentials
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
 # Add the project root directory to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -45,4 +53,3 @@ preprocess_task = PythonOperator(
 )
 
 download_task >> preprocess_task
-
