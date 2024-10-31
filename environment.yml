@@ -1,0 +1,7 @@
+name: patient-insight
+dependencies:
+  - numpy
+  - pandas
+  - requests
+  - apache-airflow
+  - datasets
