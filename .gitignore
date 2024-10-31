@@ -1,2 +1,46 @@
+# Data files
+data/raw/PMC-Patients.csv
+data/processed/PMC-Patients_preprocessed.csv
+disease_symptom_data.csv 
+#will see about disease_symptom_data.csv later
 
+# DVC files
+.dvc/tmp
+.dvc/cache
+
+# Python-related
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Node.js-related
+node_modules/
+
+# Environment variables
+.env
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Operating system-related
 .DS_Store
+Thumbs.db
+
+# IDE-related
+.vscode/
+.idea/
+
+# Airflow-related
+airflow/logs/
+airflow/*.db
+airflow/*.pid
+
+# Miscellaneous
+rough.txt
