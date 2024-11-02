@@ -1,8 +1,12 @@
 import unittest
 import pandas as pd
 import os
+import sys
 from dotenv import load_dotenv
-from src.data.preprocess import preprocess_pmc_patients
+# Add the project root directory to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from scripts_location.preprocess import preprocess_pmc_patients
 
 # Load environment variables
 load_dotenv()
