@@ -1,7 +1,7 @@
 import unittest
 import os
 from dotenv import load_dotenv
-from src.data.download import download_pmc_patients_dataset
+from scripts_location.download import download_pmc_patients_dataset
 
 # Load environment variables
 load_dotenv()
