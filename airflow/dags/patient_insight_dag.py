@@ -1,5 +1,5 @@
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 import sys
 import os
@@ -15,24 +15,26 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 # Add the project root directory to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from src.data.download import download_pmc_patients_dataset
-from src.data.preprocess import preprocess_pmc_patients
+from scripts_location.download import download_pmc_patients_dataset
+from scripts_location.preprocess import preprocess_pmc_patients
 
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2023, 1, 1),
+    'start_date': datetime(2024, 9, 9),
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
+    'catchup': False,
 }
 
 dag = DAG(
     'patient_insight_pipeline',
     default_args=default_args,
     description='A DAG for the PatientInsight data pipeline',
-    schedule_interval=timedelta(days=1),
+    schedule=timedelta(days=1),
+    max_active_runs=1,
 )
 
 download_task = PythonOperator(
