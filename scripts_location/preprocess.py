@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 import pandas as pd
-import json
+import ast
 
 # Load environment variables
 load_dotenv()
@@ -28,15 +28,15 @@ def preprocess_pmc_patients(input_path, output_path):
     df = df[important_features]
     
     # Clean and transform data
-    df['age'] = df['age'].apply(lambda x: x if pd.notna(x) else [[]])
-    
-    df['age_years'] = df['age'].apply(lambda x: sum(value if unit == 'year' 
-                                                 else value / 12 if unit == 'month' 
-                                                 else value / 52 if unit == 'week' 
-                                                 else value / 365 if unit == 'day' 
-                                                 else value / 8760 
-                                                 for item in x if isinstance(item, tuple) and len(item) == 2
-                                                 for value, unit in [item]))
+    df['age'] = df['age'].apply(lambda x:list(ast.literal_eval(x)) if pd.notna(x) else list([[]]))
+    df['age'] = df['age'].apply(lambda x: x[0])
+
+    df['age_years'] = df['age'].apply(lambda x: sum(x[0] if x[1] == 'year' 
+                                                 else x[0] / 12 if x[1] == 'month' 
+                                                 else x[0] / 52 if x[1] == 'week' 
+                                                 else x[0] / 365 if x[1] == 'day' 
+                                                 else x[0] / 8760 
+                                                 for item in [x] if len(item) == 2))
 
 
     df['relevant_articles'] = df['relevant_articles'].apply(lambda x: x if pd.notna(x) else {})
