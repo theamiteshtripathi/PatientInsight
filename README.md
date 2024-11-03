@@ -80,7 +80,7 @@ To run the pipeline manually:
 ## Project Structure
 
 - `data/`: Contains raw and processed data files.
-- `src/`: Source code for data processing and analysis.
+- `sripts_location/`: Source code for data processing and analysis.
 - `tests/`: Unit tests for the project.
 - `airflow/`: Airflow DAG definitions.
 - `notebooks/`: Jupyter notebooks for exploratory analysis.
