@@ -1,5 +1,3 @@
-os
-sys
 numpy
 pandas
 requests
@@ -7,4 +5,5 @@ dvc
 apache-airflow
 datasets
 dvc[s3]
-python-dotenv==0.19.1dvc-s3
+python-dotenv==0.19.1
+dvc-s3
