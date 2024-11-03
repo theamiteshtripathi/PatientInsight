@@ -1,7 +1,10 @@
 name: patient-insight
 dependencies:
   - numpy
+  - os
+  - sys
   - pandas
   - requests
   - apache-airflow
   - datasets
+  - dvc
