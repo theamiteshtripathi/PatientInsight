@@ -35,7 +35,7 @@ dag = DAG(
     'patient_insight_pipeline',
     default_args=default_args,
     description='A DAG for the PatientInsight data pipeline',
-    schedule_interval= None, 
+    schedule = None, 
     max_active_runs=1,
 )
 
