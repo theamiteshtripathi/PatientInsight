@@ -18,6 +18,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 from scripts_location.download import download_pmc_patients_dataset
 from scripts_location.preprocess import preprocess_pmc_patients
+from scripts_location.stats_generation import generate_stats
 from scripts_location.email_notification import send_custom_email
 
 default_args = {
@@ -56,6 +57,15 @@ preprocess_task = PythonOperator(
     dag=dag,
 )
 
+stats_generation = PythonOperator(
+    task_id='generate_stats',
+    python_callable=generate_stats,
+    op_kwargs={
+        'csv_file_path': 'data/processed'
+    },
+    dag=dag,
+)
+
 email_task = PythonOperator(
       task_id="send_email",
       python_callable=send_custom_email,
@@ -64,4 +74,4 @@ email_task = PythonOperator(
       trigger_rule=TriggerRule.ALL_DONE,
 )
 
-[download_task >> preprocess_task] >> email_task
+download_task >> preprocess_task >> stats_generation >> email_task
