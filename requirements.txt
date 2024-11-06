@@ -1,6 +1,7 @@
 numpy
 pandas
 requests
+ydata_profiling
 dvc
 apache-airflow
 datasets
