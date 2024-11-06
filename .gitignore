@@ -4,6 +4,9 @@ data/processed/PMC-Patients_preprocessed.csv
 disease_symptom_data.csv 
 #will see about disease_symptom_data.csv later
 
+# Stat files
+data/processed/stats_report.html
+
 # DVC files
 .dvc/tmp
 .dvc/cache
