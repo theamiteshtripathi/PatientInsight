@@ -57,6 +57,15 @@ After the task run is completed successfully, you should be seeing the preproces
         ├──processed
             ├──PMC-Patients_preprocessed.csv
 
+## Stat generation
+In the DAG, the third task is to generate statistic report from the pre processed file.
+The task is named `generate_stats`.
+After the task run is completed successfully, you should be seeing the stat report in the folder `data/processed/`.
+
+    ├──data
+        ├──processed
+            ├──stat_report.html
+
 ## Testing
 We are using unittest modules in python to test if datasets are downloaded and processed as per requirements.
 The files can be found under folder `tests`.
@@ -79,6 +88,7 @@ All the logs are maintaned by airflow.
 All the task logs are available under `AIRFLOW_HOME` location under `logs/"dagname"`.
 
 All the print statements are available under logs, we are not using any external logging as airflow does the job for us.
+In future we will use the logs folder to see all the logs.
 
 ## Anomaly detection and alerts
 If there are any issues in DAG tasks, alerts are sent through email when all the task have completed successfully as well as if there are any failures.
@@ -99,4 +109,4 @@ smtp_password = your_password              # Your email password
 smtp_mail_from = airflow@your_domain.com   # Sender email address
 ```
 
-We used a new gmail account to setup mail alerts, and all the mails are directed using this email id `mlopsgroup11@gmail.com <mlopsgroup11@gmail.com>`.
+We used a new gmail account to setup mail alerts, and all the mails are directed using this email id `mlopsgroup11@gmail.com`.
