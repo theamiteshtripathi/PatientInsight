@@ -39,6 +39,7 @@ Thumbs.db
 # IDE-related
 .vscode/
 .idea/
+myenv/
 
 # Airflow-related
 airflow/logs/
