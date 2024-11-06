@@ -4,6 +4,7 @@ dependencies:
   - os
   - sys
   - pandas
+  - ydata_profiling
   - requests
   - apache-airflow
   - datasets
