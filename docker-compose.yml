@@ -17,12 +17,16 @@ services:
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/patient_insight
 
-  airflow:
+  airflow: 
     image: apache/airflow
     depends_on:
       - db
     volumes:
       - ./backend/data_pipeline/dags:/opt/airflow/dags
+      - ./backend/config:/opt/airflow/config
+      - ./logs/airflow:/opt/airflow/logs
+    environment:
+      - AIRFLOW_HOME=/opt/airflow
     ports:
       - "8080:8080"
 

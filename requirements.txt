@@ -8,3 +8,7 @@ datasets
 dvc[s3]
 python-dotenv==0.19.1
 dvc-s3
+tensorflow-macos
+tensorflow-metal
+apache-beam
+tensorflow-data-validation

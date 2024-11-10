@@ -4,3 +4,52 @@ airflow users create --username admin --password admin --firstname Admin --lastn
 dvc remote add -d myremote s3://patientinsightbucket
 git add .dvc/config
 git commit -m "Configure DVC remote"
+
+
+
+FOR CREATING AIRFLOW users
+
+# For Amitesh (You)
+airflow users create \
+    --username amitesh \
+    --firstname Amitesh \
+    --lastname Tripathi \
+    --role Admin \
+    --email tripathi.am@northeastern.edu \
+    --password admin
+
+# For Deepak
+airflow users create \
+    --username deepak \
+    --firstname Deepak \
+    --lastname Pappuru \
+    --role Admin \
+    --email pappuru.d@northeastern.edu \
+    --password admin
+
+# For Udayakumar
+airflow users create \
+    --username udayakumar \
+    --firstname Udayakumar \
+    --lastname De \
+    --role Admin \
+    --email udayakumar.de@northeastern.edu \
+    --password admin
+
+# For Ramakrishna
+airflow users create \
+    --username ramakrishna \
+    --firstname Ramakrishna \
+    --lastname Gaddamsreeramulu \
+    --role Admin \
+    --email gaddamsreeramulu.r@northeastern.edu \
+    --password admin
+
+# For Syed
+airflow users create \
+    --username syed \
+    --firstname Syed \
+    --lastname Amin \
+    --role Admin \
+    --email amin.sn@northeastern.edu \
+    --password admin

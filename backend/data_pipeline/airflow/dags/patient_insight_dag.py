@@ -20,6 +20,8 @@ from data_pipeline.scripts.download import download_pmc_patients_dataset
 from data_pipeline.scripts.preprocess import preprocess_pmc_patients
 from data_pipeline.scripts.stats_generation import generate_stats
 from data_pipeline.scripts.email_notification import send_custom_email
+from ml_pipeline.src.data_processing.pipeline import TensorflowPipeline
+from data_pipeline.scripts.pdf_processing import process_patient_pdf
 
 default_args = {
     'owner': 'airflow',
@@ -35,9 +37,11 @@ default_args = {
 dag = DAG(
     'patient_insight_pipeline',
     default_args=default_args,
-    description='A DAG for the PatientInsight data pipeline',
-    schedule = None, 
+    description='Pipeline for processing patient data',
+    schedule_interval=timedelta(days=1),
+    catchup=False,
     max_active_runs=1,
+    tags=['patient', 'healthcare']
 )
 
 download_task = PythonOperator(
@@ -54,6 +58,18 @@ preprocess_task = PythonOperator(
         'input_path': 'data/raw/PMC-Patients.csv',
         'output_path': 'data/processed/PMC-Patients_preprocessed.csv'
     },
+    dag=dag,
+)
+
+pdf_processing_task = PythonOperator(
+    task_id='process_pdf',
+    python_callable=process_patient_pdf,
+    dag=dag
+)
+
+tf_pipeline_task = PythonOperator(
+    task_id='tf_pipeline',
+    python_callable=lambda: TensorflowPipeline().run_pipeline('data/processed/PMC-Patients_preprocessed.csv'),
     dag=dag,
 )
 
@@ -74,4 +90,4 @@ email_task = PythonOperator(
       trigger_rule=TriggerRule.ALL_DONE,
 )
 
-download_task >> preprocess_task >> stats_generation >> email_task
+download_task >> preprocess_task >> pdf_processing_task >> tf_pipeline_task >> stats_generation >> email_task
