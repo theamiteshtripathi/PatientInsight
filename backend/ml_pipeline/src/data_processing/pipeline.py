@@ -1,5 +1,5 @@
 from .transformation import DataTransformer
-from ...data_pipeline.scripts.tf_data_validation import DataValidator
+from ....data_pipeline.scripts.tf_data_validation import DataValidator
 import pandas as pd
 import logging
 from typing import Dict, Any

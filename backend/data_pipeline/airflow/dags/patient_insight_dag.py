@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import sys
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Load environment variables
 load_dotenv()
@@ -14,7 +15,8 @@ AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
 # Add the project root directory to the Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+project_root = Path(__file__).parent.parent.parent.parent.absolute()
+sys.path.append(str(project_root))
 
 from data_pipeline.scripts.download import download_pmc_patients_dataset
 from data_pipeline.scripts.preprocess import preprocess_pmc_patients
@@ -26,7 +28,7 @@ from data_pipeline.scripts.pdf_processing import process_patient_pdf
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2024, 9, 9),
+    'start_date': datetime(2023, 1, 1),
     'email': ['pappuru.d@northeastern.edu', 'udayakumar.de@northeastern.edu', 'tripathi.am@northeastern.edu', 'gaddamsreeramulu.r@northeastern.edu', 'amin.sn@northeastern.edu'],
     'email_on_failure': True,
     'email_on_retry': False,
@@ -83,11 +85,26 @@ stats_generation = PythonOperator(
 )
 
 email_task = PythonOperator(
-      task_id="send_email",
-      python_callable=send_custom_email,
-      provide_context=True,
-      dag=dag,
-      trigger_rule=TriggerRule.ALL_DONE,
+    task_id="send_email",
+    python_callable=send_custom_email,
+    provide_context=True,
+    dag=dag,
+    trigger_rule=TriggerRule.ALL_DONE
 )
 
-download_task >> preprocess_task >> pdf_processing_task >> tf_pipeline_task >> stats_generation >> email_task
+# Set dependencies
+download_task >> preprocess_task >> [pdf_processing_task, tf_pipeline_task] >> stats_generation >> email_task
+
+if __name__ == "__main__":
+    from airflow.utils.dag_cycle_tester import check_cycle
+    check_cycle(dag)
+    print("DAG cycle check passed")
+    
+    # Test DAG structure
+    print("\nDAG Task Dependencies:")
+    for task in dag.tasks:
+        print(f"\nTask: {task.task_id}")
+        print(f"Upstream: {[t.task_id for t in task.upstream_list]}")
+        print(f"Downstream: {[t.task_id for t in task.downstream_list]}")
+
+    dag.test()

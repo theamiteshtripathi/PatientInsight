@@ -11,43 +11,24 @@ class DataValidator:
         self.csv_dir = "data/processed/PMC-Patients_preprocessed.csv"
         self.csv_loc = os.path.join(self.root_path, self.csv_dir)
         
-    def validate_data(self) -> Dict[str, Any]:
-        """Validate data using pandas-based checks"""
-        try:
-            data = pd.read_csv(self.csv_loc)
+    def validate_data(self, data: pd.DataFrame = None) -> Dict[str, Any]:
+        """Validate the data against defined rules"""
+        validation_results = {
+            'is_valid': True,
+            'anomalies': []
+        }
+        
+        if data is not None:
+            completeness = self._check_completeness(data)
+            value_ranges = self._check_value_ranges(data)
+            data_types = self._check_data_types(data)
+            duplicates = self._check_duplicates(data)
             
-            # Basic statistics
-            stats = {
-                'row_count': len(data),
-                'column_count': len(data.columns),
-                'missing_values': data.isnull().sum().to_dict(),
-                'dtypes': data.dtypes.astype(str).to_dict()
-            }
+            validation_results['is_valid'] = all([
+                completeness, value_ranges, data_types, duplicates
+            ])
             
-            # Data quality checks
-            validation_results = {
-                'completeness': self._check_completeness(data),
-                'value_ranges': self._check_value_ranges(data),
-                'data_types': self._check_data_types(data),
-                'duplicates': self._check_duplicates(data)
-            }
-            
-            # Generate validation report
-            report = {
-                'validation_time': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                'stats': stats,
-                'validation_results': validation_results,
-                'is_valid': all(validation_results.values())
-            }
-            
-            return report
-            
-        except Exception as e:
-            logging.error(f"Data validation failed: {str(e)}")
-            return {
-                'error': str(e),
-                'is_valid': False
-            }
+        return validation_results
 
     def _check_completeness(self, data: pd.DataFrame) -> bool:
         """Check for missing values in required fields"""
@@ -101,10 +82,12 @@ class DataValidator:
         
         return "\n".join(report)
 
-    def save_validation_report(self, report: Dict, output_path: str = None):
-        """Save validation report to file"""
-        if output_path is None:
-            output_path = os.path.join(self.root_path, 'data/processed/validation_report.txt')
-            
-        with open(output_path, 'w') as f:
-            f.write(self.generate_validation_report(report))
+    def save_validation_report(self, validation_results: Dict[str, Any]) -> None:
+        """Save validation results to a log file"""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        log_dir = "logs/validation"
+        os.makedirs(log_dir, exist_ok=True)
+        
+        log_file = os.path.join(log_dir, f"validation_report_{timestamp}.log")
+        logging.basicConfig(filename=log_file, level=logging.INFO)
+        logging.info(f"Validation Results: {validation_results}")

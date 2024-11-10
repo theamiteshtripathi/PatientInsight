@@ -1,5 +1,5 @@
-from pipeline import TensorflowPipeline
-from config.pipeline_config import PIPELINE_CONFIG
+from ml_pipeline.src.data_processing.pipeline import TensorflowPipeline
+from ml_pipeline.src.config.pipeline_config import PIPELINE_CONFIG
 
 # Initialize pipeline
 pipeline = TensorflowPipeline(PIPELINE_CONFIG)

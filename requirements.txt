@@ -15,3 +15,4 @@ tensorflow-data-validation
 apache-airflow[postgres]
 psycopg2-binary
 boto3
+ydata-profiling
