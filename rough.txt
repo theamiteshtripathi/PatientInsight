@@ -1,0 +1,6 @@
+airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email tripathi.am@northeasten.edu
+
+
+dvc remote add -d myremote s3://patientinsightbucket
+git add .dvc/config
+git commit -m "Configure DVC remote"
