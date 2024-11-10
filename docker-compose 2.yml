@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/patient_insight
+
+  airflow:
+    image: apache/airflow
+    depends_on:
+      - db
+    volumes:
+      - ./backend/data_pipeline/dags:/opt/airflow/dags
+    ports:
+      - "8080:8080"
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=patient_insight
+    ports:
+      - "5432:5432"
