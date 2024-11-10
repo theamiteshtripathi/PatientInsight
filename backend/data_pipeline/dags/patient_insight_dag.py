@@ -16,10 +16,10 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 # Add the project root directory to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from scripts_location.download import download_pmc_patients_dataset
-from scripts_location.preprocess import preprocess_pmc_patients
-from scripts_location.stats_generation import generate_stats
-from scripts_location.email_notification import send_custom_email
+from data_pipeline.scripts.download import download_pmc_patients_dataset
+from data_pipeline.scripts.preprocess import preprocess_pmc_patients
+from data_pipeline.scripts.stats_generation import generate_stats
+from data_pipeline.scripts.email_notification import send_custom_email
 
 default_args = {
     'owner': 'airflow',
