@@ -1,61 +1,110 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { TextField, Button, Typography, Container } from '@material-ui/core';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import {
+  Container,
+  Paper,
+  TextField,
+  Button,
+  Typography,
+  makeStyles
+} from '@material-ui/core';
+
+const useStyles = makeStyles((theme) => ({
+  container: {
+    height: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  paper: {
+    padding: theme.spacing(4),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    maxWidth: 400,
+    width: '100%',
+  },
+  form: {
+    width: '100%',
+    marginTop: theme.spacing(1),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+}));
 
 function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const classes = useStyles();
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [credentials, setCredentials] = useState({
+    email: '',
+    password: '',
+    userType: 'patient' // default to patient
+  });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Implement login logic here
-    console.log('Login attempt', { email, password });
+    try {
+      await login(credentials);
+      // Redirect based on user type
+      if (credentials.userType === 'doctor') {
+        navigate('/doctor-dashboard');
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      // Handle error (show message to user)
+    }
   };
 
   return (
-    <Container maxWidth="xs">
-      <Typography variant="h4" align="center" gutterBottom>
-        Login to Patient Insight
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          id="email"
-          label="Email Address"
-          name="email"
-          autoComplete="email"
-          autoFocus
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          name="password"
-          label="Password"
-          type="password"
-          id="password"
-          autoComplete="current-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          color="primary"
-        >
-          Sign In
-        </Button>
-      </form>
-      <Typography align="center" style={{ marginTop: '1rem' }}>
-        Don't have an account? <Link to="/register">Register</Link>
-      </Typography>
+    <Container component="main" className={classes.container}>
+      <Paper elevation={3} className={classes.paper}>
+        <Typography component="h1" variant="h5">
+          Patient Insight Login
+        </Typography>
+        <form className={classes.form} onSubmit={handleSubmit}>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            autoComplete="email"
+            autoFocus
+            value={credentials.email}
+            onChange={(e) => setCredentials({...credentials, email: e.target.value})}
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            value={credentials.password}
+            onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+          >
+            Sign In
+          </Button>
+        </form>
+      </Paper>
     </Container>
   );
 }
