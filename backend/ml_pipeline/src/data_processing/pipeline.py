@@ -11,24 +11,35 @@ class TensorflowPipeline:
         self.transformer = DataTransformer(self.config)
         
     def run_pipeline(self, data_path: str) -> Dict[str, Any]:
-        logging.info("Starting pipeline")
+        logging.info("Starting TensorFlow pipeline processing")
         
-        # Validate data
-        validation_results = self.validator.validate_data()
-        
-        # Load and transform data if validation passes
-        if validation_results['is_valid']:
+        try:
+            # Load and validate data
+            logging.info(f"Loading data from {data_path}")
             df = pd.read_csv(data_path)
-            dataset, feature_columns = self.transformer.transform_features(df)
+            logging.info(f"Loaded {len(df)} records")
             
-            # Save validation report
-            self.validator.save_validation_report(validation_results)
+            # Data validation
+            validation_results = self.validator.validate_data()
+            logging.info("Validation complete")
             
-            return {
-                'validation_results': validation_results,
-                'dataset': dataset,
-                'feature_columns': feature_columns
-            }
-        else:
-            logging.error("Data validation failed")
-            return {'validation_results': validation_results}
+            if validation_results['is_valid']:
+                # Transform features
+                dataset, feature_columns = self.transformer.transform_features(df)
+                logging.info(f"Transformed {len(feature_columns)} features")
+                
+                # Save validation report
+                self.validator.save_validation_report(validation_results)
+                
+                return {
+                    'validation_results': validation_results,
+                    'dataset': dataset,
+                    'feature_columns': feature_columns,
+                    'records_processed': len(df)
+                }
+            else:
+                raise ValueError("Data validation failed")
+                
+        except Exception as e:
+            logging.error(f"Pipeline failed: {str(e)}")
+            raise

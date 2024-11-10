@@ -49,7 +49,12 @@ dag = DAG(
 download_task = PythonOperator(
     task_id='download_data',
     python_callable=download_pmc_patients_dataset,
-    op_kwargs={'output_dir': 'data/raw'},
+    op_kwargs={
+        'output_dir': os.path.join(str(project_root), 'data/raw'),
+    },
+    retries=2,
+    retry_delay=timedelta(minutes=1),
+    execution_timeout=timedelta(minutes=5),
     dag=dag,
 )
 
