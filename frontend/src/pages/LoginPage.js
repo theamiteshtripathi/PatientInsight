@@ -7,7 +7,11 @@ import {
   TextField,
   Button,
   Typography,
-  makeStyles
+  makeStyles,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -68,6 +72,17 @@ function LoginPage() {
           Patient Insight Login
         </Typography>
         <form className={classes.form} onSubmit={handleSubmit}>
+          <FormControl variant="outlined" margin="normal" fullWidth>
+            <InputLabel>User Type</InputLabel>
+            <Select
+              value={credentials.userType}
+              onChange={(e) => setCredentials({...credentials, userType: e.target.value})}
+              label="User Type"
+            >
+              <MenuItem value="doctor">Doctor</MenuItem>
+              <MenuItem value="patient">Patient</MenuItem>
+            </Select>
+          </FormControl>
           <TextField
             variant="outlined"
             margin="normal"
