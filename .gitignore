@@ -1,7 +1,8 @@
 # Data files
-data/raw/PMC-Patients.csv
-data/processed/PMC-Patients_preprocessed.csv
-disease_symptom_data.csv 
+backend/data/raw/PMC-Patients.csv
+backend/data/processed/PMC-Patients_preprocessed.csv
+backend/data/disease_symptom_data.csv 
+backend/data
 #will see about disease_symptom_data.csv later
 
 # Stat files
