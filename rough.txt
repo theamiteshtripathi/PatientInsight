@@ -53,3 +53,12 @@ airflow users create \
     --role Admin \
     --email amin.sn@northeastern.edu \
     --password admin
+
+
+    airflow users create \
+    --username admin \
+    --firstname Admin \
+    --lastname User \
+    --role Admin \
+    --email your.email@example.com \
+    --password admin

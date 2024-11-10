@@ -17,24 +17,49 @@ services:
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/patient_insight
 
-  airflow: 
-    image: apache/airflow
+  airflow:
+    image: apache/airflow:2.7.1
     depends_on:
-      - db
+      - postgres
     volumes:
       - ./backend/data_pipeline/dags:/opt/airflow/dags
-      - ./backend/config:/opt/airflow/config
+      - ./backend/data_pipeline/scripts:/opt/airflow/scripts
       - ./logs/airflow:/opt/airflow/logs
+      - ./.env:/opt/airflow/.env
     environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
       - AIRFLOW_HOME=/opt/airflow
     ports:
       - "8080:8080"
+    command: webserver
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  airflow-scheduler:
+    image: apache/airflow:2.7.1
+    depends_on:
+      - airflow
+    volumes:
+      - ./backend/data_pipeline/dags:/opt/airflow/dags
+      - ./backend/data_pipeline/scripts:/opt/airflow/scripts
+      - ./logs/airflow:/opt/airflow/logs
+      - ./.env:/opt/airflow/.env
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+    command: scheduler
 
   db:
     image: postgres:13
     environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=patient_insight
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
     ports:
       - "5432:5432"
