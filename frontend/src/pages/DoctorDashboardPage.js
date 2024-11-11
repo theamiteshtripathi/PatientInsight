@@ -15,7 +15,7 @@ import {
   People as PeopleIcon,
   Event as EventIcon,
   Assessment as AssessmentIcon,
-  Chat as ChatIcon,
+  Description as SummaryIcon,
 } from '@material-ui/icons';
 import PatientsList from '../components/doctor/PatientsList';
 import AppointmentsSchedule from '../components/doctor/AppointmentsSchedule';
@@ -102,7 +102,7 @@ function DoctorDashboardPage() {
           <Tab icon={<PeopleIcon />} label="Patients" />
           <Tab icon={<EventIcon />} label="Appointments" />
           <Tab icon={<AssessmentIcon />} label="Reports" />
-          <Tab icon={<ChatIcon />} label="Chat" />
+          <Tab icon={<SummaryIcon />} label="Patient Summaries" />
         </Tabs>
       </AppBar>
 

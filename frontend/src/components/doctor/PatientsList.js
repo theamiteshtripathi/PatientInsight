@@ -17,7 +17,10 @@ const useStyles = makeStyles((theme) => ({
   },
   actionButton: {
     marginRight: theme.spacing(1),
-  }
+  },
+  summaryButton: {
+    marginLeft: theme.spacing(1),
+  },
 }));
 
 function PatientsList() {
@@ -57,8 +60,9 @@ function PatientsList() {
                 <Button 
                   variant="outlined" 
                   color="primary"
+                  className={classes.summaryButton}
                 >
-                  Schedule
+                  View Summary
                 </Button>
               </TableCell>
             </TableRow>
