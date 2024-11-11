@@ -13,6 +13,7 @@ import {
 } from '@material-ui/core';
 import Header from '../dashboard/Header';
 import Sidebar from '../dashboard/Sidebar';
+import { useAuth } from '../../hooks/useAuth';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -88,18 +89,26 @@ const useStyles = makeStyles((theme) => ({
 
 function ChatInterface() {
   const classes = useStyles();
+  const { currentUser } = useAuth();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [canGenerateSummary, setCanGenerateSummary] = useState(false);
   const messagesEndRef = useRef(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    if (messages.length >= 4) {
+      setCanGenerateSummary(true);
+    }
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -132,6 +141,28 @@ function ChatInterface() {
     } catch (error) {
       console.error('Error getting response:', error);
       // Handle error appropriately
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const generateSummary = async () => {
+    try {
+      setIsLoading(true);
+      const summary = {
+        patientId: currentUser?.id,
+        symptoms: messages.filter(m => m.sender === 'user').map(m => m.text),
+        aiResponses: messages.filter(m => m.sender === 'bot').map(m => m.text),
+        date: new Date(),
+        status: 'pending_review'
+      };
+      
+      // TODO: Add API call to save summary
+      console.log('Generated Summary:', summary);
+      
+      setCanGenerateSummary(false);
+    } catch (error) {
+      console.error('Error generating summary:', error);
     } finally {
       setIsLoading(false);
     }
@@ -184,6 +215,16 @@ function ChatInterface() {
             >
               {isLoading ? <CircularProgress size={24} /> : 'Send'}
             </Button>
+            {canGenerateSummary && (
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={generateSummary}
+                disabled={isLoading}
+              >
+                Generate Summary
+              </Button>
+            )}
           </div>
         </div>
       </main>
