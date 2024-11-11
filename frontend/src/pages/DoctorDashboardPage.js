@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  makeStyles,
   AppBar,
   Toolbar,
   Typography,
@@ -10,13 +9,14 @@ import {
   Container,
   Paper,
   Grid,
-} from '@material-ui/core';
+  Button,
+  IconButton
+} from '@mui/material';
 import {
-  People as PeopleIcon,
-  Event as EventIcon,
-  Assessment as AssessmentIcon,
+  PersonAdd as PersonAddIcon,
+  EventNote as EventNoteIcon,
   Description as SummaryIcon,
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import PatientsList from '../components/doctor/PatientsList';
 import AppointmentsSchedule from '../components/doctor/AppointmentsSchedule';
 import MedicalReports from '../components/doctor/MedicalReports';
@@ -24,34 +24,25 @@ import ChatInterface from '../components/patient/ChatInterface';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
 import { useAuth } from '../hooks/useAuth';
+import { styled } from '@mui/material/styles';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-    minHeight: '100vh',
-  },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    marginTop: 64,
-  },
-  toolbar: {
-    paddingRight: 24,
-  },
-  title: {
-    flexGrow: 1,
-  },
-  tabPanel: {
-    padding: theme.spacing(3),
-  },
-  paper: {
-    padding: theme.spacing(2),
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  fixedHeight: {
-    height: 240,
-  },
+const StyledContainer = styled(Container)(({ theme }) => ({
+  marginTop: theme.spacing(4),
+  marginBottom: theme.spacing(4)
+}));
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(3),
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column'
+}));
+
+const DashboardCard = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(2),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+  height: '100%'
 }));
 
 function TabPanel(props) {
@@ -68,7 +59,6 @@ function TabPanel(props) {
 }
 
 function DoctorDashboardPage() {
-  const classes = useStyles();
   const [tabValue, setTabValue] = useState(0);
   const { loading, error } = useAuth();
 
@@ -85,45 +75,25 @@ function DoctorDashboardPage() {
   }
 
   return (
-    <div className={classes.root}>
-      <AppBar position="fixed">
-        <Toolbar className={classes.toolbar}>
-          <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            Doctor Dashboard
-          </Typography>
-        </Toolbar>
-        <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-          centered
-          indicatorColor="secondary"
-          textColor="inherit"
-        >
-          <Tab icon={<PeopleIcon />} label="Patients" />
-          <Tab icon={<EventIcon />} label="Appointments" />
-          <Tab icon={<AssessmentIcon />} label="Reports" />
-          <Tab icon={<SummaryIcon />} label="Patient Summaries" />
-        </Tabs>
-      </AppBar>
+    <StyledContainer>
+      <Typography variant="h4" sx={{ mb: 3 }}>
+        Doctor Dashboard
+      </Typography>
+      
+      <Grid container spacing={3}>
+        {/* Summary Cards */}
+        <Grid item xs={12} md={4}>
+          <DashboardCard elevation={2}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Total Patients
+            </Typography>
+            {/* Add your content */}
+          </DashboardCard>
+        </Grid>
 
-      <main className={classes.content}>
-        <TabPanel value={tabValue} index={0}>
-          <PatientsList />
-        </TabPanel>
-
-        <TabPanel value={tabValue} index={1}>
-          <AppointmentsSchedule />
-        </TabPanel>
-
-        <TabPanel value={tabValue} index={2}>
-          <MedicalReports />
-        </TabPanel>
-
-        <TabPanel value={tabValue} index={3}>
-          <ChatInterface />
-        </TabPanel>
-      </main>
-    </div>
+        {/* Quick Actions */}
+      </Grid>
+    </StyledContainer>
   );
 }
 

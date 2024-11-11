@@ -5,65 +5,82 @@ import {
   ListItem, 
   ListItemIcon, 
   ListItemText,
-  makeStyles 
-} from '@material-ui/core';
+  Box,
+  useTheme
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { 
   Dashboard as DashboardIcon,
-  Person as PersonIcon,
+  HealthAndSafety as HealthAndSafetyIcon,
   Assignment as AssignmentIcon,
-  Chat as ChatIcon,
-  Schedule as ScheduleIcon
-} from '@material-ui/icons';
+  History as HistoryIcon,
+  FitnessCenter as FitnessIcon,
+  Schedule as ScheduleIcon,
+  Settings as SettingsIcon
+} from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 240;
 
-const useStyles = makeStyles((theme) => ({
-  drawer: {
+const StyledDrawer = styled(Drawer)(({ theme }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  '& .MuiDrawer-paper': {
     width: drawerWidth,
-    flexShrink: 0,
+    boxSizing: 'border-box',
+    backgroundColor: theme.palette.background.paper,
+    borderRight: `1px solid ${theme.palette.divider}`,
   },
-  drawerPaper: {
-    width: drawerWidth,
-  },
-  toolbar: theme.mixins.toolbar,
 }));
 
 function Sidebar() {
-  const classes = useStyles();
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { text: 'Patient Intake', icon: <PersonIcon />, path: '/patient-intake' },
-    { text: 'Medical Records', icon: <AssignmentIcon />, path: '/medical-records' },
-    { text: 'Chat with AI', icon: <ChatIcon />, path: '/chat' },
+    { text: 'Symptom Checker', icon: <HealthAndSafetyIcon />, path: '/symptom-checker' },
+    { text: 'Reports & History', icon: <AssignmentIcon />, path: '/reports' },
+    { text: 'Consultation History', icon: <HistoryIcon />, path: '/consultations' },
+    { text: 'Lifestyle Tips', icon: <FitnessIcon />, path: '/lifestyle' },
     { text: 'Appointments', icon: <ScheduleIcon />, path: '/appointments' },
+    { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
   ];
 
   return (
-    <Drawer
-      className={classes.drawer}
+    <StyledDrawer
       variant="permanent"
-      classes={{
-        paper: classes.drawerPaper,
-      }}
       anchor="left"
     >
-      <div className={classes.toolbar} />
+      <Box sx={{ height: theme.spacing(8) }} /> {/* Toolbar spacing */}
       <List>
         {menuItems.map((item) => (
           <ListItem 
             button 
             key={item.text}
             onClick={() => navigate(item.path)}
+            sx={{
+              '&:hover': {
+                backgroundColor: theme.palette.action.hover,
+              },
+              py: 1.5,
+            }}
           >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
+            <ListItemIcon sx={{ color: theme.palette.primary.main }}>
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText 
+              primary={item.text}
+              sx={{
+                '& .MuiTypography-root': {
+                  fontWeight: 500,
+                }
+              }}
+            />
           </ListItem>
         ))}
       </List>
-    </Drawer>
+    </StyledDrawer>
   );
 }
 

@@ -1,20 +1,14 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { AppBar, Toolbar, Typography, IconButton } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  title: {
-    flexGrow: 1,
-  },
+const HeaderRoot = styled('div')(({ theme }) => ({
+  flexGrow: 1,
 }));
 
 function Header() {
-  const classes = useStyles();
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -24,16 +18,18 @@ function Header() {
   };
 
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <Typography variant="h6" className={classes.title}>
-          Patient Insight
-        </Typography>
-        <Button color="inherit" onClick={handleLogout}>
-          Logout
-        </Button>
-      </Toolbar>
-    </AppBar>
+    <HeaderRoot>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Patient Insight
+          </Typography>
+          <IconButton color="inherit" onClick={handleLogout}>
+            Logout
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+    </HeaderRoot>
   );
 }
 
