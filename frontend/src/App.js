@@ -9,6 +9,24 @@ import DashboardPage from './pages/DashboardPage';
 import DoctorDashboardPage from './pages/DoctorDashboardPage';
 import SymptomCheckerPage from './pages/SymptomCheckerPage';
 import { useAuth } from './context/AuthContext';
+import ReportsHistoryPage from './pages/ReportsHistoryPage';
+import ConsultationHistoryPage from './pages/ConsultationHistoryPage';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import 'dayjs/locale/en'; // Import locale if needed
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+import isBetween from 'dayjs/plugin/isBetween';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+
+// Extend dayjs with plugins
+dayjs.extend(weekOfYear);
+dayjs.extend(customParseFormat);
+dayjs.extend(localizedFormat);
+dayjs.extend(isBetween);
+dayjs.extend(advancedFormat);
 
 // Protected Route Component
 const PrivateRoute = ({ children }) => {
@@ -25,41 +43,45 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AuthProvider>
-        <Router>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/" element={<Navigate to="/login" />} />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <AuthProvider>
+          <Router>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/" element={<Navigate to="/login" />} />
 
-            {/* Protected Routes */}
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute>
-                  <DashboardPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/doctor-dashboard"
-              element={
-                <PrivateRoute>
-                  <DoctorDashboardPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/symptom-checker"
-              element={
-                <PrivateRoute>
-                  <SymptomCheckerPage />
-                </PrivateRoute>
-              }
-            />
-          </Routes>
-        </Router>
-      </AuthProvider>
+              {/* Protected Routes */}
+              <Route
+                path="/dashboard"
+                element={
+                  <PrivateRoute>
+                    <DashboardPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/doctor-dashboard"
+                element={
+                  <PrivateRoute>
+                    <DoctorDashboardPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/symptom-checker"
+                element={
+                  <PrivateRoute>
+                    <SymptomCheckerPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route path="/reports" element={<ReportsHistoryPage />} />
+              <Route path="/consultation-history" element={<ConsultationHistoryPage />} />
+            </Routes>
+          </Router>
+        </AuthProvider>
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }

@@ -19,6 +19,7 @@ import {
   Settings as SettingsIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -41,7 +42,7 @@ function Sidebar() {
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Symptom Checker', icon: <HealthAndSafetyIcon />, path: '/symptom-checker' },
     { text: 'Reports & History', icon: <AssignmentIcon />, path: '/reports' },
-    { text: 'Consultation History', icon: <HistoryIcon />, path: '/consultations' },
+    { text: 'Consultation History', icon: <HistoryIcon />, path: '/consultation-history' },
     { text: 'Lifestyle Tips', icon: <FitnessIcon />, path: '/lifestyle' },
     { text: 'Appointments', icon: <ScheduleIcon />, path: '/appointments' },
     { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
