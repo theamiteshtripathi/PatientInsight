@@ -1,5 +1,4 @@
 from backend.config.config import Config
-print(Config.N_RESULTS)
 
 class Retriever:
     def __init__(self, collection):
