@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import MainLayout from '../components/layout/MainLayout';
 import {
   Container,
   Grid,
@@ -19,8 +20,6 @@ import {
   CalendarToday as CalendarIcon,
   Sort as SortIcon
 } from '@mui/icons-material';
-import Header from '../components/dashboard/Header';
-import Sidebar from '../components/dashboard/Sidebar';
 import ReportsDashboard from '../components/reports/ReportsDashboard';
 import TimelineView from '../components/reports/TimelineView';
 import NotificationPanel from '../components/reports/NotificationPanel';
@@ -74,112 +73,98 @@ function ReportsHistoryPage() {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <Header />
-      <Sidebar />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          height: '100vh',
-          overflow: 'auto',
-          backgroundColor: '#f5f5f5',
-          padding: 3,
-          marginTop: '64px'
-        }}
-      >
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          {/* Top Section - Search and Filters */}
-          <Paper sx={{ p: 3, mb: 3 }}>
-            <Grid container spacing={3} alignItems="center">
-              <Grid item xs={12} md={6}>
-                <Typography variant="h5" gutterBottom>
-                  Reports & Medical History
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    placeholder="Search reports..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <Button
-                    variant="outlined"
-                    startIcon={<FilterIcon />}
-                    onClick={handleFilterClick}
-                  >
-                    Filter
-                  </Button>
-                </Box>
-              </Grid>
+    <MainLayout>
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        {/* Top Section - Search and Filters */}
+        <Paper sx={{ p: 3, mb: 3 }}>
+          <Grid container spacing={3} alignItems="center">
+            <Grid item xs={12} md={6}>
+              <Typography variant="h5" gutterBottom>
+                Reports & Medical History
+              </Typography>
             </Grid>
+            <Grid item xs={12} md={6}>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Search reports..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <Button
+                  variant="outlined"
+                  startIcon={<FilterIcon />}
+                  onClick={handleFilterClick}
+                >
+                  Filter
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
 
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 3 }}>
-              <Tabs 
-                value={currentTab} 
-                onChange={handleTabChange}
-                variant="fullWidth"
-              >
-                <Tab label="All Reports" />
-                <Tab label="Timeline View" />
-                <Tab label="Notifications" />
-              </Tabs>
-            </Box>
-          </Paper>
-
-          {/* Filter Menu */}
-          <Menu
-            anchorEl={filterAnchorEl}
-            open={Boolean(filterAnchorEl)}
-            onClose={handleFilterClose}
-          >
-            <MenuItem>
-              <Typography variant="subtitle2" color="textSecondary">
-                Status
-              </Typography>
-            </MenuItem>
-            <MenuItem onClick={() => handleFilterChange('status', 'all')}>
-              All
-            </MenuItem>
-            <MenuItem onClick={() => handleFilterChange('status', 'pending')}>
-              Pending Review
-            </MenuItem>
-            <MenuItem onClick={() => handleFilterChange('status', 'completed')}>
-              Completed
-            </MenuItem>
-            <MenuItem>
-              <Typography variant="subtitle2" color="textSecondary">
-                Date Range
-              </Typography>
-            </MenuItem>
-            <MenuItem onClick={() => handleFilterChange('dateRange', 'week')}>
-              Last Week
-            </MenuItem>
-            <MenuItem onClick={() => handleFilterChange('dateRange', 'month')}>
-              Last Month
-            </MenuItem>
-            <MenuItem onClick={() => handleFilterChange('dateRange', 'year')}>
-              Last Year
-            </MenuItem>
-          </Menu>
-
-          {/* Main Content */}
-          <Box sx={{ mt: 3 }}>
-            {renderContent()}
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 3 }}>
+            <Tabs 
+              value={currentTab} 
+              onChange={handleTabChange}
+              variant="fullWidth"
+            >
+              <Tab label="All Reports" />
+              <Tab label="Timeline View" />
+              <Tab label="Notifications" />
+            </Tabs>
           </Box>
-        </Container>
-      </Box>
-    </Box>
+        </Paper>
+
+        {/* Filter Menu */}
+        <Menu
+          anchorEl={filterAnchorEl}
+          open={Boolean(filterAnchorEl)}
+          onClose={handleFilterClose}
+        >
+          <MenuItem>
+            <Typography variant="subtitle2" color="textSecondary">
+              Status
+            </Typography>
+          </MenuItem>
+          <MenuItem onClick={() => handleFilterChange('status', 'all')}>
+            All
+          </MenuItem>
+          <MenuItem onClick={() => handleFilterChange('status', 'pending')}>
+            Pending Review
+          </MenuItem>
+          <MenuItem onClick={() => handleFilterChange('status', 'completed')}>
+            Completed
+          </MenuItem>
+          <MenuItem>
+            <Typography variant="subtitle2" color="textSecondary">
+              Date Range
+            </Typography>
+          </MenuItem>
+          <MenuItem onClick={() => handleFilterChange('dateRange', 'week')}>
+            Last Week
+          </MenuItem>
+          <MenuItem onClick={() => handleFilterChange('dateRange', 'month')}>
+            Last Month
+          </MenuItem>
+          <MenuItem onClick={() => handleFilterChange('dateRange', 'year')}>
+            Last Year
+          </MenuItem>
+        </Menu>
+
+        {/* Main Content */}
+        <Box sx={{ mt: 3 }}>
+          {renderContent()}
+        </Box>
+      </Container>
+    </MainLayout>
   );
 }
 

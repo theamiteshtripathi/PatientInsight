@@ -20,6 +20,9 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import isBetween from 'dayjs/plugin/isBetween';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
+import LifestyleTipsPage from './pages/LifestyleTipsPage';
+import AppointmentsPage from './pages/AppointmentsPage';
+import SettingsPage from './pages/SettingsPage';
 
 // Extend dayjs with plugins
 dayjs.extend(weekOfYear);
@@ -78,6 +81,9 @@ function App() {
               />
               <Route path="/reports" element={<ReportsHistoryPage />} />
               <Route path="/consultation-history" element={<ConsultationHistoryPage />} />
+              <Route path="/lifestyle-tips" element={<LifestyleTipsPage />} />
+              <Route path="/appointments" element={<AppointmentsPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
             </Routes>
           </Router>
         </AuthProvider>

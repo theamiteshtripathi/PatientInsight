@@ -6,9 +6,11 @@ import {
   ListItemIcon, 
   ListItemText,
   Box,
-  useTheme
+  useTheme,
+  Toolbar
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { useAuth } from '../../context/AuthContext'; 
 import { 
   Dashboard as DashboardIcon,
   HealthAndSafety as HealthAndSafetyIcon,
@@ -16,7 +18,10 @@ import {
   History as HistoryIcon,
   FitnessCenter as FitnessIcon,
   Schedule as ScheduleIcon,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Logout as LogoutIcon,
+  SelfImprovement as LifestyleIcon,
+  CalendarMonth as AppointmentIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -36,6 +41,7 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
 
 function Sidebar() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const theme = useTheme();
 
   const menuItems = [
@@ -43,17 +49,28 @@ function Sidebar() {
     { text: 'Symptom Checker', icon: <HealthAndSafetyIcon />, path: '/symptom-checker' },
     { text: 'Reports & History', icon: <AssignmentIcon />, path: '/reports' },
     { text: 'Consultation History', icon: <HistoryIcon />, path: '/consultation-history' },
-    { text: 'Lifestyle Tips', icon: <FitnessIcon />, path: '/lifestyle' },
-    { text: 'Appointments', icon: <ScheduleIcon />, path: '/appointments' },
+    { text: 'Lifestyle Tips', icon: <LifestyleIcon />, path: '/lifestyle-tips' },
+    { text: 'Appointments', icon: <AppointmentIcon />, path: '/appointments' },
     { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
   ];
+
+  const handleLogout = async () => {
+    try {
+      const success = await logout();
+      if (success) {
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
     <StyledDrawer
       variant="permanent"
       anchor="left"
     >
-      <Box sx={{ height: theme.spacing(8) }} /> {/* Toolbar spacing */}
+      <Toolbar /> {/* This creates space for the header */}
       <List>
         {menuItems.map((item) => (
           <ListItem 
@@ -80,6 +97,39 @@ function Sidebar() {
             />
           </ListItem>
         ))}
+        <ListItem
+          button
+          component={Link}
+          to="/settings"
+          sx={{
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+            },
+          }}
+        >
+        
+        </ListItem>
+      </List>
+      <Box sx={{ flexGrow: 1 }} /> {/* This pushes the logout button to the bottom */}
+      <List sx={{ marginTop: 'auto' }}>
+        <ListItem
+          button
+          onClick={handleLogout}
+          size="large"
+          sx={{ mt: 2 }}
+          // sx={{
+          //   color: 'error.main',
+          //   '&:hover': {
+          //     backgroundColor: 'error.light',
+          //     color: '.dark',
+          //   },
+          // }}
+        >
+          <ListItemIcon sx={{ color: 'inherit' }}>
+            <LogoutIcon />
+          </ListItemIcon>
+          <ListItemText primary="Logout" />
+        </ListItem>
       </List>
     </StyledDrawer>
   );

@@ -38,8 +38,16 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logout = () => {
-    setCurrentUser(null);
+  const logout = async () => {
+    try {
+      setCurrentUser(null);
+      localStorage.removeItem('token');
+      sessionStorage.removeItem('user');
+      return true;
+    } catch (error) {
+      console.error('Logout failed:', error);
+      return false;
+    }
   };
 
   return (
