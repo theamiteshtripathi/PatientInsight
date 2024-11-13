@@ -18,3 +18,8 @@ dvc[s3]
 boto3
 ydata-profiling
 awscli
+chromadb
+sentence-transformers
+transformers
+datasets
+pyyaml
