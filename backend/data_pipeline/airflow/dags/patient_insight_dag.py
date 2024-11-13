@@ -18,12 +18,12 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 project_root = Path(__file__).parent.parent.parent.parent.absolute()
 sys.path.append(str(project_root))
 
-from data_pipeline.scripts.download import download_pmc_patients_dataset
-from data_pipeline.scripts.preprocess import preprocess_pmc_patients
-from data_pipeline.scripts.stats_generation import generate_stats
-from data_pipeline.scripts.email_notification import send_custom_email
-from ml_pipeline.src.data_processing.pipeline import TensorflowPipeline
-from data_pipeline.scripts.pdf_processing import process_patient_pdf
+from backend.scripts.download import download_pmc_patients_dataset
+from backend.scripts.preprocess import preprocess_pmc_patients
+from backend.scripts.stats_generation import generate_stats
+from backend.scripts.email_notification import send_custom_email
+from ml_pipeline.src.data_processing.pipeline import MLPipeline
+from backend.scripts.pdf_processing import process_patient_pdf
 
 default_args = {
     'owner': 'airflow',
@@ -75,8 +75,8 @@ pdf_processing_task = PythonOperator(
 )
 
 tf_pipeline_task = PythonOperator(
-    task_id='tf_pipeline',
-    python_callable=lambda: TensorflowPipeline().run_pipeline('data/processed/PMC-Patients_preprocessed.csv'),
+    task_id='ml_pipeline',
+    python_callable=lambda: MLPipeline().process_text('data/processed/PMC-Patients_preprocessed.csv'),
     dag=dag,
 )
 

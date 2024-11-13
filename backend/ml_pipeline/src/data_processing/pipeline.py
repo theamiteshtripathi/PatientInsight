@@ -1,45 +1,31 @@
-from .transformation import DataTransformer
-from data_pipeline.scripts.tf_data_validation import DataValidator
+import torch
+from transformers import AutoTokenizer, AutoModel
+from sentence_transformers import SentenceTransformer
 import pandas as pd
 import logging
 from typing import Dict, Any
 
-class TensorflowPipeline:
+class MLPipeline:
     def __init__(self, config: Dict[str, Any] = None):
         self.config = config or {}
-        self.validator = DataValidator()
-        self.transformer = DataTransformer(self.config)
+        self.device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')
+        self.model = SentenceTransformer('all-MiniLM-L6-v2').to(self.device)
         
-    def run_pipeline(self, data_path: str) -> Dict[str, Any]:
-        logging.info("Starting TensorFlow pipeline processing")
-        
+    def process_text(self, text: str) -> Dict[str, Any]:
+        """
+        Process text using PyTorch-based transformers
+        """
         try:
-            # Load and validate data
-            logging.info(f"Loading data from {data_path}")
-            df = pd.read_csv(data_path)
-            logging.info(f"Loaded {len(df)} records")
+            # Generate embeddings
+            embeddings = self.model.encode(text)
             
-            # Data validation
-            validation_results = self.validator.validate_data()
-            logging.info("Validation complete")
+            # Your processing logic here
             
-            if validation_results['is_valid']:
-                # Transform features
-                dataset, feature_columns = self.transformer.transform_features(df)
-                logging.info(f"Transformed {len(feature_columns)} features")
-                
-                # Save validation report
-                self.validator.save_validation_report(validation_results)
-                
-                return {
-                    'validation_results': validation_results,
-                    'dataset': dataset,
-                    'feature_columns': feature_columns,
-                    'records_processed': len(df)
-                }
-            else:
-                raise ValueError("Data validation failed")
-                
+            return {
+                'embeddings': embeddings,
+                'processed': True
+            }
+            
         except Exception as e:
-            logging.error(f"Pipeline failed: {str(e)}")
+            logging.error(f"Processing failed: {str(e)}")
             raise
