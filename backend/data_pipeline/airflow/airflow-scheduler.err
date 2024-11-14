@@ -1,0 +1,188 @@
+Traceback (most recent call last):
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 936, in _checkout
+    raise exc.InvalidatePoolError()
+sqlalchemy.exc.InvalidatePoolError: ()
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 3371, in _wrap_pool_connect
+    return fn()
+           ^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 327, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 970, in _checkout
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 70, in __exit__
+    compat.raise_(
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/util/compat.py", line 211, in raise_
+    raise exception
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 967, in _checkout
+    fairy._connection_record.get_connection()
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 630, in get_connection
+    self.__connect()
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 690, in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 70, in __exit__
+    compat.raise_(
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/util/compat.py", line 211, in raise_
+    raise exception
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 686, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/engine/create.py", line 574, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 598, in connect
+    return self.dbapi.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.OperationalError: could not translate host name "airflow-metadata-db.c5mk2a8uqfh1.us-east-2.rds.amazonaws.com" to address: nodename nor servname provided, or not known
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/bin/airflow", line 8, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/airflow/__main__.py", line 62, in main
+    args.func(args)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/airflow/cli/cli_config.py", line 49, in command
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/airflow/utils/cli.py", line 116, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/airflow/utils/providers_configuration_loader.py", line 55, in wrapped_function
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/airflow/cli/commands/scheduler_command.py", line 59, in scheduler
+    run_command_with_daemon_option(
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/airflow/cli/commands/daemon_utils.py", line 81, in run_command_with_daemon_option
+    callback()
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/airflow/cli/commands/scheduler_command.py", line 62, in <lambda>
+    callback=lambda: _run_scheduler_job(args),
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/airflow/cli/commands/scheduler_command.py", line 48, in _run_scheduler_job
+    run_job(job=job_runner.job, execute_callable=job_runner._execute)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/airflow/utils/session.py", line 97, in wrapper
+    return func(*args, session=session, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/airflow/jobs/job.py", line 419, in run_job
+    job.prepare_for_execution(session=session)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/airflow/utils/session.py", line 94, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/airflow/jobs/job.py", line 266, in prepare_for_execution
+    self._merge_from(Job._add_to_db(job=self, session=session))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/airflow/api_internal/internal_api_call.py", line 166, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/airflow/utils/session.py", line 94, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/airflow/jobs/job.py", line 350, in _add_to_db
+    session.commit()
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1454, in commit
+    self._transaction.commit(_to_root=self.future)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 832, in commit
+    self._prepare_impl()
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 811, in _prepare_impl
+    self.session.flush()
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 3449, in flush
+    self._flush(objects)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 3588, in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 70, in __exit__
+    compat.raise_(
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/util/compat.py", line 211, in raise_
+    raise exception
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 3549, in _flush
+    flush_context.execute()
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 456, in execute
+    rec.execute(self)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 630, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 220, in save_obj
+    ) in _organize_states_for_save(base_mapper, states, uowtransaction):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 373, in _organize_states_for_save
+    for state, dict_, mapper, connection in _connections_for_states(
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 1737, in _connections_for_states
+    connection = uowtransaction.transaction.connection(base_mapper)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 629, in connection
+    return self._connection_for_bind(bind, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 738, in _connection_for_bind
+    conn = self._parent._connection_for_bind(bind, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 750, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/future/engine.py", line 412, in connect
+    return super(Engine, self).connect()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 3325, in connect
+    return self._connection_cls(self, close_with_result=close_with_result)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 96, in __init__
+    else engine.raw_connection()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 3404, in raw_connection
+    return self._wrap_pool_connect(self.pool.connect, _connection)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 3374, in _wrap_pool_connect
+    Connection._handle_dbapi_exception_noconnection(
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2208, in _handle_dbapi_exception_noconnection
+    util.raise_(
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/util/compat.py", line 211, in raise_
+    raise exception
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 3371, in _wrap_pool_connect
+    return fn()
+           ^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 327, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 970, in _checkout
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 70, in __exit__
+    compat.raise_(
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/util/compat.py", line 211, in raise_
+    raise exception
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 967, in _checkout
+    fairy._connection_record.get_connection()
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 630, in get_connection
+    self.__connect()
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 690, in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 70, in __exit__
+    compat.raise_(
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/util/compat.py", line 211, in raise_
+    raise exception
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 686, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/engine/create.py", line 574, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 598, in connect
+    return self.dbapi.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.OperationalError: (psycopg2.OperationalError) could not translate host name "airflow-metadata-db.c5mk2a8uqfh1.us-east-2.rds.amazonaws.com" to address: nodename nor servname provided, or not known
+
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
