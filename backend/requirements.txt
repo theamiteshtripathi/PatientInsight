@@ -23,3 +23,5 @@ sentence-transformers
 transformers
 datasets
 pyyaml
+huggingface_hub
+llama-cpp-python 
