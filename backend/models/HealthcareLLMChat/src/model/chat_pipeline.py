@@ -1,4 +1,4 @@
-import openai
+from openai import OpenAI
 from .conversation_manager import ConversationManager
 from .emergency_detector import EmergencyDetector
 from .symptom_analyzer import SymptomAnalyzer
@@ -6,10 +6,10 @@ from ..utils.prompt_templates import SYSTEM_PROMPT, INITIAL_PROMPT, FOLLOW_UP_PR
 
 class ChatPipeline:
     def __init__(self, api_key: str = None):
-        self.api_key = api_key or openai.api_key
+        self.client = OpenAI(api_key=api_key)
         self.conversation_manager = ConversationManager()
         self.emergency_detector = EmergencyDetector()
-        self.symptom_analyzer = SymptomAnalyzer(self.api_key)
+        self.symptom_analyzer = SymptomAnalyzer(api_key)
         
     def start_conversation(self) -> str:
         messages = [
@@ -17,10 +17,9 @@ class ChatPipeline:
             {"role": "system", "content": INITIAL_PROMPT}
         ]
         
-        response = openai.ChatCompletion.create(
+        response = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=messages,
-            api_key=self.api_key
+            messages=messages
         )
         
         initial_message = response.choices[0].message.content
@@ -42,10 +41,9 @@ class ChatPipeline:
         messages.append({"role": "system", "content": FOLLOW_UP_PROMPT})
         
         # Get response from GPT
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=messages,
-            api_key=self.api_key
+        response = self.client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=messages
         )
         
         assistant_response = response.choices[0].message.content
@@ -55,4 +53,4 @@ class ChatPipeline:
     def generate_summary(self) -> str:
         return self.symptom_analyzer.generate_summary(
             self.conversation_manager.get_messages()
-        ) 
+        )

@@ -7,10 +7,16 @@ class EmergencyDetector:
             "stroke",
             "heart attack",
             "unconscious",
-            "severe bleeding"
+            "severe bleeding",
+            "suicidal thoughts",
+            "severe abdominal pain"
         }
     
     def check_emergency(self, text: str) -> tuple[bool, str]:
+        """
+        Check if the text contains any emergency symptoms
+        Returns: (is_emergency, message)
+        """
         text_lower = text.lower()
         for symptom in self.emergency_symptoms:
             if symptom in text_lower:
