@@ -11,7 +11,7 @@ class SymptomAnalyzer:
         - Intensity
         - Associated symptoms
         - Triggers
-        Format as a clear medical summary."""
+        Format as a clear, concise medical summary."""
         
         messages = conversation_history + [{"role": "system", "content": summary_prompt}]
         
