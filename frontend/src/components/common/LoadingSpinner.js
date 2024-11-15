@@ -1,21 +1,19 @@
 import React from 'react';
-import { CircularProgress, makeStyles } from '@material-ui/core';
+import { CircularProgress, Box } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '200px',
-  },
+const SpinnerWrapper = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  minHeight: '100vh'
 }));
 
 function LoadingSpinner() {
-  const classes = useStyles();
   return (
-    <div className={classes.root}>
+    <SpinnerWrapper>
       <CircularProgress />
-    </div>
+    </SpinnerWrapper>
   );
 }
 

@@ -1,126 +1,119 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
 import {
   Container,
   Paper,
   TextField,
   Button,
   Typography,
-  makeStyles,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
-} from '@material-ui/core';
+  Grid
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { useAuth } from '../context/AuthContext';
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    height: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f5f5f5',
-  },
-  paper: {
-    padding: theme.spacing(4),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    maxWidth: 400,
-    width: '100%',
-  },
-  form: {
-    width: '100%',
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
+const LoginContainer = styled(Container)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minHeight: '100vh'
+}));
+
+const LoginPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(4),
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  maxWidth: 400,
+  width: '100%'
 }));
 
 function LoginPage() {
-  const classes = useStyles();
   const navigate = useNavigate();
-  const { login } = useAuth();
-  const [credentials, setCredentials] = useState({
-    email: '',
-    password: '',
-    userType: 'patient' // default to patient
-  });
+  const { login, currentUser, error, loading } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await login(credentials);
-      // Redirect based on user type
-      if (credentials.userType === 'doctor') {
+  // Redirect if already logged in
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.role === 'doctor') {
         navigate('/doctor-dashboard');
       } else {
         navigate('/dashboard');
       }
-    } catch (error) {
-      console.error('Login failed:', error);
-      // Handle error (show message to user)
+    }
+  }, [currentUser, navigate]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const success = await login(email, password);
+    
+    if (success) {
+      // Navigation will be handled by the useEffect above
+      console.log('Login successful');
+    } else {
+      console.error('Login failed');
     }
   };
 
   return (
-    <Container component="main" className={classes.container}>
-      <Paper elevation={3} className={classes.paper}>
-        <Typography component="h1" variant="h5">
-          Patient Insight Login
+    <LoginContainer maxWidth="sm">
+      <LoginPaper elevation={3}>
+        <Typography variant="h4" sx={{ mb: 3 }}>
+          Login
         </Typography>
-        <form className={classes.form} onSubmit={handleSubmit}>
-          <FormControl variant="outlined" margin="normal" fullWidth>
-            <InputLabel>User Type</InputLabel>
-            <Select
-              value={credentials.userType}
-              onChange={(e) => setCredentials({...credentials, userType: e.target.value})}
-              label="User Type"
+        
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Email"
+              variant="outlined"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </Grid>
+          
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Password"
+              variant="outlined"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Grid>
+          
+          <Grid item xs={12}>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              size="large"
+              sx={{ mt: 2 }}
+              onClick={handleSubmit}
+              disabled={loading}
             >
-              <MenuItem value="doctor">Doctor</MenuItem>
-              <MenuItem value="patient">Patient</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            autoFocus
-            value={credentials.email}
-            onChange={(e) => setCredentials({...credentials, email: e.target.value})}
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value={credentials.password}
-            onChange={(e) => setCredentials({...credentials, password: e.target.value})}
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Sign In
-          </Button>
-        </form>
-      </Paper>
-    </Container>
+              {loading ? 'Signing in...' : 'Sign In'}
+            </Button>
+          </Grid>
+          
+          <Grid item xs={12}>
+            <Typography 
+              variant="body2" 
+              align="center"
+              sx={{ mt: 2 }}
+            >
+              Don't have an account? Sign up
+            </Typography>
+          </Grid>
+        </Grid>
+      </LoginPaper>
+    </LoginContainer>
   );
 }
 

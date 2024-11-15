@@ -97,3 +97,5 @@ logs/
 *.tmp
 
 
+# Frontend - related
+.npmrc
