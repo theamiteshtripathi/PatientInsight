@@ -3,13 +3,11 @@ class EmergencyDetector:
         self.emergency_symptoms = {
             "chest pain",
             "difficulty breathing",
-            "severe headache",
             "stroke",
             "heart attack",
             "unconscious",
             "severe bleeding",
             "suicidal thoughts",
-            "severe abdominal pain"
         }
     
     def check_emergency(self, text: str) -> tuple[bool, str]:
