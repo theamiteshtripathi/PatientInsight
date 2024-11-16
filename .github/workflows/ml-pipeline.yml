@@ -1,0 +1,44 @@
+name: ML Pipeline CI/CD
+
+on:
+  push:
+    paths:
+      - 'backend/models/**'
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Run Tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
+        run: |
+          # Run all test files
+          python -m pytest backend/models/tests/
+          python -m pytest backend/models/HealthcareLLMChat/src/tests/
+          python -m pytest backend/models/RAG/src/test_*.py 
+
+  evaluate:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Evaluate Pipeline
+        run: python backend/models/tests/evaluate_pipeline.py
+
+  update-embeddings:
+    needs: [test, evaluate]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Embeddings
+        env:
+          PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
+        run: python backend/models/RAG/src/setup_embeddings.py
