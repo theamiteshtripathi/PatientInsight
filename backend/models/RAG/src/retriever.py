@@ -1,9 +1,22 @@
 from backend.config.config import Config
+from sentence_transformers import SentenceTransformer
+
 
 class Retriever:
-    def __init__(self, collection):
-        self.collection = collection
+    def __init__(self, index):
+        self.index = index
+        self.embedding_model = SentenceTransformer(Config.EMBEDDING_MODEL_NAME)
 
     def retrieve(self, query, n_results=Config.N_RESULTS):
-        results = self.collection.query(query_texts=[query], n_results=n_results)
-        return [doc for doc in results['documents'][0]]
+        # Generate embedding for the query
+        query_embedding = self.embedding_model.encode(query).tolist()
+        
+        # Query Pinecone
+        results = self.index.query(
+            vector=query_embedding,
+            top_k=n_results,         
+            include_metadata=True   
+        )
+        
+        # Extract documents from metadata
+        return [match.metadata["text"] for match in results.matches]
