@@ -5,9 +5,9 @@ psycopg2-binary
 flask
 gunicorn
 requests
-torch>=2.0.0
+#torch==2.0.0
 transformers>=4.30.0
-sentence-transformers>=2.2.0
+sentence-transformers
 scikit-learn
 datasets
 apache-beam
@@ -18,3 +18,8 @@ dvc[s3]
 boto3
 ydata-profiling
 awscli
+chromadb
+pyyaml
+huggingface_hub
+llama-cpp-python 
+pinecone-client>=2.2.1
