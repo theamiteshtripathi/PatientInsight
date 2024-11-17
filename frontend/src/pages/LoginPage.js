@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   Container,
   Paper,
@@ -108,7 +108,17 @@ function LoginPage() {
               align="center"
               sx={{ mt: 2 }}
             >
-              Don't have an account? Sign up
+              Don't have an account?{' '}
+              <Link 
+                to="/register" 
+                style={{ 
+                  color: '#1976d2',
+                  textDecoration: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                Sign up
+              </Link>
             </Typography>
           </Grid>
         </Grid>

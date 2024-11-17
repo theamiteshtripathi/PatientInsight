@@ -23,6 +23,7 @@ import advancedFormat from 'dayjs/plugin/advancedFormat';
 import LifestyleTipsPage from './pages/LifestyleTipsPage';
 import AppointmentsPage from './pages/AppointmentsPage';
 import SettingsPage from './pages/SettingsPage';
+import RegisterPage from './pages/RegisterPage';
 
 // Extend dayjs with plugins
 dayjs.extend(weekOfYear);
@@ -53,6 +54,7 @@ function App() {
               {/* Public Routes */}
               <Route path="/login" element={<LoginPage />} />
               <Route path="/" element={<Navigate to="/login" />} />
+              <Route path="/register" element={<RegisterPage />} />
 
               {/* Protected Routes */}
               <Route
