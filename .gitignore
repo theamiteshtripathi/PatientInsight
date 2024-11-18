@@ -99,5 +99,3 @@ logs/
 
 # Frontend - related
 .npmrc
-.env
-

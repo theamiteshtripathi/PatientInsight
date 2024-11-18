@@ -4,22 +4,22 @@ import {
   Grid,
   Typography,
   Button,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  styled,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
+  TableRow,
+  styled
 } from '@mui/material';
 
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   marginTop: theme.spacing(3),
   marginBottom: theme.spacing(3)
+}));
+
+const Root = styled('div')(({ theme }) => ({
+  padding: theme.spacing(3)
 }));
 
 function AppointmentsSchedule() {
@@ -29,7 +29,10 @@ function AppointmentsSchedule() {
   ]);
 
   return (
-    <div className={classes.root}>
+    <Root>
+      <Typography variant="h4" sx={{ mb: 3 }}>
+        Appointments Schedule
+      </Typography>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <StyledTableContainer component={Paper}>
@@ -66,7 +69,7 @@ function AppointmentsSchedule() {
           </StyledTableContainer>
         </Grid>
       </Grid>
-    </div>
+    </Root>
   );
 }
 
