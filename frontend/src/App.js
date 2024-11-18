@@ -45,10 +45,10 @@ const PrivateRoute = ({ children }) => {
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <AuthProvider>
+    <AuthProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Router>
             <Routes>
               {/* Public Routes */}
@@ -88,9 +88,9 @@ function App() {
               <Route path="/settings" element={<SettingsPage />} />
             </Routes>
           </Router>
-        </AuthProvider>
-      </LocalizationProvider>
-    </ThemeProvider>
+        </LocalizationProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 
