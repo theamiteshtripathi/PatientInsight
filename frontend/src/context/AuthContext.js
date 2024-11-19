@@ -56,7 +56,6 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
-
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
@@ -64,3 +63,4 @@ export function useAuth() {
   }
   return context;
 }
+

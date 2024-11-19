@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAuth } from '../context/AuthContext';
 import { 
   Container,
   Grid,
@@ -21,12 +22,35 @@ import MainLayout from '../components/layout/MainLayout';
 import ChatInterface from '../components/patient/ChatInterface';
 import ReportView from '../components/patient/ReportView';
 import HealthRecommendations from '../components/patient/HealthRecommendations';
-import MedicalHistory from '../components/patient/MedicalHistory';
+import MedicalHistory from '../components/patient/Medicalhistory';
 import ConversationHistory from '../components/patient/ConversationHistory';
 
+// Add these imports at the top
+import { useOnboarding } from '../hooks/useOnboarding';
+import PatientOnboardingForm from '../components/onboarding/PatientOnboardingForm';
+
 function DashboardPage() {
+  // Add this near your other hooks
+  const { currentUser } = useAuth();
+  const { showOnboarding, completeOnboarding } = useOnboarding(currentUser?.id);
+
+  const handleOnboardingSubmit = async (formData) => {
+    const success = await completeOnboarding(formData);
+    if (success) {
+      // Show success message or update UI
+      console.log('Onboarding completed successfully');
+    }
+  };
+
   return (
     <MainLayout>
+      {/* Add this before your existing content */}
+      <PatientOnboardingForm
+        open={showOnboarding}
+        onClose={() => {}} // Optional: Add close handler if needed
+        onSubmit={handleOnboardingSubmit}
+      />
+      
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         {/* Welcome Section */}
         <Grid container spacing={3} sx={{ mb: 4 }}>

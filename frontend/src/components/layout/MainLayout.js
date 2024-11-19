@@ -1,10 +1,11 @@
 import React from 'react';
 import { Box, Toolbar, Container } from '@mui/material';
+
 import Header from '../dashboard/Header';
 import Sidebar from '../dashboard/Sidebar';
 
 // Define the drawer width constant
-const drawerWidth = 240;
+const drawerWidth = 0;
 
 function MainLayout({ children }) {
   return (

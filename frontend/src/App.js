@@ -23,6 +23,7 @@ import advancedFormat from 'dayjs/plugin/advancedFormat';
 import LifestyleTipsPage from './pages/LifestyleTipsPage';
 import AppointmentsPage from './pages/AppointmentsPage';
 import SettingsPage from './pages/SettingsPage';
+import RegisterPage from './pages/RegisterPage';
 
 // Extend dayjs with plugins
 dayjs.extend(weekOfYear);
@@ -44,15 +45,16 @@ const PrivateRoute = ({ children }) => {
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <AuthProvider>
+    <AuthProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Router>
             <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<LoginPage />} />
               <Route path="/" element={<Navigate to="/login" />} />
+              <Route path="/register" element={<RegisterPage />} />
 
               {/* Protected Routes */}
               <Route
@@ -86,9 +88,9 @@ function App() {
               <Route path="/settings" element={<SettingsPage />} />
             </Routes>
           </Router>
-        </AuthProvider>
-      </LocalizationProvider>
-    </ThemeProvider>
+        </LocalizationProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 
