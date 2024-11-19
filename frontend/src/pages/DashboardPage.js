@@ -22,7 +22,7 @@ import MainLayout from '../components/layout/MainLayout';
 import ChatInterface from '../components/patient/ChatInterface';
 import ReportView from '../components/patient/ReportView';
 import HealthRecommendations from '../components/patient/HealthRecommendations';
-import MedicalHistory from '../components/patient/Medicalhistory';
+import MedicalHistory from '../components/patient/MedicalHistory';
 import ConversationHistory from '../components/patient/ConversationHistory';
 
 // Add these imports at the top

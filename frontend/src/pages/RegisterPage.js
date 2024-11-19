@@ -97,17 +97,54 @@ const RegisterPage = () => {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      // Add your API call here
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulated API call
-      navigate('/login');
-    } catch (error) {
-      setSubmitError('Registration failed. Please try again.');
-    } finally {
-      setIsLoading(false);
+  //   setIsLoading(true);
+  //   try {
+  //     // Add your API call here
+
+
+  //     await new Promise(resolve => setTimeout(resolve, 1500)); // Simulated API call
+  //     navigate('/login');
+  //   } catch (error) {
+  //     setSubmitError('Registration failed. Please try again.');
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  setIsLoading(true);
+  try {
+    const response = await fetch('http://localhost:5000/api/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'  //to return response in json
+      },
+      body: JSON.stringify({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        confirmPassword: formData.confirmPassword
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Registration failed');
     }
-  };
+
+    // Registration successful
+    navigate('/login');
+  } catch (error) {
+    setSubmitError(error.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
 
   const passwordStrength = calculatePasswordStrength(formData.password);
 
@@ -280,7 +317,10 @@ const RegisterPage = () => {
                 fullWidth
                 variant="contained"
                 color="primary"
-                disabled={isLoading || Object.keys(errors).length > 0}
+                disabled={isLoading || 
+            //      Object.keys(errors).length > 0 
+            Object.values(errors).some(error => error)  //newlogic
+                }
                 sx={{ 
                   mt: 2,
                   height: 48,
