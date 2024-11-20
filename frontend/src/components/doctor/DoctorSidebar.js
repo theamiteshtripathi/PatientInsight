@@ -23,10 +23,10 @@ import {
 import { useAuth } from '../../context/AuthContext';
 
 // Import doctor components
-import PatientsList from './PatientsList';
 import AppointmentsSchedule from './AppointmentsSchedule';
 import MedicalReports from './MedicalReports';
 import DoctorChat from './DoctorChat';
+import PatientsPage from '../../pages/PatientsPage';
 
 const drawerWidth = 240;
 
@@ -63,7 +63,7 @@ function DoctorSidebar() {
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/doctor-dashboard' },
-    { text: 'Patients', icon: <PatientsIcon />, path: '/doctor/patients', component: PatientsList },
+    { text: 'Patients', icon: <PatientsIcon />, path: '/doctor/patients', component: PatientsPage },
     { text: 'Appointments', icon: <ScheduleIcon />, path: '/doctor/appointments', component: AppointmentsSchedule },
     { text: 'Medical Reports', icon: <ReportsIcon />, path: '/doctor/reports', component: MedicalReports },
     { text: 'Chat', icon: <MessagesIcon />, path: '/doctor/chat', component: DoctorChat },
