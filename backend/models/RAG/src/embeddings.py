@@ -2,6 +2,7 @@ from sentence_transformers import SentenceTransformer
 from pinecone import Pinecone, ServerlessSpec
 from backend.config.config import Config
 from backend.models.RAG.data.load_data import load_full_data
+from tqdm import tqdm
 
 class EmbeddingsHandler:
     def __init__(self):
@@ -32,10 +33,11 @@ class EmbeddingsHandler:
         self.index = self.pc.Index(Config.PINECONE_INDEX_NAME)
 
     def upsert_embeddings(self):
+        
         data = load_full_data()
         batch_size = 100
         
-        for i in range(0, len(data), batch_size):
+        for i in tqdm(range(0, len(data), batch_size), desc="Generating embeddings"):
             batch = data[i:i + batch_size]
             
             # Prepare batch data
