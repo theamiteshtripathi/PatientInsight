@@ -15,15 +15,15 @@ AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
 # Add the project root directory to the Python path
-project_root = Path(__file__).parent.parent.parent.parent.absolute()
-sys.path.append(str(project_root))
+root_path = Path(__file__).parent.parent.parent.parent.absolute()
+sys.path.append(str(root_path))
 
-from backend.scripts.download import download_pmc_patients_dataset
-from backend.scripts.preprocess import preprocess_pmc_patients
-from backend.scripts.stats_generation import generate_stats
-from backend.scripts.email_notification import send_custom_email
+from backend.data_pipeline.scripts.download import download_pmc_patients_dataset
+from backend.data_pipeline.scripts.preprocess import preprocess_pmc_patients
+from backend.data_pipeline.scripts.stats_generation import generate_stats
+from backend.data_pipeline.scripts.email_notification import send_custom_email
 from ml_pipeline.src.data_processing.pipeline import MLPipeline
-from backend.scripts.pdf_processing import process_patient_pdf
+from backend.data_pipeline.scripts.pdf_processing import process_patient_pdf
 
 default_args = {
     'owner': 'airflow',

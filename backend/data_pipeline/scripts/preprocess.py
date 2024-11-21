@@ -2,6 +2,8 @@ import os
 from dotenv import load_dotenv
 import pandas as pd
 import ast
+from pathlib import Path
+import sys
 
 # Load environment variables
 load_dotenv()
@@ -11,13 +13,14 @@ AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
 def preprocess_pmc_patients(input_path, output_path):
-    print('Function call')
-    # load exact location of data
-    root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    print("root path: ", root_path)
+    # Pointing to the start of the project
+    root_path = Path(__file__).parent.parent.parent.parent.absolute()
+    sys.path.append(str(root_path))
+    
+    data_location = "backend/data_pipeline/"
 
-    input_path = os.path.join(root_path, input_path)
-    output_path = os.path.join(root_path, output_path)
+    input_path = os.path.join(root_path, data_location, input_path)
+    output_path = os.path.join(root_path, data_location, output_path)
 
 
     # Read the CSV file

@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 import requests
 from datasets import load_dataset
 import logging
+import sys
+from pathlib import Path
 
 # Load environment variables
 load_dotenv()
@@ -13,8 +15,14 @@ AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
 def download_pmc_patients_dataset(output_dir: str) -> None:
+    # Pointing to the start of the project
+    root_path = Path(__file__).parent.parent.parent.parent.absolute()
+    sys.path.append(str(root_path))
+
+    data_location = "backend/data_pipeline/"
+    output_dir = os.path.join(root_path, data_location, output_dir)
     logging.info(f"Starting download to {output_dir}")
-    
+
     try:
         # Create output directory if it doesn't exist
         os.makedirs(output_dir, exist_ok=True)
