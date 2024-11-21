@@ -31,6 +31,8 @@ def preprocess_pmc_patients(input_path, output_path):
     df = df[important_features]
     
     # Clean and transform data
+    # Remove all non-alphanumeric characters
+    df['patient'] = df['patient'].str.replace(r'[^a-zA-Z0-9]', ' ', regex=True)
     df['age'] = df['age'].apply(lambda x:list(ast.literal_eval(x)) if pd.notna(x) else list([[]]))
     df['age'] = df['age'].apply(lambda x: x[0])
 
