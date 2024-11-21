@@ -22,9 +22,9 @@ jobs:
       run: pip install -r backend/requirements.txt
 
     - name: Run unittests
-      run: 
-      python -m unittest backend/data_pipeline/tests/test_data_download.py
-      python -m unittest backend/data_pipeline/tests/test_data_preprocess.py
+      run: |
+        python -m unittest backend/data_pipeline/tests/test_data_download.py
+        python -m unittest backend/data_pipeline/tests/test_data_preprocess.py
 
 
 
