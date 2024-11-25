@@ -1,11 +1,24 @@
-name: patient-insight
+name: patient-insight  # Name of the Conda environment
+channels:
+  - conda-forge             # Additional channels to search for packages
+  - defaults                # Default channel
 dependencies:
-  - numpy
-  - os
-  - sys
-  - pandas
-  - ydata_profiling
-  - requests
-  - apache-airflow
-  - datasets
-  - dvc
+  - python=3.12.0           # Specify Python version (optional)
+  - numpy                   # Example package with version
+  - pandas                  # Package without a specified version
+  - scikit-learn
+  - pip                     # Include pip if using pip dependencies
+  - pip:
+      - python-dotenv
+      - requests
+      - datasets
+      - ydata-profiling
+      - apache-airflow[postgres,aws]
+      - dvc
+      - dvc[s3]
+      - awscli
+      - pyyaml
+      - huggingface_hub
+      - llama-cpp-python
+      - pinecone-client>=2.2.1
+      - mlflow

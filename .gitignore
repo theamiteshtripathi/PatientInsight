@@ -1,14 +1,10 @@
 # Data files and directories
-backend/data/raw/PMC-Patients.csv
-backend/data/processed/PMC-Patients_preprocessed.csv
-backend/data/raw/*
-backend/data/processed/*
-backend/data/interim/*
 *.csv
 *.xlsx
 *.parquet
 *.h5
 *.pkl
+*.html
 
 # DVC files
 .dvc/tmp

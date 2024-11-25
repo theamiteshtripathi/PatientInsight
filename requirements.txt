@@ -1,0 +1,16 @@
+numpy
+pandas
+python-dotenv
+requests
+scikit-learn
+datasets
+ydata-profiling
+apache-airflow[postgres,aws]
+dvc
+dvc[s3]
+awscli
+pyyaml
+huggingface_hub
+llama-cpp-python 
+pinecone-client>=2.2.1
+mlflow
