@@ -20,7 +20,7 @@ class EmbeddingsHandler:
         if Config.PINECONE_INDEX_NAME not in indexes.names():
             # Define the serverless spec with the region
             spec = ServerlessSpec(
-                cloud="aws",  # Assuming AWS is the cloud provider
+                cloud="aws",  
                 region=Config.PINECONE_ENVIRONMENT
             )
             self.pc.create_index(

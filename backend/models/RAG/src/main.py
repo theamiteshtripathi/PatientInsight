@@ -16,7 +16,9 @@ def main(query):
     context = " ".join(retrieved_docs)
     generator = Generator()
     answer = generator.generate(context, query)
-    print("Generated Answer:", answer)
+    print("Generated Answer:", answer['content'])
+
+    return answer
 
 if __name__ == "__main__":
     # Validate environment variables first

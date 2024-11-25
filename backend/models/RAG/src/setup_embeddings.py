@@ -1,5 +1,5 @@
 from backend.models.RAG.src.embeddings import EmbeddingsHandler
-
+print("working")
 def setup():
     print("Starting one-time embedding generation...")
     embeddings_handler = EmbeddingsHandler()

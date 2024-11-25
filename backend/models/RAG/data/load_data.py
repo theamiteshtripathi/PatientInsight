@@ -27,7 +27,7 @@ def load_full_data():
         df = pd.read_csv(io.BytesIO(response['Body'].read()))
         
         # Convert to the required format
-        patients_description = [{"patient": row["patient"]} for _, row in df.iterrows()]
+        patients_description = [{"patient": row["patient"]} for _, row in df.iterrows()][:10]
         
         print(f"Successfully loaded {len(patients_description)} patient records")
         return patients_description
