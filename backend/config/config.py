@@ -9,7 +9,7 @@ class Config:
     EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
     GENERATIVE_MODEL_NAME = "gpt-4o-mini"
     COLLECTION_NAME = "Patient_insight"
-    N_RESULTS = 3
+    N_RESULTS = 4
     
     # API Keys (from environment variables)
     PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")

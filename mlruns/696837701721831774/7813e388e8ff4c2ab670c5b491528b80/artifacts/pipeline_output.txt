@@ -1,0 +1,23 @@
+SYMPTOM SUMMARY:
+### Patient Symptom Summary
+
+**Primary Symptoms:**  
+- Severe headaches
+
+**Duration:**  
+- Present for the past week
+
+**Intensity:**  
+- Pain level: 7-8 out of 10
+
+**Associated Symptoms:**  
+- Nausea, especially during severe headache episodes
+
+**Triggers:**  
+- Worse in the morning
+- Light sensitivity exacerbates the headache
+
+This summary may help healthcare professionals in assessing the situation further. If you're experiencing these symptoms, it’s important to consult with a healthcare provider for a thorough evaluation and appropriate management.
+
+MEDICAL ANALYSIS:
+None

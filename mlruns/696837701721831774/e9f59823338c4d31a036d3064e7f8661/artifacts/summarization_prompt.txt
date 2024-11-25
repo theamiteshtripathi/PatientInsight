@@ -1,0 +1,9 @@
+
+        Please provide a concise summary of the patient's symptoms and concerns 
+        in a structured format including:
+        - Primary symptoms
+        - Duration
+        - Intensity
+        - Associated symptoms
+        - Triggers or factors that worsen/improve symptoms
+        
