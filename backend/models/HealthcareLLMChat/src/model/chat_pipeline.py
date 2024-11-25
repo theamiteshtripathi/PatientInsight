@@ -10,8 +10,13 @@ class ChatPipeline:
         self.conversation_manager = ConversationManager()
         self.emergency_detector = EmergencyDetector()
         self.symptom_analyzer = SymptomAnalyzer(api_key)
+
+
         
     def start_conversation(self) -> str:
+        # Clear any existing conversation history
+        self.conversation_manager.clear_history()
+        
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "system", "content": INITIAL_PROMPT}
@@ -54,3 +59,8 @@ class ChatPipeline:
         return self.symptom_analyzer.generate_summary(
             self.conversation_manager.get_messages()
         )
+        
+    def get_conversation_history(self) -> list:
+        """Returns the conversation history in a format suitable for MLflow logging"""
+        messages = self.conversation_manager.get_messages()
+        return [{"role": msg["role"], "content": msg["content"]} for msg in messages]

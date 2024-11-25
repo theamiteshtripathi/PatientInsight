@@ -3,6 +3,10 @@ from backend.models.utils.mlflow_experiment_tracker import MLflowExperimentTrack
 from backend.models.RAG.src.main import main as rag_main
 from backend.config.config import Config
 import time
+from backend.models.HealthcareLLMChat.src.utils.prompt_templates import SYSTEM_PROMPT, INITIAL_PROMPT, FOLLOW_UP_PROMPT
+from backend.models.HealthcareLLMChat.src.model.symptom_analyzer import SymptomAnalyzer
+from backend.models.RAG.src.generator import Generator
+from backend.models.utils.mlflow_save_content import save_content_as_artifact
 
 class IntegratedPipeline:
     def __init__(self, api_key: str = None):
@@ -10,24 +14,11 @@ class IntegratedPipeline:
         self.mlflow_tracker = MLflowExperimentTracker()
 
     def _get_summary_prompt(self):
-        return """
-        Please provide a concise summary of the patient's symptoms and concerns 
-        in a structured format including:
-        - Primary symptoms
-        - Duration
-        - Intensity
-        - Associated symptoms
-        - Triggers or factors that worsen/improve symptoms
-        """
+        analyzer = SymptomAnalyzer(api_key="")
+        return analyzer.summary_prompt
     
     def _get_doctor_report_prompt(self):
-        return """
-        Based on the patient's symptoms, please provide:
-        1. Initial assessment
-        2. Potential diagnoses to consider
-        3. Recommended next steps or immediate actions
-        4. Red flags or warning signs to monitor
-        """
+        return Generator.DOCTOR_REPORT_PROMPT
         
     def run_conversation_and_analysis(self):
         # Start MLflow tracking
@@ -43,7 +34,8 @@ class IntegratedPipeline:
             if user_input.lower() in ['quit', 'exit', 'bye']:
                 # Generate summary and analysis
                 summary = self.chat_pipeline.generate_summary()
-                medical_analysis = rag_main(summary)
+                medical_analysis_response = rag_main(summary)
+                medical_analysis = medical_analysis_response['content']
                 
                 # Print outputs
                 print("\nSYMPTOM SUMMARY:")
@@ -54,21 +46,33 @@ class IntegratedPipeline:
                 # Prepare MLflow data
                 metrics = {
                     "num_retrieved_samples": Config.N_RESULTS,
+                    "input_cost": medical_analysis_response['usage']['input_cost'],
+                    "output_cost": medical_analysis_response['usage']['output_cost'],
+                    "total_cost": medical_analysis_response['usage']['total_cost'],
+                    "prompt_tokens": medical_analysis_response['usage']['prompt_tokens'],
+                    "completion_tokens": medical_analysis_response['usage']['completion_tokens'],
+                    "total_tokens": medical_analysis_response['usage']['total_tokens']
                 }
                 
                 parameters = {
-                    "summarization_model": "gpt-4o-mini",
+                    "summarization_model": Config.GENERATIVE_MODEL_NAME,
                     "embedding_model": Config.EMBEDDING_MODEL_NAME,
-                    "n_results": Config.N_RESULTS
+                    "n_results": Config.N_RESULTS,
+                    "temperature": Config.GENERATIVE_MODEL_TEMPERATURE,
+                    "max_tokens": Config.GENERATIVE_MODEL_MAX_TOKENS
                 }
                 
                 artifacts = {
                     "summary_prompt": self._get_summary_prompt(),
                     "doctor_report_prompt": self._get_doctor_report_prompt(),
                     "pipeline_output": f"SYMPTOM SUMMARY:\n{summary}\n\nMEDICAL ANALYSIS:\n{medical_analysis}",
-                    "conversation_history": self.chat_pipeline.conversation_manager.get_messages()
+                    "prompt_templates": {"SYSTEM_PROMPT": SYSTEM_PROMPT, "INITIAL_PROMPT": INITIAL_PROMPT, "FOLLOW_UP_PROMPT": FOLLOW_UP_PROMPT}
                 }
                 
+                # Log chat history separately
+                chat_content = "\n".join([f"{msg['role']}: {msg['content']}" for msg in self.chat_pipeline.get_conversation_history()])
+                save_content_as_artifact(chat_content, "chat_history.txt")
+
                 # End MLflow run
                 self.mlflow_tracker.end_run(metrics, parameters, artifacts)
                 break

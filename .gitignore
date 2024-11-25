@@ -6,6 +6,9 @@
 *.pkl
 *.html
 
+#ML-Pipeline realted
+mlruns/
+
 # DVC files
 .dvc/tmp
 .dvc/cache
