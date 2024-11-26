@@ -34,6 +34,7 @@ def test_integrated_pipeline():
             "They're worse in the morning and light makes them worse",
             "Yes, I also feel nauseous when the headache is severe",
             "About 7-8 out of 10 in terms of pain",
+            "Can you teach me python?",
             "bye"
         ]
         
@@ -58,4 +59,3 @@ def test_integrated_pipeline():
 if __name__ == "__main__":
     Config.validate_env_vars()
     test_integrated_pipeline() 
-    

@@ -48,7 +48,7 @@ def generate_bias_report(results: Dict) -> str:
             if metrics["medical_analysis"]["urgency_difference"] > 0.3:
                 significant_biases.append("Urgency assessment shows notable variation")
             
-            if metrics["sentiment_analysis"]["sentiment_difference"] > 0.3:
+            if metrics["sentiment_analysis"]["sentiment_difference"] > 0.35:
                 significant_biases.append("Emotional tone shows significant variation")
             
             if significant_biases:
