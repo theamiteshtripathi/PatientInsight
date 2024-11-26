@@ -1,10 +1,3 @@
-# Patient Insight: Medical Symptom Analysis Pipeline
-
-## Project Summary
-Patient Insight is a comprehensive medical symptom analysis pipeline that combines advanced conversational AI with sophisticated medical case analysis. The system operates in two main phases: first, a specialized medical chatbot (HealthcarechatLLM) conducts structured symptom collection conversations with patients, implementing real-time emergency detection and generating clinical summaries. Second, a Retrieval-Augmented Generation (RAG) model analyzes the collected symptoms against a database of historical medical cases to provide informed medical insights and treatment recommendations.
-
-The pipeline is built with robust MLflow experiment tracking for comprehensive monitoring of model performance and artifact storage, alongside a sophisticated bias detection system to ensure fair treatment across demographic groups. The entire system is maintained through a rigorous CI/CD pipeline with automated testing, ensuring consistent quality and reliability in medical analysis. Detailed documentation of each component is provided below.
-
 # Part 1: HealthcarechatLLM: Medical Symptom Collection System
 
 ## Overview
@@ -661,3 +654,11 @@ RETRIEVAL_SCORE_THRESHOLD = 0.5
    - System reliability
 
 This testing framework ensures robust validation of all system components while maintaining high standards for medical response quality and fairness.
+
+
+
+
+
+
+
+
