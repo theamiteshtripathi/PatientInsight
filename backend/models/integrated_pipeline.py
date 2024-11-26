@@ -36,12 +36,8 @@ class IntegratedPipeline:
                 summary = self.chat_pipeline.generate_summary()
                 medical_analysis_response = rag_main(summary)
                 medical_analysis = medical_analysis_response['content']
-                
-                # Print outputs
-                print("\nSYMPTOM SUMMARY:")
-                print(summary)
-                print("\nMEDICAL ANALYSIS:")
-                print(medical_analysis)
+                retrieved_docs = medical_analysis_response.get('retrieved_documents', [])
+                retrieval_scores = medical_analysis_response.get('retrieval_scores', [])
                 
                 # Prepare MLflow data
                 metrics = {
@@ -51,8 +47,12 @@ class IntegratedPipeline:
                     "total_cost": medical_analysis_response['usage']['total_cost'],
                     "prompt_tokens": medical_analysis_response['usage']['prompt_tokens'],
                     "completion_tokens": medical_analysis_response['usage']['completion_tokens'],
-                    "total_tokens": medical_analysis_response['usage']['total_tokens']
+                    "total_tokens": medical_analysis_response['usage']['total_tokens'],
                 }
+                
+                # Add retrieval scores to metrics
+                for i, score in enumerate(retrieval_scores):
+                    metrics[f"retrieval_score_{i+1}"] = score
                 
                 parameters = {
                     "summarization_model": Config.GENERATIVE_MODEL_NAME,

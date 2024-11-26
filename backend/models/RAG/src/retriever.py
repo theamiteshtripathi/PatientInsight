@@ -18,5 +18,8 @@ class Retriever:
             include_metadata=True   
         )
         
-        # Extract documents from metadata
-        return [match.metadata["text"] for match in results.matches]
+        # Extract documents and scores separately
+        documents = [match.metadata["text"] for match in results.matches]
+        scores = [match.score for match in results.matches]
+        
+        return documents, scores

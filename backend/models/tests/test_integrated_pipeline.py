@@ -58,4 +58,3 @@ def test_integrated_pipeline():
 if __name__ == "__main__":
     Config.validate_env_vars()
     test_integrated_pipeline() 
-    

@@ -34,6 +34,11 @@ class MLflowExperimentTracker:
             mlflow.log_metric("completion_tokens", metrics["completion_tokens"])
             mlflow.log_metric("total_tokens", metrics["total_tokens"])
             
+            # Log retrieval scores if they exist
+            for metric_name, value in metrics.items():
+                if metric_name.startswith("retrieval_score_"):
+                    mlflow.log_metric(metric_name, value)
+            
             # Log parameters
             mlflow.log_param("summarization_model", parameters["summarization_model"])
             mlflow.log_param("embedding_model", parameters["embedding_model"])
