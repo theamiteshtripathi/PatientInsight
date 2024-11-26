@@ -1,4 +1,5 @@
 from openai import OpenAI
+from backend.config.config import Config
 
 class SymptomAnalyzer:
     summary_prompt = """Analyze the conversation and create a structured clinical summary including:
@@ -34,7 +35,7 @@ class SymptomAnalyzer:
         messages = conversation_history + [{"role": "system", "content": self.summary_prompt}]
         
         response = self.client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=Config.GENERATIVE_MODEL_NAME,
             messages=messages
         )
         

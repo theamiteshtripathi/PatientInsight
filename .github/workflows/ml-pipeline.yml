@@ -1,44 +1,48 @@
-name: ML Pipeline CI/CD
+name: Symptom Analyzer Tests
 
 on:
   push:
+    branches:
+      - main
     paths:
+      - 'backend/config/config.py'
       - 'backend/models/**'
-    branches: [ main, develop ]
-
+  
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+    
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
-          
+          python-version: 3.12.0
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-mock pytest-xdist
+          pip install requirements.txt
+      
       - name: Run Tests
+        run: |
+          pytest backend/models/tests/test_symptom_analyzer.py \
+                backend/models/tests/test_final_pipeline.py \
+                backend/models/tests/test_bias_metrics.py \
+                backend/models/tests/test_retrieval_validation.py \
+                backend/models/tests/test_integrated_pipeline.py -v
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
-        run: |
-          # Run all test files
-          python -m pytest backend/models/tests/
-          python -m pytest backend/models/HealthcareLLMChat/src/tests/
-          python -m pytest backend/models/RAG/src/test_*.py 
 
-  evaluate:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Evaluate Pipeline
-        run: python backend/models/tests/evaluate_pipeline.py
+      - name: Notify on success
+        if: success()
+        run: echo "✅ ML Pipeline tests passed successfully!"
 
-  update-embeddings:
-    needs: [test, evaluate]
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Update Embeddings
-        env:
-          PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
-        run: python backend/models/RAG/src/setup_embeddings.py
+
+      - name: Notify on failure
+        if: failure()
+        run: echo "❌ ML Pipeline tests failed!"

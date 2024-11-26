@@ -17,3 +17,5 @@ mlflow
 boto3
 textblob
 spacy
+pytest
+pytest-cov
