@@ -15,3 +15,5 @@ llama-cpp-python
 pinecone-client>=2.2.1
 mlflow
 boto3
+textblob
+spacy
