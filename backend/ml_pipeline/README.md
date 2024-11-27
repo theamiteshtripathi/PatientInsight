@@ -464,6 +464,10 @@ Bias was a critical factor in model selection. The chosen model needed to demons
 
 After extensive testing, the configuration that emerged as the best choice featured a `max_tokens` setting of 650, utilizing the `gpt-4o` model, with three retrieved samples from the RAG system. This setup was selected because it consistently produced high-quality doctor reports that were both detailed and free from bias. The retrieval scores were robust, indicating effective case matching, and the overall system performance met our standards for efficiency and cost-effectiveness.
 
+MLflow's experiment tracking capabilities played a crucial role in this selection process by enabling direct comparison of different model configurations. Through MLflow's interface, we could easily compare metrics across different runs, visualizing the performance differences between models like `gpt-3.5-turbo`, `gpt-4o-mini`, and `gpt-4o`. This systematic comparison of metrics such as token usage, response quality, and cost efficiency helped validate our choice of the final configuration.
+
+![Example Comparison between diffrent runs](images/comparison.png)
+
 This configuration not only provided superior analytical insights but also maintained fairness and accuracy, making it the ideal choice for our healthcare chatbot system.
 
 
