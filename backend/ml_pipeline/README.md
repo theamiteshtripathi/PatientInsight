@@ -1,5 +1,7 @@
 # Patient Insight: Medical Symptom Analysis Pipeline
 
+#### code to this can be found in the `backend/models` directory
+
 ## Project Summary
 Patient Insight is a comprehensive medical symptom analysis pipeline that combines advanced conversational AI with sophisticated medical case analysis. The system operates in two main phases: first, a specialized medical chatbot (HealthcarechatLLM) conducts structured symptom collection conversations with patients, implementing real-time emergency detection and generating clinical summaries. Second, a Retrieval-Augmented Generation (RAG) model analyzes the collected symptoms against a database of historical medical cases to provide informed medical insights and treatment recommendations.
 
@@ -355,19 +357,6 @@ Critical configuration parameters are tracked:
 - Temperature settings
 - Maximum token limits
 
-#### 4. Artifact Storage
-MLflow maintains a structured repository of important artifacts:
-- Conversation histories
-- Generated prompts:
-  * Summarization prompts
-  * Doctor report prompts
-  * System prompts
-  * Initial interaction prompts
-  * Follow-up prompts
-- Pipeline outputs:
-  * Symptom summaries
-  * Medical analyses
-  * Retrieved similar cases
 
 ### Implementation Details
 The MLflow integration is handled by two key components:
@@ -405,6 +394,78 @@ Run Completion
 - **Analysis**: Comprehensive metrics for system performance evaluation
 - **Documentation**: Automatic storage of all generated artifacts
 - **Debugging**: Detailed logging for troubleshooting and optimization
+
+## Experiment Run Tracking
+The MLflow dashboard for the "healthcare-chat-rag-system" experiment displays multiple runs, highlighting key metrics. It provides insights into configurations, helping to analyze performance across different parameter settings and models like GPT-3 and GPT-4.
+
+Below is a screenshot of our MLflow experiment runs:
+
+![MLflow Experiment Runs](backend/ml_pipeline/images/MLflow_runs.png)
+
+### Individual Run Examples (Parameters and Metrics)
+Below is a detailed view of a specific experiment run for example, showcasing the tracked parameters, metrics:
+
+![MLflow Individual Run Details](backend/ml_pipeline/images/run_example.png)
+
+This detailed view demonstrates:
+- **Parameters**: Model configurations, temperature settings, and retrieval parameters
+- **Metrics**: Token usage, response times, and cost analysis
+
+### Model Metrics Visualization
+The following screenshot displays the model metrics section of a specific run, featuring bar charts that illustrate key performance indicators:
+
+![MLflow Model Metrics](backend/ml_pipeline/images/model_metrics.png)
+
+hese visualizations provide a clear overview of the model's performance, highlighting metrics such as token usage, response time, and cost analysis. This helps in assessing the efficiency and effectiveness of the model, guiding further optimization efforts.
+
+### Artifact Management and Storage
+Our MLflow implementation maintains a comprehensive repository of artifacts that are crucial for model analysis, debugging, and improvement. At the core of our artifact storage system are the conversation histories, which capture every interaction between the user and our healthcare chatbot. These histories are stored in a structured format, preserving the context and flow of each medical consultation.
+
+The system meticulously tracks all generated prompts across different stages of the pipeline. This includes the initial system prompts that define the chatbot's behavior and medical expertise, the carefully crafted summarization prompts that help distill patient information, and the specialized doctor report prompts used for generating professional medical analyses. We also maintain records of both initial interaction prompts and follow-up prompts, which are essential for understanding how the conversation evolves and adapts to patient responses.
+
+Pipeline outputs form another critical category of stored artifacts. These include the structured symptom summaries generated from patient conversations, which serve as intermediate data for our analysis system. The medical analyses produced by our RAG model are preserved, along with the retrieved similar cases that informed these analyses. This comprehensive collection of outputs allows us to trace the decision-making process from initial patient interaction through to final medical recommendations.
+
+Each artifact is automatically versioned and tagged with relevant metadata, making it simple to associate outputs with specific model configurations and experimental parameters. This systematic approach to artifact storage not only supports our current analysis needs but also facilitates future improvements to the system by providing a rich dataset for retrospective analysis and model refinement.
+
+#### Artifact Storage
+MLflow maintains a structured repository of important artifacts:
+- Conversation histories
+- Generated prompts:
+  * Summarization prompts
+  * Doctor report prompts
+  * System prompts
+  * Initial interaction prompts
+  * Follow-up prompts
+- Pipeline outputs:
+  * Symptom summaries
+  * Medical analyses
+  * Retrieved similar cases
+
+
+![Artifacts](backend/ml_pipeline/images/Artifacts.png)
+
+### Experimentation and Model Selection
+
+Throughout the development of our healthcare chatbot system, extensive experimentation was conducted to identify the optimal configuration for generating accurate and unbiased medical analyses. The experiments focused on varying key parameters and evaluating their impact on the system's performance.
+
+#### Parameter Exploration
+
+One of the primary parameters explored was the `max_tokens` setting for the GPT model. This parameter controls the length of the generated responses, which is crucial for ensuring comprehensive yet concise medical reports. Various values were tested to balance detail and efficiency. Additionally, while the embedding model for the RAG system remained consistent as Sentence Transformers, different summarization models were evaluated, including `gpt-3.5-turbo`, `gpt-4o-mini`, and `gpt-4o`. These models were assessed for their ability to accurately summarize patient symptoms and generate insightful analyses. Different prompting styles were also extensively tested, experimenting with various formats and structures to optimize the model's understanding of medical contexts and improve the quality of generated responses.
+
+The number of retrieved samples from the RAG model was another critical factor. By experimenting with different retrieval counts, we aimed to optimize the quality of the analyses by ensuring that the most relevant historical cases were considered. Furthermore, different prompting styles were tested to observe how they influenced the output, with the goal of enhancing the clarity and relevance of the generated reports.
+
+#### Metrics and Evaluation
+
+The evaluation of these experiments was based on several key metrics. Cost efficiency was a significant consideration, as was the total number of output tokens, which directly impacts the system's operational expenses. Retrieval scores from Pinecone were monitored to ensure high-quality case matching, and execution time was measured to maintain a responsive user experience. Beyond these quantitative metrics, manual evaluations were conducted to assess the quality of the doctor reports generated by the pipeline, focusing on their accuracy and comprehensiveness.
+
+Bias was a critical factor in model selection. The chosen model needed to demonstrate minimal bias across different demographic groups, ensuring fair and equitable treatment for all users. This was assessed through both automated bias detection and manual review of the generated outputs.
+
+#### Best Model Selection
+
+After extensive testing, the configuration that emerged as the best choice featured a `max_tokens` setting of 650, utilizing the `gpt-4o` model, with three retrieved samples from the RAG system. This setup was selected because it consistently produced high-quality doctor reports that were both detailed and free from bias. The retrieval scores were robust, indicating effective case matching, and the overall system performance met our standards for efficiency and cost-effectiveness.
+
+This configuration not only provided superior analytical insights but also maintained fairness and accuracy, making it the ideal choice for our healthcare chatbot system.
+
 
 # Bias Detection and Analysis System
 
@@ -523,6 +584,20 @@ Comparison: [Demographics Pair]
   * [Bias Finding 1]
   * [Bias Finding 2]
 ```
+
+For example, an early bias analysis revealed:
+```
+Healthcare Chatbot Bias Analysis Report
+=====================================
+
+Scenario: Headache Assessment
+--------------------
+Comparison: 35-year-old male executive vs 35-year-old female factory worker
+- Significant differences detected:
+  * Emotional tone shows significant variation
+```
+
+This initial finding led to prompt refinement, where we explicitly instructed the model to maintain consistent emotional tone regardless of demographic factors. Subsequent testing showed no detectable bias in emotional tone, demonstrating the effectiveness of our prompt engineering approach in ensuring equitable treatment across different demographic groups.
 
 ## Usage Example
 ```python
