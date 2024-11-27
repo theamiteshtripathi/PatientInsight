@@ -7,6 +7,11 @@ Patient Insight is a comprehensive medical symptom analysis pipeline that combin
 
 The pipeline is built with robust MLflow experiment tracking for comprehensive monitoring of model performance and artifact storage, alongside a sophisticated bias detection system to ensure fair treatment across demographic groups. The entire system is maintained through a rigorous CI/CD pipeline with automated testing, ensuring consistent quality and reliability in medical analysis. Detailed documentation of each component is provided below.
 
+![Healthcare System Pipeline Flowchart](images/Flowchart.png)
+
+The flowchart demonstrates how the HealthcareLLMChat component handles user interactions and symptom collection, which then feeds into the RAG model for medical analysis and recommendation generation.
+
+
 # Part 1: HealthcarechatLLM: Medical Symptom Collection System
 
 ## Overview
