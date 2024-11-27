@@ -7,6 +7,11 @@ Patient Insight is a comprehensive medical symptom analysis pipeline that combin
 
 The pipeline is built with robust MLflow experiment tracking for comprehensive monitoring of model performance and artifact storage, alongside a sophisticated bias detection system to ensure fair treatment across demographic groups. The entire system is maintained through a rigorous CI/CD pipeline with automated testing, ensuring consistent quality and reliability in medical analysis. Detailed documentation of each component is provided below.
 
+![Healthcare System Pipeline Flowchart](images/Flowchart.png)
+
+The flowchart demonstrates how the HealthcareLLMChat component handles user interactions and symptom collection, which then feeds into the RAG model for medical analysis and recommendation generation.
+
+
 # Part 1: HealthcarechatLLM: Medical Symptom Collection System
 
 ## Overview
@@ -133,11 +138,18 @@ The system generates two primary outputs:
 - MLflow-compatible logging format
 - Structured data output for downstream processing
 
-## Future Enhancements
-- Expansion of emergency symptom database
-- Integration of medical terminology validation
-- Enhanced context awareness for follow-up questions
-- Multi-language support for international deployment
+
+### Handling Irrelevant Questions
+
+Our model is designed to maintain focus on healthcare-related conversations, ensuring that users receive the appropriate guidance and support for their medical concerns. If a user asks an irrelevant question, the model gently redirects the conversation back to the healthcare context. 
+
+For example, consider a scenario where a user initially reports a headache and nausea. During the conversation, the user might ask:
+```
+**User**: Can you teach me Python?
+**Assistant**: I’m here to help with your healthcare needs, but I can’t teach programming. If you’re feeling unwell with your headache and nausea, it’s important to focus on alleviating those symptoms first. Is there anything else you’d like to share about how you’re feeling or any other symptoms you might be experiencing?
+```
+
+This approach ensures that the conversation remains relevant and focused on the user's health, while also providing a supportive and empathetic interaction.
 
 
 # Part 2: RAG Model - Medical Case Analysis and Treatment Recommendation System
