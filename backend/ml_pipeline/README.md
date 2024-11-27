@@ -400,12 +400,12 @@ The MLflow dashboard for the "healthcare-chat-rag-system" experiment displays mu
 
 Below is a screenshot of our MLflow experiment runs:
 
-![MLflow Experiment Runs](backend/ml_pipeline/images/MLflow_runs.png)
+![MLflow Experiment Runs](images/MLflow_runs.png)
 
 ### Individual Run Examples (Parameters and Metrics)
 Below is a detailed view of a specific experiment run for example, showcasing the tracked parameters, metrics:
 
-![MLflow Individual Run Details](backend/ml_pipeline/images/run_example.png)
+![MLflow Individual Run Details](images/run_example.png)
 
 This detailed view demonstrates:
 - **Parameters**: Model configurations, temperature settings, and retrieval parameters
@@ -414,7 +414,7 @@ This detailed view demonstrates:
 ### Model Metrics Visualization
 The following screenshot displays the model metrics section of a specific run, featuring bar charts that illustrate key performance indicators:
 
-![MLflow Model Metrics](backend/ml_pipeline/images/model_metrics.png)
+![MLflow Model Metrics](images/model_metrics.png)
 
 hese visualizations provide a clear overview of the model's performance, highlighting metrics such as token usage, response time, and cost analysis. This helps in assessing the efficiency and effectiveness of the model, guiding further optimization efforts.
 
@@ -442,7 +442,7 @@ MLflow maintains a structured repository of important artifacts:
   * Retrieved similar cases
 
 
-![Artifacts](backend/ml_pipeline/images/Artifacts.png)
+![Artifacts](images/Artifacts.png)
 
 ### Experimentation and Model Selection
 
