@@ -9,6 +9,7 @@ from pathlib import Path
 root_path = Path(__file__).parent.parent.parent.parent.absolute()
 sys.path.append(str(root_path))
 
+# Loading functions
 from backend.data_pipeline.scripts.preprocess import preprocess_pmc_patients
 
 # Load environment variables
@@ -20,13 +21,12 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
 class TestDataPreprocess(unittest.TestCase):
     def test_preprocess_pmc_patients(self):
-        data_location = "backend/data_pipeline/"
-        input_path = "data/raw/PMC-Patients.csv"
-        output_path = "data/processed/PMC-Patients_preprocessed.csv"
+        input_path = "backend/data_pipeline/data/raw/PMC-Patients.csv"
+        output_path = "backend/data_pipeline/data/processed/PMC-Patients_preprocessed.csv"
 
         preprocess_pmc_patients(input_path, output_path)
 
-        output_path = os.path.join(root_path, data_location, output_path)
+        output_path = os.path.join(root_path, output_path)
         
         self.assertTrue(os.path.exists(output_path))
         

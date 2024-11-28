@@ -18,11 +18,11 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 root_path = Path(__file__).parent.parent.parent.parent.parent.absolute()
 sys.path.append(str(root_path))
 
+# Loading script files
 from backend.data_pipeline.scripts.download import download_pmc_patients_dataset
 from backend.data_pipeline.scripts.preprocess import preprocess_pmc_patients
 from backend.data_pipeline.scripts.stats_generation import generate_stats
 from backend.data_pipeline.scripts.email_notification import send_custom_email
-from backend.data_pipeline.scripts.pdf_processing import process_patient_pdf
 
 default_args = {
     'owner': 'airflow',
@@ -49,7 +49,7 @@ download_task = PythonOperator(
     task_id='download_data',
     python_callable=download_pmc_patients_dataset,
     op_kwargs={
-        'output_dir': 'data/raw',
+        'output_dir': 'backend/data_pipeline/data/raw/',
     },
     retries=2,
     retry_delay=timedelta(minutes=1),
@@ -61,23 +61,17 @@ preprocess_task = PythonOperator(
     task_id='preprocess_data',
     python_callable=preprocess_pmc_patients,
     op_kwargs={
-        'input_path': 'data/raw/PMC-Patients.csv',
-        'output_path': 'data/processed/PMC-Patients_preprocessed.csv'
+        'input_path': 'backend/data_pipeline/data/raw/PMC-Patients.csv',
+        'output_path': 'backend/data_pipeline/data/processed/PMC-Patients_preprocessed.csv'
     },
     dag=dag,
-)
-
-pdf_processing_task = PythonOperator(
-    task_id='process_pdf',
-    python_callable=process_patient_pdf,
-    dag=dag
 )
 
 stats_generation = PythonOperator(
     task_id='generate_stats',
     python_callable=generate_stats,
     op_kwargs={
-        'csv_file_path': 'data/processed'
+        'csv_file_dir': 'backend/data_pipeline/data/processed/'
     },
     dag=dag,
 )
@@ -91,7 +85,7 @@ email_task = PythonOperator(
 )
 
 # Set dependencies
-download_task >> preprocess_task >> pdf_processing_task >> stats_generation >> email_task
+download_task >> preprocess_task >> stats_generation >> email_task
 
 if __name__ == "__main__":
     from airflow.utils.dag_cycle_tester import check_cycle
