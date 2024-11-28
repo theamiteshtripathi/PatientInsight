@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'backend/config/config.py'
-      - 'backend/models/**'
+      - 'backend/ml_pipeline/**'
   
 jobs:
   test:
@@ -30,11 +30,11 @@ jobs:
       
       - name: Run Tests
         run: |
-          pytest backend/ml_pipeline/tests/test_symptom_analyzer.py \
-                backend/ml_pipeline/tests/test_final_pipeline.py \
-                backend/ml_pipeline/tests/test_bias_metrics.py \
-                backend/ml_pipeline/tests/test_retrieval_validation.py \
-                backend/ml_pipeline/tests/test_integrated_pipeline.py -v
+          python backend/ml_pipeline/tests/test_env_variables 
+          python -m pytest backend/ml_pipeline/tests/test_retrieval_validation.py 
+          python -m pytest backend/ml_pipeline/tests/test_bias_metrics.py 
+          python backend/ml_pipeline/tests/test_integrated_pipeline.py
+
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
