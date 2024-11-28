@@ -1,7 +1,7 @@
 import os
 import subprocess
 import time
-from backend.models.integrated_pipeline import IntegratedPipeline
+from backend.ml_pipeline.integrated_pipeline import IntegratedPipeline
 from backend.config.config import Config
 
 def ensure_mlflow_server():

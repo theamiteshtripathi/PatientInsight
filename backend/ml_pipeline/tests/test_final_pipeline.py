@@ -1,15 +1,15 @@
 import pytest
 from unittest.mock import Mock, patch, MagicMock
-from backend.models.integrated_pipeline import IntegratedPipeline
+from backend.ml_pipeline.integrated_pipeline import IntegratedPipeline
 from backend.config.config import Config
 
 @pytest.fixture
 def mock_dependencies():
-    with patch('backend.models.integrated_pipeline.ChatPipeline') as mock_chat, \
-         patch('backend.models.integrated_pipeline.MLflowExperimentTracker') as mock_mlflow, \
-         patch('backend.models.integrated_pipeline.rag_main') as mock_rag, \
-         patch('backend.models.integrated_pipeline.SymptomAnalyzer') as mock_analyzer, \
-         patch('backend.models.integrated_pipeline.Generator') as mock_generator:
+    with patch('backend.ml_pipeline.integrated_pipeline.ChatPipeline') as mock_chat, \
+         patch('backend.ml_pipeline.integrated_pipeline.MLflowExperimentTracker') as mock_mlflow, \
+         patch('backend.ml_pipeline.integrated_pipeline.rag_main') as mock_rag, \
+         patch('backend.ml_pipeline.integrated_pipeline.SymptomAnalyzer') as mock_analyzer, \
+         patch('backend.ml_pipeline.integrated_pipeline.Generator') as mock_generator:
         
         # Setup mock returns
         mock_chat.return_value.start_conversation.return_value = "Hello, how can I help you today?"
