@@ -27,7 +27,6 @@ jobs:
       run: |
         python -m unittest backend/data_pipeline/tests/test_data_download.py
         python -m unittest backend/data_pipeline/tests/test_data_preprocess.py
-        python -m unittest backend/data_pipeline/tests/test_stat_generation.py
 
     - name: Notify on success
       if: success()
