@@ -54,5 +54,10 @@ jobs:
         to: pappuru.d@northeastern.edu, udayakumar.de@northeastern.edu, tripathi.am@northeastern.edu, gaddamsreeramulu.r@northeastern.edu, amin.sn@northeastern.edu
         from: mlopsgroup11@gmail.com
         body: |
-          The workflow "{{ github.workflow }}" has failed.
-          Check the logs here: ${{ github.run_url }}
+          The workflow "${{ github.workflow }}" has failed.
+            
+          Repository: ${{ github.repository }}
+          Workflow: ${{ github.workflow }}
+          Run ID: ${{ github.run_id }}
+          
+          Check the logs here: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
