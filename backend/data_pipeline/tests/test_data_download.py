@@ -4,6 +4,8 @@ import sys
 from dotenv import load_dotenv
 from pathlib import Path
 
+# Tesing actions
+
 # Add the project root directory to the Python path
 root_path = Path(__file__).parent.parent.parent.parent.absolute()
 sys.path.append(str(root_path))
@@ -27,4 +29,3 @@ class TestDataDownload(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
