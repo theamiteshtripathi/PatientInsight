@@ -3,10 +3,12 @@
 This project, **Patient Insight**, aims to build a modular and reusable data pipeline to clean, transform, and perform feature engineering on healthcare data, specifically targeting patient symptom data. The preprocessing pipeline is designed for flexibility and easy adjustment to ensure scalability.
 
 ## Folder structure
+- `backend/data_pipeline`: All the information regarding data pipeline is present in this path.
 - `data/`: Contains raw and processed data files.
-- `sripts_location/`: Source code for data processing and analysis.
+- `sripts/`: Source code for data processing and analysis.
 - `tests/`: Unit tests for the project.
 - `airflow/`: Airflow DAG definitions.
+- `images`: Saved images to be used for readme.
 
 ## Dataset
 
@@ -37,7 +39,9 @@ airflow scheduler &
 airflow webserver -p 8080
 ```
 
-You should be seeing your DAG `patient_insight_dag` in the UI.
+You should be seeing your DAG `data_pipeline` in the UI.
+
+![DAG](images/DAG.png)
 
 ## Download data
 Once you start the DAG, the first task is to download the dataset. 
@@ -66,8 +70,26 @@ After the task run is completed successfully, you should be seeing the stat repo
         ├──processed
             ├──stat_report.html
 
+## DAG optimization
+We are using ```Gantt chart``` in DAG to see if we can optimize any of the processes.
+
+![Stat generation before optimization](images/stats_before.png)
+
+As we cannot do much about the data download and preprocess the data, we can optimize stat generation to decrease the amount of time we have to generate stats.
+
+This can be achieved by restricting only the data columns we need to generate stats.
+
+![Stat generation before optimization](images/stats_after.png)
+
+As you can see from gantt chart that we are able to decrease the time elapased for generating stats.
+
+Note: Observe the start and end time of the script run, not the whole duration.
+
 ## Testing
 We are using unittest modules in python to test if datasets are downloaded and processed as per requirements.
+
+All the test files run when there are any changes to the data pipeline code using ```Github Actions```.
+
 The files can be found under folder `tests`.
 
 You can run the python file to test if all the unittest are working properly.
@@ -77,11 +99,19 @@ For `test_data_download.py`
 python test_data_download.py
 ```
 
-and for `test_data_preprocess` it's
+for `test_data_preprocess` it's
 
 ```bash
 python test_data_preprocess.py
 ```
+
+and for `test_stat_generation` it's
+
+```bash
+python test_stat_generation.py
+```
+
+![Git Actions](images/git_actions.png)
 
 ## Tracking and logging
 All the logs are maintaned by airflow.
@@ -92,6 +122,8 @@ In future we will use the logs folder to see all the logs.
 
 ## Anomaly detection and alerts
 If there are any issues in DAG tasks, alerts are sent through email when all the task have completed successfully as well as if there are any failures.
+
+![Email Alert](images/email_alert.png)
 
 ### Setting up alerts using mail
 We need make few changes in `airflow.cfg` file.

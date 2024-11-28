@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'backend/data_pipeline/**'
 
 jobs:
   build:
@@ -25,8 +27,7 @@ jobs:
       run: |
         python -m unittest backend/data_pipeline/tests/test_data_download.py
         python -m unittest backend/data_pipeline/tests/test_data_preprocess.py
-
-
+        python -m unittest backend/data_pipeline/tests/test_stat_generation.py
 
     - name: Notify on success
       if: success()
@@ -35,3 +36,22 @@ jobs:
     - name: Notify on failure
       if: failure()
       run: echo "Unit tests failed"
+  
+  send_email:
+    if: ${{github.event.workflow_run.conclusion == 'failure' }} # Send only if workflow fails
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Send email
+      uses: dawidd6/action-send-mail@v4
+      with:
+        server_address: smtp.gmail.com
+        server_port: 465
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: GitHub Actions Workflow Failed
+        to: mlopsgroup11@gmail.com
+        from: pappuru.d@northeastern.edu, udayakumar.de@northeastern.edu, tripathi.am@northeastern.edu, gaddamsreeramulu.r@northeastern.edu, amin.sn@northeastern.edu
+        body: |
+          The workflow "{{ github.event.workflow_run.name }}" has failed.
+          Check the logs here: ${{ github.event.workflow_run.html_url }}

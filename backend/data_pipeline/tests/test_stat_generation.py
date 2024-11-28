@@ -9,7 +9,7 @@ root_path = Path(__file__).parent.parent.parent.parent.absolute()
 sys.path.append(str(root_path))
 
 # Loading functions
-from backend.data_pipeline.scripts.download import download_pmc_patients_dataset
+from backend.data_pipeline.scripts.stats_generation import generate_stats
 
 # Load environment variables
 load_dotenv()
@@ -21,9 +21,9 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 # Unit tests
 class TestDataDownload(unittest.TestCase):
     def test_download_pmc_patients_dataset(self):
-        output_dir = "backend/data_pipeline/data/raw/"
-        download_pmc_patients_dataset(output_dir)
-        self.assertTrue(os.path.exists(os.path.join(root_path, output_dir, "PMC-Patients.csv")))
+        output_dir = "backend/data_pipeline/data/processed/"
+        generate_stats(output_dir)
+        self.assertTrue(os.path.exists(os.path.join(root_path, output_dir, "stats_report.html")))
 
 if __name__ == "__main__":
     unittest.main()
