@@ -25,7 +25,11 @@ class SymptomAnalyzer:
     Red Flags:
     - Any concerning symptoms that require immediate attention
 
-    Format this as a clear, professional medical summary using bullet points where appropriate."""
+    Format this as a clear, professional medical summary using bullet points where appropriate.
+
+    IMPORTANT NOTE: IF YOU FIND THAT THE USER HAS SOME SYMPTOMS THAT IS VERY UNUSUAL OR UNLIKELY FOR A HUMAN TO HAVE, THEN ADD KEYWORD "UNUSUAL_CASE" TO THE START OF THE SUMMARY, WITHOUT FAIL!!!"""
+
+    
 
 
     def __init__(self, api_key: str):
