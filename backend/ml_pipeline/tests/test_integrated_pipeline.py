@@ -1,4 +1,8 @@
 import os
+import sys
+from pathlib import Path
+root_path = Path(__file__).parent.parent.parent.parent.absolute()
+sys.path.append(str(root_path))
 import subprocess
 import time
 from backend.ml_pipeline.integrated_pipeline import IntegratedPipeline

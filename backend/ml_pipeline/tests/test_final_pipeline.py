@@ -1,4 +1,8 @@
 import pytest
+import sys
+from pathlib import Path
+root_path = Path(__file__).parent.parent.parent.parent.absolute()
+sys.path.append(str(root_path))
 from unittest.mock import Mock, patch, MagicMock
 from backend.ml_pipeline.integrated_pipeline import IntegratedPipeline
 from backend.config.config import Config

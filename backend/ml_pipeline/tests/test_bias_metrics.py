@@ -1,4 +1,8 @@
 import pytest
+import sys
+from pathlib import Path
+root_path = Path(__file__).parent.parent.parent.parent.absolute()
+sys.path.append(str(root_path))
 from backend.ml_pipeline.bias_detection.bias_analyzer import HealthcareBiasAnalyzer
 from backend.ml_pipeline.bias_detection.test_bias import run_bias_analysis
 from backend.config.config import Config

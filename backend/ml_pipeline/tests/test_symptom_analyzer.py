@@ -1,4 +1,8 @@
 import pytest
+import sys
+from pathlib import Path
+root_path = Path(__file__).parent.parent.parent.parent.absolute()
+sys.path.append(str(root_path))
 from unittest.mock import Mock, patch
 from backend.ml_pipeline.HealthcareLLMChat.model.symptom_analyzer import SymptomAnalyzer
 from backend.config.config import Config
