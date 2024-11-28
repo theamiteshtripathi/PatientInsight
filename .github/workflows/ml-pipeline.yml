@@ -30,7 +30,7 @@ jobs:
       
       - name: Run Tests
         run: |
-          python backend/ml_pipeline/tests/test_env_variables 
+          python backend/ml_pipeline/tests/test_env_variables.py 
           python -m pytest backend/ml_pipeline/tests/test_retrieval_validation.py 
           python -m pytest backend/ml_pipeline/tests/test_bias_metrics.py 
           python backend/ml_pipeline/tests/test_integrated_pipeline.py
@@ -45,7 +45,7 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
 
 
-      - name: Notify on success
+      - name: Notify on successs
         if: success()
         run: echo "✅ ML Pipeline tests passed successfully!"
 
