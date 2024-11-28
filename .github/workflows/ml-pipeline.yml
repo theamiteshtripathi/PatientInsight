@@ -54,7 +54,7 @@ jobs:
         if: failure()
         run: echo "❌ ML Pipeline tests failed!"
 
-send_email:
+  send_email:
     runs-on: ubuntu-latest
     needs: test  
     if: failure()  

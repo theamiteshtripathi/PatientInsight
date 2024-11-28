@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Testing actions
+# Testing actionss
 class Config:
 
     #RAG
