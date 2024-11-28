@@ -1,6 +1,6 @@
-from backend.models.RAG.src.embeddings import EmbeddingsHandler
-from backend.models.RAG.src.retriever import Retriever
-from backend.models.RAG.src.generator import Generator
+from backend.ml_pipeline.RAG.embeddings import EmbeddingsHandler
+from backend.ml_pipeline.RAG.retriever import Retriever
+from backend.ml_pipeline.RAG.generator import Generator
 from backend.config.config import Config
 
 def main(query):

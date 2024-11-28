@@ -1,6 +1,6 @@
 from .bias_analyzer import HealthcareBiasAnalyzer
 from .test_scenarios import BIAS_TEST_SCENARIOS
-from backend.models.integrated_pipeline import IntegratedPipeline
+from backend.ml_pipeline.integrated_pipeline import IntegratedPipeline
 from backend.config.config import Config
 from typing import Dict, List
 

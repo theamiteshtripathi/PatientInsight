@@ -30,11 +30,11 @@ jobs:
       
       - name: Run Tests
         run: |
-          pytest backend/models/tests/test_symptom_analyzer.py \
-                backend/models/tests/test_final_pipeline.py \
-                backend/models/tests/test_bias_metrics.py \
-                backend/models/tests/test_retrieval_validation.py \
-                backend/models/tests/test_integrated_pipeline.py -v
+          pytest backend/ml_pipeline/tests/test_symptom_analyzer.py \
+                backend/ml_pipeline/tests/test_final_pipeline.py \
+                backend/ml_pipeline/tests/test_bias_metrics.py \
+                backend/ml_pipeline/tests/test_retrieval_validation.py \
+                backend/ml_pipeline/tests/test_integrated_pipeline.py -v
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 

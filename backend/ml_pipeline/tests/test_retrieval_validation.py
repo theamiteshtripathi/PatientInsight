@@ -1,5 +1,5 @@
 import pytest
-from backend.models.integrated_pipeline import IntegratedPipeline
+from backend.ml_pipeline.integrated_pipeline import IntegratedPipeline
 from backend.config.config import Config
 
 RETRIEVAL_SCORE_THRESHOLD = 0.5
@@ -46,7 +46,7 @@ class TestRetrievalValidation:
                 
                 # Generate summary and get RAG analysis
                 summary = pipeline.chat_pipeline.generate_summary()
-                from backend.models.RAG.src.main import main as rag_main
+                from backend.ml_pipeline.RAG.main import main as rag_main
                 medical_analysis_response = rag_main(summary)
                 
                 # Get retrieval scores directly from the response

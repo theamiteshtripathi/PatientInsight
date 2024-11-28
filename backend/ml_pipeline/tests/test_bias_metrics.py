@@ -1,6 +1,6 @@
 import pytest
-from backend.models.bias_detection.bias_analyzer import HealthcareBiasAnalyzer
-from backend.models.bias_detection.test_bias import run_bias_analysis
+from backend.ml_pipeline.bias_detection.bias_analyzer import HealthcareBiasAnalyzer
+from backend.ml_pipeline.bias_detection.test_bias import run_bias_analysis
 from backend.config.config import Config
 
 # Define thresholds for bias metrics

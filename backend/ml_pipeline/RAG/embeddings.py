@@ -1,7 +1,7 @@
 from sentence_transformers import SentenceTransformer
 from pinecone import Pinecone, ServerlessSpec
 from backend.config.config import Config
-from backend.models.RAG.data.load_data import load_full_data
+from backend.ml_pipeline.RAG.data.load_data import load_full_data
 from tqdm import tqdm
 
 class EmbeddingsHandler:

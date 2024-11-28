@@ -1,12 +1,12 @@
-from backend.models.HealthcareLLMChat.src.model.chat_pipeline import ChatPipeline
-from backend.models.utils.mlflow_experiment_tracker import MLflowExperimentTracker
-from backend.models.RAG.src.main import main as rag_main
+from backend.ml_pipeline.HealthcareLLMChat.model.chat_pipeline import ChatPipeline
+from backend.ml_pipeline.utils.mlflow_experiment_tracker import MLflowExperimentTracker
+from backend.ml_pipeline.RAG.main import main as rag_main
 from backend.config.config import Config
 import time
-from backend.models.HealthcareLLMChat.src.utils.prompt_templates import SYSTEM_PROMPT, INITIAL_PROMPT, FOLLOW_UP_PROMPT
-from backend.models.HealthcareLLMChat.src.model.symptom_analyzer import SymptomAnalyzer
-from backend.models.RAG.src.generator import Generator
-from backend.models.utils.mlflow_save_content import save_content_as_artifact
+from backend.ml_pipeline.HealthcareLLMChat.utils.prompt_templates import SYSTEM_PROMPT, INITIAL_PROMPT, FOLLOW_UP_PROMPT
+from backend.ml_pipeline.HealthcareLLMChat.model.symptom_analyzer import SymptomAnalyzer
+from backend.ml_pipeline.RAG.generator import Generator
+from backend.ml_pipeline.utils.mlflow_save_content import save_content_as_artifact
 
 class IntegratedPipeline:
     def __init__(self, api_key: str = None):

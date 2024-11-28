@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import Mock, patch
-from backend.models.HealthcareLLMChat.src.model.symptom_analyzer import SymptomAnalyzer
+from backend.ml_pipeline.HealthcareLLMChat.model.symptom_analyzer import SymptomAnalyzer
 from backend.config.config import Config
 
 @pytest.fixture
