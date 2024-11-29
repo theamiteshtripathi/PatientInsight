@@ -28,3 +28,4 @@ torch==2.5.1
 tqdm==4.67.0
 transformers==4.46.2
 httpx==0.27.2
+sagemaker-mlflow==0.1.0

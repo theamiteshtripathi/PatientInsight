@@ -1,11 +1,12 @@
 from datetime import datetime
 import mlflow
+import sagemaker_mlflow
 import time
 
 class MLflowExperimentTracker:
     def __init__(self):
         # Set tracking URI with file store
-        mlflow.set_tracking_uri("http://localhost:8050")
+        mlflow.set_tracking_uri("arn:aws:sagemaker:us-east-2:167325058662:mlflow-tracking-server/patient-insight")
         
         # Create or get experiment
         try:
