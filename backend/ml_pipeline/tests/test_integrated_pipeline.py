@@ -8,26 +8,26 @@ import time
 from backend.ml_pipeline.integrated_pipeline import IntegratedPipeline
 from backend.config.config import Config
 
-def ensure_mlflow_server():
-    # Start MLflow server if not already running
-    try:
-        import requests
-        requests.get("http://localhost:8050")
-    except requests.exceptions.ConnectionError:
-        print("Starting MLflow server...")
-        subprocess.Popen([
-            "mlflow", "server",
-            "--backend-store-uri", "mlruns",
-            "--default-artifact-root", "mlruns",
-            "--host", "0.0.0.0",
-            "--port", "8050"
-        ])
-        time.sleep(5)
+# def ensure_mlflow_server():
+#     # Start MLflow server if not already running
+#     try:
+#         import requests
+#         requests.get("http://localhost:8050")
+#     except requests.exceptions.ConnectionError:
+#         print("Starting MLflow server...")
+#         subprocess.Popen([
+#             "mlflow", "server",
+#             "--backend-store-uri", "mlruns",
+#             "--default-artifact-root", "mlruns",
+#             "--host", "0.0.0.0",
+#             "--port", "8050"
+#         ])
+#         time.sleep(5)
 
 def test_integrated_pipeline():
     try:
         # Ensure MLflow server is running
-        ensure_mlflow_server()
+        # ensure_mlflow_server()
         
         # Initialize pipeline
         pipeline = IntegratedPipeline(Config.OPENAI_API_KEY)
