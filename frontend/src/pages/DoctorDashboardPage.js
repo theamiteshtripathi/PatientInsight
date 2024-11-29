@@ -16,7 +16,6 @@ import {
   TrendingUp
 } from '@mui/icons-material';
 import PatientsList from '../components/doctor/PatientsList';
-import AppointmentsSchedule from '../components/doctor/AppointmentsSchedule';
 import MedicalReports from '../components/doctor/MedicalReports';
 import DoctorSidebar from '../components/doctor/DoctorSidebar';
 
@@ -157,7 +156,6 @@ function DoctorDashboardPage() {
                   background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)'
                 }}
               >
-                <AppointmentsSchedule />
               </Paper>
             </Grid>
 

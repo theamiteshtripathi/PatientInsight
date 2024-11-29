@@ -25,6 +25,7 @@ import AppointmentsPage from './pages/AppointmentsPage';
 import SettingsPage from './pages/SettingsPage';
 import RegisterPage from './pages/RegisterPage';
 import PatientsPage from './pages/PatientsPage';
+import DoctorAppointmentsPage from './pages/DoctorAppointmentsPage';
 
 // Extend dayjs with plugins
 dayjs.extend(weekOfYear);
@@ -86,8 +87,17 @@ function App() {
               <Route path="/consultation-history" element={<ConsultationHistoryPage />} />
               <Route path="/lifestyle-tips" element={<LifestyleTipsPage />} />
               <Route path="/appointments" element={<AppointmentsPage />} />
+              <Route path="/doctor/appointments" element={<DoctorAppointmentsPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/doctor/patients" element={<PatientsPage />} />
+              <Route 
+                path="/doctor/appointments" 
+                element={
+                  <PrivateRoute>
+                    <DoctorAppointmentsPage />
+                  </PrivateRoute>
+                } 
+              />
             </Routes>
           </Router>
         </LocalizationProvider>

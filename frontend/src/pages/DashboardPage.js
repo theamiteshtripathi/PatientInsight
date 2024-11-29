@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
   Container,
@@ -30,24 +30,29 @@ import { useOnboarding } from '../hooks/useOnboarding';
 import PatientOnboardingForm from '../components/onboarding/PatientOnboardingForm';
 
 function DashboardPage() {
-  // Add this near your other hooks
   const { currentUser } = useAuth();
-  const { showOnboarding, completeOnboarding } = useOnboarding(currentUser?.id);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    // Check if user has completed onboarding
+    const hasCompletedOnboarding = localStorage.getItem('onboardingCompleted');
+    if (!hasCompletedOnboarding) {
+      setShowOnboarding(true);
+    }
+  }, []);
 
   const handleOnboardingSubmit = async (formData) => {
-    const success = await completeOnboarding(formData);
-    if (success) {
-      // Show success message or update UI
-      console.log('Onboarding completed successfully');
-    }
+    // Handle the form submission
+    console.log('Onboarding data:', formData);
+    localStorage.setItem('onboardingCompleted', 'true');
+    setShowOnboarding(false);
   };
 
   return (
     <MainLayout>
-      {/* Add this before your existing content */}
       <PatientOnboardingForm
         open={showOnboarding}
-        onClose={() => {}} // Optional: Add close handler if needed
+        onClose={() => setShowOnboarding(false)}
         onSubmit={handleOnboardingSubmit}
       />
       

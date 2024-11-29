@@ -21,9 +21,11 @@ import {
   Logout as LogoutIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+
 
 // Import doctor components
-import AppointmentsSchedule from './AppointmentsSchedule';
+import DoctorAppointmentsPage from '../../pages/DoctorAppointmentsPage';
 import MedicalReports from './MedicalReports';
 import DoctorChat from './DoctorChat';
 import PatientsPage from '../../pages/PatientsPage';
@@ -64,7 +66,7 @@ function DoctorSidebar() {
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/doctor-dashboard' },
     { text: 'Patients', icon: <PatientsIcon />, path: '/doctor/patients', component: PatientsPage },
-    { text: 'Appointments', icon: <ScheduleIcon />, path: '/doctor/appointments', component: AppointmentsSchedule },
+    { text: 'Appointments', icon: <CalendarTodayIcon />, path: '/doctor/appointments' },
     { text: 'Medical Reports', icon: <ReportsIcon />, path: '/doctor/reports', component: MedicalReports },
     { text: 'Chat', icon: <MessagesIcon />, path: '/doctor/chat', component: DoctorChat },
     { text: 'Settings', icon: <SettingsIcon />, path: '/doctor/settings' },

@@ -36,7 +36,8 @@ const PatientOnboardingForm = ({ open, onClose, onSubmit }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
     // Personal Information
-    fullName: '',
+    firstName: '',
+    lastName: '',
     dateOfBirth: null,
     gender: '',
     
@@ -95,12 +96,20 @@ const PatientOnboardingForm = ({ open, onClose, onSubmit }) => {
       case 0:
         return (
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Full Name"
-                value={formData.fullName}
-                onChange={handleChange('fullName')}
+                label="First Name"
+                value={formData.firstName}
+                onChange={handleChange('firstName')}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Last Name"
+                value={formData.lastName}
+                onChange={handleChange('lastName')}
               />
             </Grid>
             <Grid item xs={12}>
