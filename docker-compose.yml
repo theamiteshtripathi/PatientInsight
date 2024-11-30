@@ -14,10 +14,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    depends_on:
-      - db
     environment:
-      - DATABASE_URL=postgresql://user:password@db:5432/patient_insight
+      - DATABASE_URL=postgresql://${PATIENT_DB_USER}:${PATIENT_DB_PASSWORD}@${PATIENT_DB_HOST}:${PATIENT_DB_PORT}/${PATIENT_DB_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_DEFAULT_REGION=us-east-2
@@ -64,12 +62,3 @@ services:
       - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@db:5432/airflow
       - AIRFLOW__CORE__LOAD_EXAMPLES=false
     command: scheduler
-
-  db:
-    image: postgres:13
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=patient_insight
-    ports:
-      - "5432:5432"
