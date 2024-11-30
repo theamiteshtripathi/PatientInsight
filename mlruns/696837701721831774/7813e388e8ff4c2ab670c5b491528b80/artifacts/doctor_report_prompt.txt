@@ -1,0 +1,7 @@
+
+        Based on the patient's symptoms, please provide:
+        1. Initial assessment
+        2. Potential diagnoses to consider
+        3. Recommended next steps or immediate actions
+        4. Red flags or warning signs to monitor
+        

@@ -1,19 +1,26 @@
 import os
 from dotenv import load_dotenv
 import requests
-from datasets import load_dataset
-import logging
+import time
+import sys
+from pathlib import Path
 
 # Load environment variables
 load_dotenv()
-
 
 # Access AWS credentials
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
 def download_pmc_patients_dataset(output_dir: str) -> None:
-    logging.info(f"Starting download to {output_dir}")
+    # Start time
+    start_time = time.time()
+
+    # Pointing to the start of the project
+    root_path = Path(__file__).parent.parent.parent.parent.absolute()
+    sys.path.append(str(root_path))
+    output_dir = os.path.join(root_path, output_dir)
+    print(f"Starting download to: {output_dir}")
     
     try:
         # Create output directory if it doesn't exist
@@ -28,14 +35,24 @@ def download_pmc_patients_dataset(output_dir: str) -> None:
         with open(output_path, "wb") as f:
             f.write(response.content)
         
-        print(f"Dataset downloaded to {output_path}")
-        logging.info("Download completed successfully")
+        print(f"Dataset downloaded to: {output_path}")
+        print("Download completed successfully")
         
     except Exception as e:
-        logging.error(f"Download failed: {str(e)}")
+        print(f"Download failed: {str(e)}")
         raise
 
+    if os.path.exists(output_path):
+        print('Download file exists. Successfully exiting the script')
+    else:
+        raise Exception('File not found in the download directory')
+    
+    # Calculating time elapsed
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Time elapsed: {elapsed_time:.2f} seconds")
+
 if __name__ == "__main__":
-    print("Start script")
-    output_dir = "data/raw"
+    print("Starting process to download data")
+    output_dir = "backend/data_pipeline/data/raw"
     download_pmc_patients_dataset(output_dir)

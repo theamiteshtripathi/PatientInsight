@@ -1,0 +1,15 @@
+artifact_uri: /Users/deepakuday/Northeastern/MLOps/Project/PatientInsight/mlruns/696837701721831774/e9f59823338c4d31a036d3064e7f8661/artifacts
+end_time: 1732133950374
+entry_point_name: ''
+experiment_id: '696837701721831774'
+lifecycle_stage: active
+run_id: e9f59823338c4d31a036d3064e7f8661
+run_name: useful-chimp-824
+run_uuid: e9f59823338c4d31a036d3064e7f8661
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1732133932301
+status: 3
+tags: []
+user_id: deepakuday

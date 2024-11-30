@@ -1,0 +1,15 @@
+artifact_uri: /Users/deepakuday/Northeastern/MLOps/Project/PatientInsight/mlruns/696837701721831774/8c2cf0a81491474bb0d8e0f905882d54/artifacts
+end_time: 1732126718514
+entry_point_name: ''
+experiment_id: '696837701721831774'
+lifecycle_stage: active
+run_id: 8c2cf0a81491474bb0d8e0f905882d54
+run_name: stylish-fowl-749
+run_uuid: 8c2cf0a81491474bb0d8e0f905882d54
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1732126703325
+status: 3
+tags: []
+user_id: deepakuday
