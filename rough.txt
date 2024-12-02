@@ -94,6 +94,9 @@ IMPORTANT NOTE: ALOT OF THE IMPLEMENTATION HAS BEEN DONE ALREADY. TAKE TIME TO R
 
 
 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 psql -h patient-insight-db.c5mk2a8uqfh1.us-east-2.rds.amazonaws.com -U patientadmin -d patient_records -p 5432
 
 
