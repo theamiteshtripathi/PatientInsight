@@ -94,6 +94,9 @@ IMPORTANT NOTE: ALOT OF THE IMPLEMENTATION HAS BEEN DONE ALREADY. TAKE TIME TO R
 
 
 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 psql -h patient-insight-db.c5mk2a8uqfh1.us-east-2.rds.amazonaws.com -U patientadmin -d patient_records -p 5432
 
 
@@ -109,3 +112,22 @@ psql -h patient-insight-db.c5mk2a8uqfh1.us-east-2.rds.amazonaws.com -U patientad
     connection to airflow db = psql -h airflow-metadata-db.c5mk2a8uqfh1.us-east-2.rds.amazonaws.com -U airflow -d airflow -p 5432
 
  
+=======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+aws ec2 authorize-security-group-ingress \
+    --group-id sg-09b61829e0abea479 \
+    --protocol tcp \
+    --port 5432 \
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+    --cidr 172.31.0.0/16
+>>>>>>> Stashed changes
+=======
+    --cidr 172.31.0.0/16
+>>>>>>> Stashed changes
+=======
+    --cidr 172.31.0.0/16
+>>>>>>> Stashed changes
