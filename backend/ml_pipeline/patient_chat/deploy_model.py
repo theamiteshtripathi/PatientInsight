@@ -7,7 +7,7 @@ def deploy():
     
     if endpoint_name:
         # Save the endpoint name to a file
-        with open('endpoint_config.json', 'w') as f:
+        with open('backend/ml_pipeline/patient_chat/endpoint_config.json', 'w') as f:
             json.dump({'endpoint_name': endpoint_name}, f)
         print(f"Model deployed successfully. Endpoint name saved: {endpoint_name}")
     else:

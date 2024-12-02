@@ -43,7 +43,7 @@ class SageMakerLLM(LLM):
 
 def load_endpoint_name():
     try:
-        with open('endpoint_config.json', 'r') as f:
+        with open('backend/ml_pipeline/patient_chat/endpoint_config.json', 'r') as f:
             config = json.load(f)
             return config['endpoint_name']
     except FileNotFoundError:
