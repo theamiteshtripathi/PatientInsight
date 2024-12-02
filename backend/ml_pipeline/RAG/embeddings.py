@@ -33,7 +33,6 @@ class EmbeddingsHandler:
         self.index = self.pc.Index(Config.PINECONE_INDEX_NAME)
 
     def upsert_embeddings(self):
-        
         data = load_full_data()
         batch_size = 100
         
@@ -48,7 +47,9 @@ class EmbeddingsHandler:
             # Create vectors list for batch upsert
             vectors = []
             for id, embedding, text in zip(ids, embeddings, texts):
-                vectors.append((id, embedding.tolist(), {"text": text}))
+                # Truncate text to stay within Pinecone's metadata size limit
+                truncated_text = text[:40000]  # Adjust this number as needed
+                vectors.append((id, embedding.tolist(), {"text": truncated_text}))
             
             # Upsert to Pinecone
             self.index.upsert(vectors=vectors)
