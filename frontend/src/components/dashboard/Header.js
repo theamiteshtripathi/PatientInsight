@@ -1,37 +1,38 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import { useAuth } from '../../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, IconButton } from '@mui/material';
+import { Menu as MenuIcon } from '@mui/icons-material';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  title: {
-    flexGrow: 1,
-  },
-}));
-
-function Header() {
-  const classes = useStyles();
-  const { logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
+function Header({ drawerWidth }) {
   return (
-    <AppBar position="static">
+    <AppBar 
+      position="fixed"
+      sx={{
+        width: { sm: `calc(100% - ${drawerWidth}px)` },
+        ml: { sm: `${drawerWidth}px` },
+        backgroundColor: 'white',
+        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+        zIndex: (theme) => theme.zIndex.drawer + 1
+      }}
+    >
       <Toolbar>
-        <Typography variant="h6" className={classes.title}>
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          sx={{ mr: 2, color: 'primary.main', display: { sm: 'none' } }}
+        >
+          <MenuIcon />
+        </IconButton>
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            flexGrow: 1,
+            color: 'primary.main',
+            fontWeight: 500
+          }}
+        >
           Patient Insight
         </Typography>
-        <Button color="inherit" onClick={handleLogout}>
-          Logout
-        </Button>
       </Toolbar>
     </AppBar>
   );

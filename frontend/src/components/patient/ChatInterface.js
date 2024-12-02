@@ -1,234 +1,244 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Paper, 
-  TextField, 
-  Button, 
-  Box, 
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  Paper,
+  TextField,
+  Button,
   Typography,
-  List,
-  ListItem,
-  ListItemText,
+  Container,
+  Grid,
+  Box,
   CircularProgress,
-  makeStyles 
-} from '@material-ui/core';
-import Header from '../dashboard/Header';
-import Sidebar from '../dashboard/Sidebar';
-import { useAuth } from '../../hooks/useAuth';
+  Alert,
+  Fade
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { Send, Refresh } from '@mui/icons-material';
+import { v4 as uuidv4 } from 'uuid';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-    minHeight: '100vh',
-    backgroundColor: '#fff',
-  },
-  content: {
-    flexGrow: 1,
-    marginLeft: 240,
-    marginTop: 64,
-    height: `calc(100vh - 64px)`,
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  chatContainer: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    padding: theme.spacing(2),
-    height: '100%',
-    position: 'relative',
-  },
-  messageList: {
-    flex: 1,
-    overflow: 'auto',
-    padding: theme.spacing(2),
-    marginBottom: '100px',
-  },
-  message: {
-    marginBottom: theme.spacing(1),
-    padding: theme.spacing(1),
-    borderRadius: theme.spacing(2),
-    maxWidth: '80%',
-  },
-  userMessage: {
-    backgroundColor: theme.palette.primary.light,
-    color: theme.palette.primary.contrastText,
-    alignSelf: 'flex-end',
-    marginLeft: 'auto',
-  },
-  botMessage: {
-    backgroundColor: theme.palette.grey[200],
-    alignSelf: 'flex-start',
-  },
-  inputContainer: {
-    position: 'fixed',
-    bottom: 0,
-    left: 240,
-    right: 0,
-    padding: theme.spacing(3),
-    backgroundColor: '#fff',
-    borderTop: `1px solid ${theme.palette.divider}`,
-    display: 'flex',
-    alignItems: 'center',
-    gap: theme.spacing(2),
-    zIndex: 1000,
-  },
-  textField: {
-    flex: 1,
-    '& .MuiOutlinedInput-root': {
-      borderRadius: theme.spacing(2),
-    },
-  },
-  sendButton: {
-    height: 56,
-    width: 100,
-    borderRadius: theme.spacing(2),
-  }
+const ChatWrapper = styled(Container)(({ theme }) => ({
+  marginTop: theme.spacing(3),
+  marginBottom: theme.spacing(3),
+  height: '90vh',
+  display: 'flex',
+  flexDirection: 'column'
 }));
 
+const MessageContainer = styled(Box)(({ theme }) => ({
+  flexGrow: 1,
+  overflowY: 'auto',
+  padding: theme.spacing(2),
+  scrollBehavior: 'smooth',
+  marginBottom: theme.spacing(2)
+}));
+
+const MessageBubble = styled(Box)(({ theme, isBot }) => ({
+  maxWidth: '80%',
+  margin: '8px',
+  padding: '12px 16px',
+  borderRadius: '12px',
+  backgroundColor: isBot ? theme.palette.grey[100] : theme.palette.primary.main,
+  color: isBot ? theme.palette.text.primary : theme.palette.common.white,
+  alignSelf: isBot ? 'flex-start' : 'flex-end',
+  wordWrap: 'break-word'
+}));
+
+const API_BASE_URL = 'http://localhost:8000/api';
+
 function ChatInterface() {
-  const classes = useStyles();
-  const { currentUser } = useAuth();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [canGenerateSummary, setCanGenerateSummary] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [sessionId, setSessionId] = useState('');
+  const [error, setError] = useState('');
   const messagesEndRef = useRef(null);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  useEffect(() => {
-    if (messages.length >= 4) {
-      setCanGenerateSummary(true);
-    }
-  }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
-    const userMessage = {
-      text: input,
-      sender: 'user',
-      timestamp: new Date(),
-    };
+  const startNewSession = () => {
+    const newSessionId = uuidv4();
+    setSessionId(newSessionId);
+    setMessages([]);
+    setError('');
+    startChat(newSessionId);
+  };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setIsLoading(true);
+  useEffect(() => {
+    startNewSession();
+  }, []);
 
+  const startChat = async (newSessionId) => {
     try {
-      // TODO: Replace with actual API call to your LLM backend
-      const response = await new Promise(resolve => 
-        setTimeout(() => resolve({ 
-          text: "I understand your symptoms. Based on the information you've provided, I recommend scheduling an appointment with a doctor for a proper evaluation. Would you like me to help you schedule one?" 
-        }), 1000)
-      );
+      setLoading(true);
+      setError('');
+      const response = await fetch(`${API_BASE_URL}/chat/start`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ session_id: newSessionId }),
+      });
 
-      const botMessage = {
-        text: response.text,
-        sender: 'bot',
-        timestamp: new Date(),
-      };
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+      }
 
-      setMessages(prev => [...prev, botMessage]);
+      if (data.status === 'error') {
+        setError(data.error);
+      } else {
+        setMessages([{ text: data.message, isBot: true }]);
+      }
     } catch (error) {
-      console.error('Error getting response:', error);
-      // Handle error appropriately
+      setError(`Error starting chat: ${error.message}`);
+      console.error('Error:', error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const generateSummary = async () => {
+  const handleSend = async () => {
+    if (!input.trim() || loading) return;
+
+    const userMessage = input.trim();
+    setInput('');
+    setMessages(prev => [...prev, { text: userMessage, isBot: false }]);
+    setLoading(true);
+    setError('');
+
     try {
-      setIsLoading(true);
-      const summary = {
-        patientId: currentUser?.id,
-        symptoms: messages.filter(m => m.sender === 'user').map(m => m.text),
-        aiResponses: messages.filter(m => m.sender === 'bot').map(m => m.text),
-        date: new Date(),
-        status: 'pending_review'
-      };
+      const response = await fetch(`${API_BASE_URL}/chat/message`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          session_id: sessionId,
+          message: userMessage
+        }),
+      });
       
-      // TODO: Add API call to save summary
-      console.log('Generated Summary:', summary);
+      const data = await response.json();
       
-      setCanGenerateSummary(false);
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+      }
+
+      if (userMessage.toLowerCase() === 'bye') {
+        setMessages(prev => [...prev, { 
+          text: "Chat session ended. Your medical report has been generated.", 
+          isBot: true 
+        }]);
+        setTimeout(() => {
+          startNewSession();
+        }, 2000);
+        return;
+      }
+
+      setMessages(prev => [...prev, { text: data.message, isBot: true }]);
     } catch (error) {
-      console.error('Error generating summary:', error);
+      setError(`Error sending message: ${error.message}`);
+      console.error('Error:', error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
+    }
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      handleSend();
     }
   };
 
   return (
-    <div className={classes.root}>
-      <Header />
-      <Sidebar />
-      <main className={classes.content}>
-        <div className={classes.chatContainer}>
-          <List className={classes.messageList}>
+    <ChatWrapper>
+      <Paper 
+        elevation={3} 
+        sx={{ 
+          p: 3, 
+          borderRadius: 2,
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h5" component="h1">
+            Medical Chat Assistant
+          </Typography>
+          <Button
+            startIcon={<Refresh />}
+            onClick={startNewSession}
+            disabled={loading}
+            variant="outlined"
+          >
+            New Session
+          </Button>
+        </Box>
+        
+        {error && (
+          <Fade in={!!error}>
+            <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
+              {error}
+            </Alert>
+          </Fade>
+        )}
+        
+        <MessageContainer>
+          <Box display="flex" flexDirection="column">
             {messages.map((message, index) => (
-              <ListItem
-                key={index}
-                className={`${classes.message} ${
-                  message.sender === 'user' ? classes.userMessage : classes.botMessage
-                }`}
-                style={{ display: 'flex', justifyContent: message.sender === 'user' ? 'flex-end' : 'flex-start' }}
-              >
-                <ListItemText
-                  primary={message.text}
-                  secondary={message.timestamp.toLocaleTimeString()}
-                />
-              </ListItem>
+              <MessageBubble key={index} isBot={message.isBot}>
+                <Typography variant="body1">
+                  {message.text}
+                </Typography>
+              </MessageBubble>
             ))}
             <div ref={messagesEndRef} />
-          </List>
-          <div className={classes.inputContainer}>
-            <TextField
-              className={classes.textField}
-              variant="outlined"
-              placeholder="Type your message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              disabled={isLoading}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-            />
-            <Button
-              className={classes.sendButton}
-              variant="contained"
-              color="primary"
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-            >
-              {isLoading ? <CircularProgress size={24} /> : 'Send'}
-            </Button>
-            {canGenerateSummary && (
+          </Box>
+        </MessageContainer>
+        
+        <Box component="form" onSubmit={(e) => e.preventDefault()} sx={{ mt: 'auto' }}>
+          <Grid container spacing={2}>
+            <Grid item xs={10}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Type your message... (type 'bye' to end chat)"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                disabled={loading}
+                multiline
+                maxRows={4}
+                sx={{ backgroundColor: 'background.paper' }}
+              />
+            </Grid>
+            <Grid item xs={2}>
               <Button
+                fullWidth
                 variant="contained"
-                color="secondary"
-                onClick={generateSummary}
-                disabled={isLoading}
+                color="primary"
+                endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Send />}
+                onClick={handleSend}
+                disabled={loading || !input.trim()}
+                sx={{ height: '100%' }}
               >
-                Generate Summary
+                Send
               </Button>
-            )}
-          </div>
-        </div>
-      </main>
-    </div>
+            </Grid>
+          </Grid>
+        </Box>
+      </Paper>
+    </ChatWrapper>
   );
 }
 

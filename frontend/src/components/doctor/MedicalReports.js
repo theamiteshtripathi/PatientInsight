@@ -10,36 +10,33 @@ import {
   TableHead,
   TableRow,
   Button,
-  makeStyles
-} from '@material-ui/core';
+  styled
+} from '@mui/material';
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    padding: theme.spacing(2),
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  table: {
-    minWidth: 650,
-  },
+const StyledContainer = styled(Grid)(({ theme }) => ({
+  marginTop: theme.spacing(4),
+  marginBottom: theme.spacing(4)
+}));
+
+const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
+  marginTop: theme.spacing(3)
 }));
 
 function MedicalReports() {
-  const classes = useStyles();
   const [reports] = useState([
     { id: 1, patientName: 'John Doe', type: 'Blood Test', date: '2024-03-15', status: 'Completed' },
     { id: 2, patientName: 'Jane Smith', type: 'X-Ray', date: '2024-03-14', status: 'Pending' },
   ]);
 
   return (
-    <Grid container spacing={3}>
+    <StyledContainer container spacing={3}>
       <Grid item xs={12}>
-        <Paper className={classes.paper}>
+        <Paper>
           <Typography variant="h6" gutterBottom>
             Recent Medical Reports
           </Typography>
-          <TableContainer>
-            <Table className={classes.table}>
+          <StyledTableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="medical reports table">
               <TableHead>
                 <TableRow>
                   <TableCell>Patient Name</TableCell>
@@ -69,10 +66,10 @@ function MedicalReports() {
                 ))}
               </TableBody>
             </Table>
-          </TableContainer>
+          </StyledTableContainer>
         </Paper>
       </Grid>
-    </Grid>
+    </StyledContainer>
   );
 }
 

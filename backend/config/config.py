@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Testing actions
 class Config:
 
     #RAG
@@ -22,15 +23,20 @@ class Config:
     PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT")
     PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    HUGGING_FACE_TOKEN = os.getenv("HUGGING_FACE_TOKEN")
 
     # S3 Configuration
     S3_BUCKET = "patientinsightbucket"
     S3_PATH = "files/md5/44/14d973e28b5eedd86d5b5213281870"
     
-    # AWS Credentials
+    # AWS 
     AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
     AWS_REGION = os.getenv("AWS_REGION", "us-east-2")  
+    EXECUTION_ROLE = "arn:aws:iam::167325058662:role/sagemaker_execution_role"
+
+    #HF
+    HUGGING_FACE_TOKEN = "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"
 
     @classmethod
     def validate_env_vars(cls):

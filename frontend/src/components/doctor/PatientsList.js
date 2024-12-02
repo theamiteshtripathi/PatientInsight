@@ -8,68 +8,66 @@ import {
   TableRow,
   Paper,
   Button,
-  makeStyles
-} from '@material-ui/core';
+  Typography
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
 
-const useStyles = makeStyles((theme) => ({
-  table: {
-    minWidth: 650,
-  },
-  actionButton: {
-    marginRight: theme.spacing(1),
-  },
-  summaryButton: {
-    marginLeft: theme.spacing(1),
-  },
+const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
+  marginTop: theme.spacing(3),
+  marginBottom: theme.spacing(3)
 }));
 
 function PatientsList() {
-  const classes = useStyles();
   const [patients] = useState([
     { id: 1, name: 'John Doe', age: 45, condition: 'Diabetes', lastVisit: '2024-03-15' },
     { id: 2, name: 'Jane Smith', age: 32, condition: 'Hypertension', lastVisit: '2024-03-14' },
   ]);
 
   return (
-    <TableContainer component={Paper}>
-      <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Age</TableCell>
-            <TableCell>Condition</TableCell>
-            <TableCell>Last Visit</TableCell>
-            <TableCell>Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {patients.map((patient) => (
-            <TableRow key={patient.id}>
-              <TableCell>{patient.name}</TableCell>
-              <TableCell>{patient.age}</TableCell>
-              <TableCell>{patient.condition}</TableCell>
-              <TableCell>{patient.lastVisit}</TableCell>
-              <TableCell>
-                <Button 
-                  variant="contained" 
-                  color="primary" 
-                  className={classes.actionButton}
-                >
-                  View Details
-                </Button>
-                <Button 
-                  variant="outlined" 
-                  color="primary"
-                  className={classes.summaryButton}
-                >
-                  View Summary
-                </Button>
-              </TableCell>
+    <div>
+      <Typography variant="h4" sx={{ mb: 3 }}>
+        Patients List
+      </Typography>
+      
+      <StyledTableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="patients table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Age</TableCell>
+              <TableCell>Condition</TableCell>
+              <TableCell>Last Visit</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {patients.map((patient) => (
+              <TableRow key={patient.id}>
+                <TableCell>{patient.name}</TableCell>
+                <TableCell>{patient.age}</TableCell>
+                <TableCell>{patient.condition}</TableCell>
+                <TableCell>{patient.lastVisit}</TableCell>
+                <TableCell>
+                  <Button 
+                    variant="contained" 
+                    color="primary" 
+                    sx={{ mr: 1 }}
+                  >
+                    View Details
+                  </Button>
+                  <Button 
+                    variant="outlined" 
+                    color="primary"
+                  >
+                    View Summary
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </StyledTableContainer>
+    </div>
   );
 }
 

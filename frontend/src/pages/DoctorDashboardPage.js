@@ -1,129 +1,180 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
-  makeStyles,
-  AppBar,
-  Toolbar,
-  Typography,
-  Tabs,
-  Tab,
-  Box,
   Container,
-  Paper,
   Grid,
-} from '@material-ui/core';
+  Paper,
+  Typography,
+  Box,
+  styled,
+  IconButton,
+  Tooltip
+} from '@mui/material';
 import {
-  People as PeopleIcon,
-  Event as EventIcon,
-  Assessment as AssessmentIcon,
-  Description as SummaryIcon,
-} from '@material-ui/icons';
+  PeopleAlt,
+  EventNote,
+  Description,
+  TrendingUp
+} from '@mui/icons-material';
 import PatientsList from '../components/doctor/PatientsList';
-import AppointmentsSchedule from '../components/doctor/AppointmentsSchedule';
 import MedicalReports from '../components/doctor/MedicalReports';
-import ChatInterface from '../components/patient/ChatInterface';
-import LoadingSpinner from '../components/common/LoadingSpinner';
-import ErrorMessage from '../components/common/ErrorMessage';
-import { useAuth } from '../hooks/useAuth';
+import DoctorSidebar from '../components/doctor/DoctorSidebar';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-    minHeight: '100vh',
+const DashboardCard = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(3),
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100%',
+  borderRadius: 16,
+  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+  '&:hover': {
+    transform: 'translateY(-4px)',
+    boxShadow: theme.shadows[8],
   },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    marginTop: 64,
-  },
-  toolbar: {
-    paddingRight: 24,
-  },
-  title: {
-    flexGrow: 1,
-  },
-  tabPanel: {
-    padding: theme.spacing(3),
-  },
-  paper: {
-    padding: theme.spacing(2),
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  fixedHeight: {
-    height: 240,
-  },
+  background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)',
 }));
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      {...other}
-    >
-      {value === index && <Box p={3}>{children}</Box>}
-    </div>
-  );
-}
+const StatsBox = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  marginTop: 2,
+});
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.light,
+  borderRadius: '50%',
+  padding: theme.spacing(2),
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
 
 function DoctorDashboardPage() {
-  const classes = useStyles();
-  const [tabValue, setTabValue] = useState(0);
-  const { loading, error } = useAuth();
-
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-  };
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  if (error) {
-    return <ErrorMessage message={error} />;
-  }
-
   return (
-    <div className={classes.root}>
-      <AppBar position="fixed">
-        <Toolbar className={classes.toolbar}>
-          <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            Doctor Dashboard
+    <Box sx={{ display: 'flex' }}>
+      <DoctorSidebar />
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          width: { sm: `calc(100% - 240px)` },
+          ml: { sm: `240px` },
+          mt: '64px',
+        }}
+      >
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <Typography variant="h4" sx={{ mb: 4, fontWeight: 'bold', color: '#2c3e50' }}>
+            Welcome back, Dr. Smith
           </Typography>
-        </Toolbar>
-        <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-          centered
-          indicatorColor="secondary"
-          textColor="inherit"
-        >
-          <Tab icon={<PeopleIcon />} label="Patients" />
-          <Tab icon={<EventIcon />} label="Appointments" />
-          <Tab icon={<AssessmentIcon />} label="Reports" />
-          <Tab icon={<SummaryIcon />} label="Patient Summaries" />
-        </Tabs>
-      </AppBar>
+          
+          <Grid container spacing={3}>
+            {/* Stats Cards */}
+            <Grid item xs={12} md={4}>
+              <DashboardCard elevation={3}>
+                <StatsBox>
+                  <Box>
+                    <Typography variant="h6" color="textSecondary" gutterBottom>
+                      Total Patients
+                    </Typography>
+                    <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#2c3e50' }}>
+                      120
+                    </Typography>
+                    <Typography variant="body2" color="success.main" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <TrendingUp fontSize="small" /> +5% this month
+                    </Typography>
+                  </Box>
+                  <IconWrapper>
+                    <PeopleAlt sx={{ fontSize: 40, color: 'primary.main' }} />
+                  </IconWrapper>
+                </StatsBox>
+              </DashboardCard>
+            </Grid>
+            
+            <Grid item xs={12} md={4}>
+              <DashboardCard elevation={3}>
+                <StatsBox>
+                  <Box>
+                    <Typography variant="h6" color="textSecondary" gutterBottom>
+                      Today's Appointments
+                    </Typography>
+                    <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#2c3e50' }}>
+                      8
+                    </Typography>
+                    <Typography variant="body2" color="primary.main">
+                      Next appointment in 30 mins
+                    </Typography>
+                  </Box>
+                  <IconWrapper>
+                    <EventNote sx={{ fontSize: 40, color: 'primary.main' }} />
+                  </IconWrapper>
+                </StatsBox>
+              </DashboardCard>
+            </Grid>
+            
+            <Grid item xs={12} md={4}>
+              <DashboardCard elevation={3}>
+                <StatsBox>
+                  <Box>
+                    <Typography variant="h6" color="textSecondary" gutterBottom>
+                      Pending Reports
+                    </Typography>
+                    <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#2c3e50' }}>
+                      5
+                    </Typography>
+                    <Typography variant="body2" color="error.main">
+                      Requires attention
+                    </Typography>
+                  </Box>
+                  <IconWrapper>
+                    <Description sx={{ fontSize: 40, color: 'primary.main' }} />
+                  </IconWrapper>
+                </StatsBox>
+              </DashboardCard>
+            </Grid>
 
-      <main className={classes.content}>
-        <TabPanel value={tabValue} index={0}>
-          <PatientsList />
-        </TabPanel>
+            {/* Main Content */}
+            <Grid item xs={12}>
+              <Paper 
+                elevation={3} 
+                sx={{ 
+                  p: 3, 
+                  borderRadius: 4,
+                  background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)'
+                }}
+              >
+                <PatientsList />
+              </Paper>
+            </Grid>
 
-        <TabPanel value={tabValue} index={1}>
-          <AppointmentsSchedule />
-        </TabPanel>
+            <Grid item xs={12}>
+              <Paper 
+                elevation={3} 
+                sx={{ 
+                  p: 3, 
+                  borderRadius: 4,
+                  background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)'
+                }}
+              >
+              </Paper>
+            </Grid>
 
-        <TabPanel value={tabValue} index={2}>
-          <MedicalReports />
-        </TabPanel>
-
-        <TabPanel value={tabValue} index={3}>
-          <ChatInterface />
-        </TabPanel>
-      </main>
-    </div>
+            <Grid item xs={12}>
+              <Paper 
+                elevation={3} 
+                sx={{ 
+                  p: 3, 
+                  borderRadius: 4,
+                  background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)'
+                }}
+              >
+                <MedicalReports />
+              </Paper>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+    </Box>
   );
 }
 
