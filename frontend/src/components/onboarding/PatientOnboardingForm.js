@@ -23,6 +23,7 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { createPatient } from '../../services/patientApi';
 
 const steps = [
   'Personal Information',
@@ -64,6 +65,8 @@ const PatientOnboardingForm = ({ open, onClose, onSubmit }) => {
     enableNotifications: true,
     allowDataSharing: false
   });
+  const [submitError, setSubmitError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (field) => (event) => {
     setFormData({
@@ -87,8 +90,50 @@ const PatientOnboardingForm = ({ open, onClose, onSubmit }) => {
     setActiveStep((prevStep) => prevStep - 1);
   };
 
-  const handleSubmit = () => {
-    onSubmit(formData);
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+    
+    try {
+      // Format the date properly
+      const formattedDate = formData.dateOfBirth ? 
+        formData.dateOfBirth.format('YYYY-MM-DD') : null;
+
+      const patientData = {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        date_of_birth: formattedDate, // Use formatted date
+        gender: formData.gender,
+        phone_number: formData.phone,
+        address: formData.address,
+        blood_type: formData.bloodType,
+        height: parseFloat(formData.height) || null, // Convert to number
+        weight: parseFloat(formData.weight) || null, // Convert to number
+        medical_conditions: formData.medicalConditions,
+        allergies: formData.allergies,
+        emergency_contact_name: formData.emergencyName,
+        emergency_contact_relationship: formData.emergencyRelationship,
+        emergency_contact_phone: formData.emergencyPhone,
+        notifications_enabled: formData.enableNotifications,
+        data_sharing_allowed: formData.allowDataSharing
+      };
+
+      // Log the data being sent (for debugging)
+      console.log('Submitting patient data:', patientData);
+
+      const response = await createPatient(patientData);
+      
+      if (response) {
+        console.log('Patient created successfully:', response);
+        onSubmit(response);
+        onClose();
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      setSubmitError(error.message || 'Failed to submit form');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderStepContent = (step) => {
@@ -301,6 +346,12 @@ const PatientOnboardingForm = ({ open, onClose, onSubmit }) => {
       </DialogTitle>
       
       <DialogContent>
+        {submitError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {submitError}
+          </Alert>
+        )}
+        
         <Box sx={{ mt: 2, mb: 4 }}>
           <Stepper activeStep={activeStep} alternativeLabel>
             {steps.map((label) => (
@@ -325,8 +376,9 @@ const PatientOnboardingForm = ({ open, onClose, onSubmit }) => {
           <Button 
             variant="contained" 
             onClick={handleSubmit}
+            disabled={isSubmitting}
           >
-            Complete Setup
+            {isSubmitting ? 'Submitting...' : 'Complete Setup'}
           </Button>
         ) : (
           <Button 

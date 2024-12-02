@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Paper,
   TextField,
@@ -9,18 +10,23 @@ import {
   Box,
   CircularProgress,
   Alert,
-  Fade
+  Fade,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Send, Refresh } from '@mui/icons-material';
+import { Send, Refresh, CheckCircleOutline } from '@mui/icons-material';
 import { v4 as uuidv4 } from 'uuid';
 
 const ChatWrapper = styled(Container)(({ theme }) => ({
-  marginTop: theme.spacing(3),
-  marginBottom: theme.spacing(3),
-  height: '90vh',
+  height: '100%',
   display: 'flex',
-  flexDirection: 'column'
+  flexDirection: 'column',
+  padding: '10px',
+  overflow: 'hidden'
 }));
 
 const MessageContainer = styled(Box)(({ theme }) => ({
@@ -51,6 +57,9 @@ function ChatInterface() {
   const [sessionId, setSessionId] = useState('');
   const [error, setError] = useState('');
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
+  const [showReportDialog, setShowReportDialog] = useState(false);
+  const navigate = useNavigate();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -137,9 +146,7 @@ function ChatInterface() {
           text: "Chat session ended. Your medical report has been generated.", 
           isBot: true 
         }]);
-        setTimeout(() => {
-          startNewSession();
-        }, 2000);
+        setShowReportDialog(true);
         return;
       }
 
@@ -149,6 +156,7 @@ function ChatInterface() {
       console.error('Error:', error);
     } finally {
       setLoading(false);
+      inputRef.current?.focus();
     }
   };
 
@@ -159,16 +167,22 @@ function ChatInterface() {
     }
   };
 
+  const handleViewReport = () => {
+    setShowReportDialog(false);
+    navigate('/symptom-checker');
+  };
+
   return (
     <ChatWrapper>
       <Paper 
         elevation={3} 
         sx={{ 
-          p: 3, 
+          p: 2, 
           borderRadius: 2,
           height: '100%',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          overflow: 'hidden'
         }}
       >
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
@@ -193,7 +207,26 @@ function ChatInterface() {
           </Fade>
         )}
         
-        <MessageContainer>
+        <MessageContainer
+          sx={{
+            height: '100%',
+            overflowY: 'auto',
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: '#f1f1f1',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: '#888',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              background: '#555',
+            },
+          }}
+        >
           <Box display="flex" flexDirection="column">
             {messages.map((message, index) => (
               <MessageBubble key={index} isBot={message.isBot}>
@@ -206,10 +239,18 @@ function ChatInterface() {
           </Box>
         </MessageContainer>
         
-        <Box component="form" onSubmit={(e) => e.preventDefault()} sx={{ mt: 'auto' }}>
+        <Box 
+          component="form" 
+          onSubmit={(e) => e.preventDefault()} 
+          sx={{ 
+            mt: 2,
+            flexShrink: 0
+          }}
+        >
           <Grid container spacing={2}>
             <Grid item xs={10}>
               <TextField
+                inputRef={inputRef}
                 fullWidth
                 variant="outlined"
                 placeholder="Type your message... (type 'bye' to end chat)"
@@ -220,6 +261,7 @@ function ChatInterface() {
                 multiline
                 maxRows={4}
                 sx={{ backgroundColor: 'background.paper' }}
+                autoFocus
               />
             </Grid>
             <Grid item xs={2}>
@@ -238,6 +280,45 @@ function ChatInterface() {
           </Grid>
         </Box>
       </Paper>
+
+      <Dialog
+        open={showReportDialog}
+        onClose={() => setShowReportDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 1,
+          color: 'success.main' 
+        }}>
+          <CheckCircleOutline />
+          Report Generated Successfully
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Your medical report has been generated and sent to our medical team for review. 
+            You can track the status of your report in the Symptoms Checker page.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 0 }}>
+          <Button 
+            onClick={() => setShowReportDialog(false)}
+            color="inherit"
+          >
+            Close
+          </Button>
+          <Button 
+            onClick={handleViewReport}
+            variant="contained"
+            color="primary"
+            autoFocus
+          >
+            View Report Status
+          </Button>
+        </DialogActions>
+      </Dialog>
     </ChatWrapper>
   );
 }
