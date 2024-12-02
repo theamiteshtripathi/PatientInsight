@@ -8,33 +8,24 @@ import {
   Typography,
   IconButton,
   Divider,
-  Button
+  Avatar,
+  useTheme
 } from '@mui/material';
 import {
   Notifications as NotificationsIcon,
   Settings as SettingsIcon,
-  Upload as UploadIcon,
-  Refresh as RefreshIcon
+  HealthAndSafety as HealthIcon
 } from '@mui/icons-material';
 import MainLayout from '../components/layout/MainLayout';
-
-// Import components
 import ChatInterface from '../components/patient/ChatInterface';
-import ReportView from '../components/patient/ReportView';
-import HealthRecommendations from '../components/patient/HealthRecommendations';
-import MedicalHistory from '../components/patient/Medicalhistory';
-import ConversationHistory from '../components/patient/ConversationHistory';
-
-// Add these imports at the top
-import { useOnboarding } from '../hooks/useOnboarding';
 import PatientOnboardingForm from '../components/onboarding/PatientOnboardingForm';
 
 function DashboardPage() {
+  const theme = useTheme();
   const { currentUser } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
-    // Check if user has completed onboarding
     const hasCompletedOnboarding = localStorage.getItem('onboardingCompleted');
     if (!hasCompletedOnboarding) {
       setShowOnboarding(true);
@@ -42,8 +33,6 @@ function DashboardPage() {
   }, []);
 
   const handleOnboardingSubmit = async (formData) => {
-    // Handle the form submission
-    console.log('Onboarding data:', formData);
     localStorage.setItem('onboardingCompleted', 'true');
     setShowOnboarding(false);
   };
@@ -56,83 +45,88 @@ function DashboardPage() {
         onSubmit={handleOnboardingSubmit}
       />
       
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
         {/* Welcome Section */}
         <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={12}>
-            <Paper sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Box>
-                <Typography variant="h5">Welcome Back, [Patient Name]</Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Last login: {new Date().toLocaleDateString()}
-                </Typography>
+            <Paper 
+              elevation={0}
+              sx={{ 
+                p: 3, 
+                background: 'linear-gradient(135deg, #1976d2 0%, #0f4c81 100%)',
+                borderRadius: '20px',
+                color: 'white',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Avatar 
+                  sx={{ 
+                    width: 60, 
+                    height: 60, 
+                    bgcolor: 'rgba(255,255,255,0.2)',
+                    border: '2px solid white'
+                  }}
+                >
+                  <HealthIcon sx={{ fontSize: 30 }} />
+                </Avatar>
+                <Box>
+                  <Typography variant="h4" sx={{ fontWeight: 600 }}>
+                    Welcome Back, [Patient Name]
+                  </Typography>
+                  <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+                    Let's take care of your health today
+                  </Typography>
+                </Box>
               </Box>
-              <Box>
-                <IconButton><NotificationsIcon /></IconButton>
-                <IconButton><SettingsIcon /></IconButton>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <IconButton sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.1)', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' } }}>
+                  <NotificationsIcon />
+                </IconButton>
+                <IconButton sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.1)', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' } }}>
+                  <SettingsIcon />
+                </IconButton>
               </Box>
             </Paper>
           </Grid>
         </Grid>
 
-        <Grid container spacing={3}>
-          {/* Left Column - AI Chat Interface */}
-          <Grid item xs={12} md={8}>
-            <Paper sx={{ p: 3, mb: 3 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6">AI Health Assistant</Typography>
-                <Button
-                  startIcon={<RefreshIcon />}
-                  variant="outlined"
-                  size="small"
-                >
-                  New Session
-                </Button>
-              </Box>
-              <Divider sx={{ mb: 2 }} />
-              <ChatInterface />
-            </Paper>
-
-            {/* Previous Conversations */}
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Recent Conversations
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-              <ConversationHistory />
-            </Paper>
-          </Grid>
-
-          {/* Right Column - Reports & Recommendations */}
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 3, mb: 3 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6">Health Reports</Typography>
-                <IconButton color="primary" size="small">
-                  <UploadIcon />
-                </IconButton>
-              </Box>
-              <Divider sx={{ mb: 2 }} />
-              <ReportView />
-            </Paper>
-
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Personalized Recommendations
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-              <HealthRecommendations />
-            </Paper>
-          </Grid>
-
-          {/* Bottom Section - Medical History */}
+        {/* Main Chat Interface */}
+        <Grid container>
           <Grid item xs={12}>
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Medical History Timeline
-              </Typography>
+            <Paper 
+              elevation={0}
+              sx={{ 
+                p: 3, 
+                height: 'auto', 
+                display: 'flex',
+                flexDirection: 'column',
+                borderRadius: '20px',
+                bgcolor: '#ffffff',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+              }}
+            >
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center', 
+                mb: 2 
+              }}>
+                <Typography variant="h5" sx={{ 
+                  fontWeight: 600,
+                  background: 'linear-gradient(135deg, #1976d2 0%, #0f4c81 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}>
+                  AI Health Assistant
+                </Typography>
+              </Box>
               <Divider sx={{ mb: 2 }} />
-              <MedicalHistory />
+              <Box sx={{ flexGrow: 1, display: 'flex' }}>
+                <ChatInterface />
+              </Box>
             </Paper>
           </Grid>
         </Grid>
