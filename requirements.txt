@@ -34,3 +34,4 @@ pydantic==2.9.2
 flask-cors==5.0.0
 fpdf==1.7.2
 flask==2.2.5
+

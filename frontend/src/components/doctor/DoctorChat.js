@@ -1,21 +1,18 @@
 import React from 'react';
 import ChatInterface from '../patient/ChatInterface';
-import { makeStyles } from '@material-ui/core';
+import { styled } from '@mui/material/styles';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-  }
+const Root = styled('div')(({ theme }) => ({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
 }));
 
 function DoctorChat() {
-  const classes = useStyles();
   return (
-    <div className={classes.root}>
+    <Root>
       <ChatInterface isDoctorView={true} />
-    </div>
+    </Root>
   );
 }
 
