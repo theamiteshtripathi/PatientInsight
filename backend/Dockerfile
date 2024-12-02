@@ -1,5 +1,5 @@
-# Use tensorflow's official image as base
-FROM tensorflow/tensorflow:2.13.0-gpu
+# Use Python 3.12 slim as base
+FROM python:3.12-slim
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -17,9 +17,6 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /app
 
-# Specify files to ignore
-COPY .dockerignore .
-
 # Copy requirements first for better caching
 COPY requirements.txt .
 
@@ -32,8 +29,8 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p /app/data/raw /app/data/processed /app/logs
 
-# Expose ports for API and Airflow
-EXPOSE 8000 8080
+# Expose port for API
+EXPOSE 8000
 
 # Add entrypoint script
 COPY entrypoint.sh /entrypoint.sh

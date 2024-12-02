@@ -109,3 +109,54 @@ psql -h patient-insight-db.c5mk2a8uqfh1.us-east-2.rds.amazonaws.com -U patientad
     connection to airflow db = psql -h airflow-metadata-db.c5mk2a8uqfh1.us-east-2.rds.amazonaws.com -U airflow -d airflow -p 5432
 
  
+
+TOKEN FOR EKS CLUSTER
+(PatientInsight) amiteshtripathi@MacBookAir PatientInsight % aws eks get-token \
+    --cluster-name PatientInsightEKSCluster \
+    --region us-east-2 \
+    --role-arn arn:aws:iam::167325058662:role/eks_execution_role
+{
+    "kind": "ExecCredential",
+    "apiVersion": "client.authentication.k8s.io/v1beta1",
+    "spec": {},
+    "status": {
+        "expirationTimestamp": "2024-12-01T03:21:51Z",
+        "token": "k8s-aws-v1.aHR0cHM6Ly9zdHMudXMtZWFzdC0yLmFtYXpvbmF3cy5jb20vP0FjdGlvbj1HZXRDYWxsZXJJZGVudGl0eSZWZXJzaW9uPTIwMTEtMDYtMTUmWC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BU0lBU041S1pZWlRQTjdTS1RVSCUyRjIwMjQxMjAxJTJGdXMtZWFzdC0yJTJGc3RzJTJGYXdzNF9yZXF1ZXN0JlgtQW16LURhdGU9MjAyNDEyMDFUMDMwNzUxWiZYLUFtei1FeHBpcmVzPTYwJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCUzQngtazhzLWF3cy1pZCZYLUFtei1TZWN1cml0eS1Ub2tlbj1JUW9KYjNKcFoybHVYMlZqRVBQJTJGJTJGJTJGJTJGJTJGJTJGJTJGJTJGJTJGJTJGd0VhQ1hWekxXVmhjM1F0TWlKR01FUUNJRXIlMkJwRlJmMXh2aUFNM1hQeUVISlo0UHJxT1dibm13WEE1JTJCeWUxU2x3dWVBaUJIOWhWaE5NdXFINTBPY0xMVk81VFBQWG0zSDg5QURhNHdmVXNSTmFOZlhTcWxBZ2ljJTJGJTJGJTJGJTJGJTJGJTJGJTJGJTJGJTJGJTJGOEJFQUFhRERFMk56TXlOVEExT0RZMk1pSU1CZGZmNTUlMkIlMkI3TUdwZnBZekt2a0JOJTJGMVhmVkNqcjMlMkZFSlBNZHpZRFNTOHVIdkdFR3RFR0d4RlM3YllDNnN6YmRSb3dsajlZTWw3NENVaDNISWNQdXlLQnRwcWQyVHVuUE5uQWxqaTlxbkRpVzJRd0RXTU5wcTB6WSUyRmJaUzMyNEVqbFIlMkZXeG4lMkZJbUR1M1kyMHdTWGZxSm5aaUFiS1pQWk5lSlpqaTZpRW4wdVclMkJUaXQlMkZGaVFsZ2Y5cDlZdXhPaEhMN1dPOUthT0lRUlRQOXNrUmxCRVRJQUdmbk1zY01LYWszcDlPSG9GeFduZ01hcnM5Y1NXT3hPRDZuc1NoTnE1ZXVSNUEyMklnaFI5NEtEJTJCYlMydVkzY1VVRFJuNnlIeHNxZFlRYnVrM092RXEyNFd2NWtDSU82SFJCVTYlMkZYWjdtNldoTlVHcSUyRiUyQjdOMENDQ3NVSkdtY3FWcGFPak56M1NNSWVtcjdvR09wNEIwaHJJdklQZ0tRQmxPUjJaS2dJSHVWdlhWbjVTQ2ZhVkw1WlFtSFBEUXo1S0VFYjF2R1Q0JTJCekdpaEV6Y0g3OXl2ajBiJTJGeG8yblJDdEU4UmxMZWU2TFdDYVZNU0wlMkZWSGZCR2dTcTFVRFJ1dDF3T3BzUkhKNmZ0cVlBNll3bno4eVNMc3BIUVRRSmQlMkJpYjBzOTBzbTlxZ0IlMkZwNzVQZGRiaHhrd0ZzbnhhUzlpZkJVc0tlalBCUGNpNFBLJTJCTXdUNDZOMlI2eDU2SzREMlVrMHducWlvJTNEJlgtQW16LVNpZ25hdHVyZT04ZGUxYTRhNGQ4ZWY1NjhhMDliMmQ2MTBmMjI2ZGRjN2ZlMjk5OTEyNGUyYmI1MTE1YjU2NWUzZTViNjFhMDEy"
+    }
+}
+
+
+aws iam attach-role-policy \
+    --role-name EKSAdminRole \
+    --policy-arn arn:aws:aws-service-role/eks.amazonaws.com/AWSServiceRoleForAmazonEKS
+
+
+
+(PatientInsight) amiteshtripathi@MacBookAir PatientInsight % aws iam create-role \
+    --role-name EKSAdminRole \
+    --assume-role-policy-document file://trust-policy.json
+{
+    "Role": {
+        "Path": "/",
+        "RoleName": "EKSAdminRole",
+        "RoleId": "AROASN5KZYZTOUCBYJU6A",
+        "Arn": "arn:aws:iam::167325058662:role/EKSAdminRole",
+        "CreateDate": "2024-12-01T02:16:55+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": "arn:aws:iam::167325058662:root"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+:
+    
+
+
+
+
+aws eks describe-cluster --name PatientInsightEKSCluster --region us-east-2

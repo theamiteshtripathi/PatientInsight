@@ -1,0 +1,47 @@
+# frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: default
+  labels:
+    app: patient-insight
+    tier: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: patient-insight
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: patient-insight
+        tier: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: 167325058662.dkr.ecr.us-east-2.amazonaws.com/patient-insight-frontend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          name: http
+        env:
+        - name: BACKEND_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: backend-url
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "200m"
+            memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
