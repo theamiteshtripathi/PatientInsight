@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/database');
 
-router.post('/patients', async (req, res) => {
+router.post('/api/patientsonboardingform', async (req, res) => {
   try {
     console.log('Received patient data:', req.body);
 
@@ -20,7 +20,7 @@ router.post('/patients', async (req, res) => {
     }
 
     const query = `
-      INSERT INTO patients (
+      INSERT INTO patientsonboardingform (
         first_name, last_name, date_of_birth, gender, phone_number,
         address, blood_type, height, weight, medical_conditions,
         allergies, emergency_contact_name, emergency_contact_relationship,

@@ -172,6 +172,36 @@ function ChatInterface() {
     navigate('/symptom-checker');
   };
 
+  const handleGenerateReport = async (chatHistory) => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      
+      const response = await fetch('http://localhost:8000/api/generate-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          messages: chatHistory,
+          user_id: user.id
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate report');
+      }
+
+      const data = await response.json();
+      console.log('Report generated successfully:', data);
+      
+      alert('Chat report has been generated and saved successfully!');
+
+    } catch (error) {
+      console.error('Error generating report:', error);
+      alert('Failed to generate report. Please try again.');
+    }
+  };
+
   return (
     <ChatWrapper>
       <Paper 

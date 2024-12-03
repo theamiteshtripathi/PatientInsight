@@ -27,17 +27,51 @@ function DashboardPage() {
   const { currentUser } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    const hasCompletedOnboarding = localStorage.getItem('onboardingCompleted');
-    if (!hasCompletedOnboarding) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    console.log('User data from localStorage:', user);
+    setUserData(user);
+
+    // Show onboarding form if user doesn't have a profile
+    if (user && !user.hasProfile) {
       setShowOnboarding(true);
     }
   }, []);
 
   const handleOnboardingSubmit = async (formData) => {
-    localStorage.setItem('onboardingCompleted', 'true');
-    setShowOnboarding(false);
+    try {
+      // Add user_id to the form data
+      const dataWithUserId = {
+        ...formData,
+        user_id: userData.id
+      };
+
+      const response = await fetch('http://localhost:8000/api/patientsonboardingform', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataWithUserId),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save profile');
+      }
+
+      // Update user data in localStorage to reflect profile completion
+      const updatedUser = {
+        ...userData,
+        hasProfile: true
+      };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUserData(updatedUser);
+      setShowOnboarding(false);
+
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    }
   };
 
   const handleCardClick = (type) => {
@@ -71,7 +105,7 @@ function DashboardPage() {
               }} />
               <Box>
                 <Typography variant="h5" sx={{ fontWeight: 600, color: '#ffffff' }}>
-                  Welcome Back, [Patient Name]
+                  Welcome Back, {userData ? `${userData.first_name} ${userData.last_name}` : 'Guest'}
                 </Typography>
                 <Typography variant="subtitle2" sx={{ color: '#ffffff', opacity: 0.9 }}>
                   Let's take care of your health today
@@ -125,7 +159,7 @@ function DashboardPage() {
             }} />
             <Box>
               <Typography variant="h5" sx={{ fontWeight: 600, color: '#ffffff' }}>
-                Welcome Back, [Patient Name]
+                Welcome Back, {userData ? `${userData.first_name} ${userData.last_name}` : 'Guest'}
               </Typography>
               <Typography variant="subtitle2" sx={{ color: '#ffffff', opacity: 0.9 }}>
                 Let's take care of your health today

@@ -36,34 +36,14 @@ const steps = [
 const PatientOnboardingForm = ({ open, onClose, onSubmit }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
-    // Personal Information
+    // Get user_id from localStorage when component mounts
+    user_id: JSON.parse(localStorage.getItem('user'))?.id || null,
+    // Rest of your form fields...
     firstName: '',
     lastName: '',
     dateOfBirth: null,
     gender: '',
-    
-    // Contact Information
-    phone: '',
-    address: '',
-    
-    // Medical History
-    bloodType: '',
-    height: '',
-    weight: '',
-    medicalConditions: '',
-    allergies: '',
-    currentMedications: '',
-    recentSurgeries: '',
-    familyHistory: '',
-    
-    // Emergency Contact
-    emergencyName: '',
-    emergencyRelationship: '',
-    emergencyPhone: '',
-    
-    // Preferences
-    enableNotifications: true,
-    allowDataSharing: false
+    // ... other fields
   });
   const [submitError, setSubmitError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -95,36 +75,41 @@ const PatientOnboardingForm = ({ open, onClose, onSubmit }) => {
     setSubmitError(null);
     
     try {
-      // Format the date properly
+      const user = JSON.parse(localStorage.getItem('user'));
       const formattedDate = formData.dateOfBirth ? 
         formData.dateOfBirth.format('YYYY-MM-DD') : null;
 
       const patientData = {
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        date_of_birth: formattedDate, // Use formatted date
-        gender: formData.gender,
-        phone_number: formData.phone,
-        address: formData.address,
-        blood_type: formData.bloodType,
-        height: parseFloat(formData.height) || null, // Convert to number
-        weight: parseFloat(formData.weight) || null, // Convert to number
-        medical_conditions: formData.medicalConditions,
-        allergies: formData.allergies,
-        emergency_contact_name: formData.emergencyName,
-        emergency_contact_relationship: formData.emergencyRelationship,
-        emergency_contact_phone: formData.emergencyPhone,
-        notifications_enabled: formData.enableNotifications,
-        data_sharing_allowed: formData.allowDataSharing
+        user_id: user.id,
+        first_name: formData.firstName || '',
+        last_name: formData.lastName || '',
+        date_of_birth: formattedDate,
+        gender: formData.gender || '',
+        phone_number: formData.phone || '',
+        address: formData.address || '',
+        blood_type: formData.bloodType || '',
+        height: parseFloat(formData.height) || null,
+        weight: parseFloat(formData.weight) || null,
+        medical_conditions: formData.medicalConditions || '',
+        allergies: formData.allergies || '',
+        emergency_contact_name: formData.emergencyName || '',
+        emergency_contact_relationship: formData.emergencyRelationship || '',
+        emergency_contact_phone: formData.emergencyPhone || '',
+        notifications_enabled: Boolean(formData.enableNotifications),
+        data_sharing_allowed: Boolean(formData.allowDataSharing)
       };
 
-      // Log the data being sent (for debugging)
       console.log('Submitting patient data:', patientData);
 
       const response = await createPatient(patientData);
       
       if (response) {
         console.log('Patient created successfully:', response);
+        const updatedUser = {
+          ...user,
+          hasProfile: true
+        };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
         onSubmit(response);
         onClose();
       }
