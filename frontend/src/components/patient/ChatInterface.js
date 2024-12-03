@@ -54,7 +54,7 @@ function ChatInterface() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [sessionId, setSessionId] = useState('');
+  const [sessionId, setSessionId] = useState(null);
   const [error, setError] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -123,15 +123,18 @@ function ChatInterface() {
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/chat/message`, {
+      const user = JSON.parse(localStorage.getItem('user'));
+      
+      const response = await fetch('http://localhost:8000/api/chat/message', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
         },
         body: JSON.stringify({
-          session_id: sessionId,
-          message: userMessage
+          message: userMessage,
+          chatHistory: messages,
+          user_id: user.id,
+          session_id: sessionId
         }),
       });
       
@@ -176,15 +179,13 @@ function ChatInterface() {
     try {
       const user = JSON.parse(localStorage.getItem('user'));
       
+      // First generate the PDF (your existing code)
       const response = await fetch('http://localhost:8000/api/generate-report', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          messages: chatHistory,
-          user_id: user.id
-        }),
+        body: JSON.stringify({ messages: chatHistory }),
       });
 
       if (!response.ok) {
@@ -192,15 +193,39 @@ function ChatInterface() {
       }
 
       const data = await response.json();
-      console.log('Report generated successfully:', data);
       
+      // Now store the generated PDF in database
+      const storeResponse = await fetch('http://localhost:8000/api/store-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          report_path: data.report_path
+        }),
+      });
+
+      if (!storeResponse.ok) {
+        throw new Error('Failed to store report in database');
+      }
+
+      const storeData = await storeResponse.json();
+      console.log('Report stored in database:', storeData);
+      
+      // Show success message
       alert('Chat report has been generated and saved successfully!');
 
     } catch (error) {
-      console.error('Error generating report:', error);
-      alert('Failed to generate report. Please try again.');
+      console.error('Error handling report:', error);
+      alert('Failed to handle report. Please try again.');
     }
   };
+
+  useEffect(() => {
+    // Generate a new session ID when the component mounts
+    setSessionId(crypto.randomUUID());
+  }, []);
 
   return (
     <ChatWrapper>
