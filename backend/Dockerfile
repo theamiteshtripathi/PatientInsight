@@ -1,42 +1,29 @@
-# Use tensorflow's official image as base
-FROM tensorflow/tensorflow:2.13.0-gpu
-
-# Set environment variables
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    git \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+# Use Python 3.12 slim base image
+FROM python:3.12-slim
 
 # Set working directory
-WORKDIR /app
+WORKDIR /backend
 
-# Specify files to ignore
-COPY .dockerignore .
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential gcc g++ \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
+# Copy requirements file
 COPY requirements.txt .
 
-# Install Python dependencies
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the backend code
+# Copy the backend directory
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p /app/data/raw /app/data/processed /app/logs
+# Expose port 8000
+EXPOSE 8000
 
-# Expose ports for API and Airflow
-EXPOSE 8000 8080
+# Set environment variables
+ENV PYTHONPATH=/backend
 
-# Add entrypoint script
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-ENTRYPOINT ["/entrypoint.sh"]
+# Run the application
+CMD ["python", "run.py"]

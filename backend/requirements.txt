@@ -11,7 +11,7 @@ mlflow==2.18.0
 sentence-transformers==3.3.0
 aiobotocore==2.15.2
 boto3==1.35.36
-awscli==1.35.2
+awscli==1.35.2 
 dvc
 dvc[s3]
 en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl#sha256=1932429db727d4bff3deed6b34cfc05df17794f4a52eeb26cf8928f7c1a0fb85

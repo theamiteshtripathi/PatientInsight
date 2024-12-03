@@ -1,3 +1,9 @@
+import sys
+from pathlib import Path
+# Add the project root directory to the Python path
+root_path = Path(__file__).parent.parent.absolute()
+sys.path.append(str(root_path))
+
 from backend.app import app
 from backend.config.config import Config
 
