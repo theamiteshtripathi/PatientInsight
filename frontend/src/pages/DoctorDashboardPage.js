@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   Grid,
@@ -50,6 +50,26 @@ const IconWrapper = styled(Box)(({ theme }) => ({
 }));
 
 function DoctorDashboardPage() {
+  const [stats, setStats] = useState({
+    total_patients: 0,
+    total_appointments: 0,
+    pending_reports: 0
+  });
+
+  useEffect(() => {
+    fetchDashboardStats();
+  }, []);
+
+  const fetchDashboardStats = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/doctor/dashboard-stats');
+      const data = await response.json();
+      setStats(data);
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+    }
+  };
+
   return (
     <Box sx={{ display: 'flex' }}>
       <DoctorSidebar />
@@ -78,7 +98,7 @@ function DoctorDashboardPage() {
                       Total Patients
                     </Typography>
                     <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#2c3e50' }}>
-                      120
+                      {stats.total_patients}
                     </Typography>
                     <Typography variant="body2" color="success.main" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <TrendingUp fontSize="small" /> +5% this month
@@ -99,7 +119,7 @@ function DoctorDashboardPage() {
                       Today's Appointments
                     </Typography>
                     <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#2c3e50' }}>
-                      8
+                      {stats.total_appointments}
                     </Typography>
                     <Typography variant="body2" color="primary.main">
                       Next appointment in 30 mins
@@ -120,7 +140,7 @@ function DoctorDashboardPage() {
                       Pending Reports
                     </Typography>
                     <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#2c3e50' }}>
-                      5
+                      {stats.pending_reports}
                     </Typography>
                     <Typography variant="body2" color="error.main">
                       Requires attention

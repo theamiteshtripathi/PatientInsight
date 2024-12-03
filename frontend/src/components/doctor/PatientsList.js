@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -6,36 +6,79 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Button,
-  Typography
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Typography,
+  Grid,
+  Paper
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
-
-const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  marginTop: theme.spacing(3),
-  marginBottom: theme.spacing(3)
-}));
 
 function PatientsList() {
-  const [patients] = useState([
-    { id: 1, name: 'John Doe', age: 45, condition: 'Diabetes', lastVisit: '2024-03-15' },
-    { id: 2, name: 'Jane Smith', age: 32, condition: 'Hypertension', lastVisit: '2024-03-14' },
-  ]);
+  const [patients, setPatients] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [openDetails, setOpenDetails] = useState(false);
+  const [openSummary, setOpenSummary] = useState(false);
+  const [patientReports, setPatientReports] = useState([]);
+  const [selectedReportId, setSelectedReportId] = useState(null);
+
+  useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  const fetchPatients = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/doctor/patients');
+      if (!response.ok) {
+        throw new Error('Failed to fetch patients');
+      }
+      const data = await response.json();
+      setPatients(data);
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+    }
+  };
+
+  const handleViewDetails = async (patientId) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/doctor/patient/${patientId}/details`);
+      const data = await response.json();
+      setSelectedPatient(data);
+      setOpenDetails(true);
+    } catch (error) {
+      console.error('Error fetching patient details:', error);
+    }
+  };
+
+  const handleViewSummary = async (patientId) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/doctor/patient/${patientId}/reports`);
+      const data = await response.json();
+      setPatientReports(data);
+      setOpenSummary(true);
+    } catch (error) {
+      console.error('Error fetching patient reports:', error);
+    }
+  };
+
+  const handleOpenReport = (reportId) => {
+    setSelectedReportId(reportId);
+  };
 
   return (
-    <div>
-      <Typography variant="h4" sx={{ mb: 3 }}>
+    <>
+      <Typography variant="h6" gutterBottom>
         Patients List
       </Typography>
-      
-      <StyledTableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="patients table">
+      <TableContainer>
+        <Table>
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>
-              <TableCell>Age</TableCell>
-              <TableCell>Condition</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Gender</TableCell>
+              <TableCell>Medical Condition</TableCell>
               <TableCell>Last Visit</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
@@ -43,14 +86,16 @@ function PatientsList() {
           <TableBody>
             {patients.map((patient) => (
               <TableRow key={patient.id}>
-                <TableCell>{patient.name}</TableCell>
-                <TableCell>{patient.age}</TableCell>
-                <TableCell>{patient.condition}</TableCell>
-                <TableCell>{patient.lastVisit}</TableCell>
+                <TableCell>{`${patient.first_name} ${patient.last_name}`}</TableCell>
+                <TableCell>{patient.email}</TableCell>
+                <TableCell>{patient.gender || 'N/A'}</TableCell>
+                <TableCell>{patient.medical_conditions || 'None'}</TableCell>
+                <TableCell>{patient.last_visit ? new Date(patient.last_visit).toLocaleDateString() : 'Never'}</TableCell>
                 <TableCell>
                   <Button 
                     variant="contained" 
                     color="primary" 
+                    onClick={() => handleViewDetails(patient.id)}
                     sx={{ mr: 1 }}
                   >
                     View Details
@@ -58,6 +103,7 @@ function PatientsList() {
                   <Button 
                     variant="outlined" 
                     color="primary"
+                    onClick={() => handleViewSummary(patient.id)}
                   >
                     View Summary
                   </Button>
@@ -66,8 +112,63 @@ function PatientsList() {
             ))}
           </TableBody>
         </Table>
-      </StyledTableContainer>
-    </div>
+      </TableContainer>
+
+      {/* Patient Details Dialog */}
+      <Dialog open={openDetails} onClose={() => setOpenDetails(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Patient Details</DialogTitle>
+        <DialogContent>
+          {selectedPatient && (
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Typography variant="subtitle1">Personal Information</Typography>
+                <Typography>Name: {`${selectedPatient.first_name} ${selectedPatient.last_name}`}</Typography>
+                <Typography>Date of Birth: {selectedPatient.date_of_birth}</Typography>
+                <Typography>Gender: {selectedPatient.gender}</Typography>
+              </Grid>
+            </Grid>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Patient Reports Dialog */}
+      <Dialog open={openSummary} onClose={() => setOpenSummary(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Patient Reports</DialogTitle>
+        <DialogContent>
+          {patientReports.map((report) => (
+            <Paper key={report.id} sx={{ p: 2, mb: 2 }}>
+              <Typography variant="h6">{report.report_name}</Typography>
+              <Typography variant="body2" color="textSecondary">
+                Generated on: {new Date(report.created_at).toLocaleString()}
+              </Typography>
+              <Button 
+                variant="contained" 
+                color="primary" 
+                sx={{ mt: 1 }}
+                onClick={() => handleOpenReport(report.id)}
+              >
+                View Report
+              </Button>
+            </Paper>
+          ))}
+        </DialogContent>
+      </Dialog>
+
+      {/* PDF Viewer Dialog */}
+      <Dialog open={!!selectedReportId} onClose={() => setSelectedReportId(null)} maxWidth="lg" fullWidth>
+        <DialogTitle>View Report</DialogTitle>
+        <DialogContent>
+          {selectedReportId && (
+            <iframe
+              src={`http://localhost:8000/api/reports/view/${selectedReportId}`}
+              width="100%"
+              height="600px"
+              title="PDF Viewer"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
