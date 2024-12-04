@@ -30,10 +30,24 @@ function SettingsPage() {
         setUserData(user);
 
         const response = await fetch(`http://localhost:8000/api/patient-profile/${user.id}`);
+        
+        if (response.status === 404) {
+          // Profile doesn't exist
+          setProfileData(null);
+          setError('No profile found');
+          return;
+        }
+        
         const data = await response.json();
         
         if (response.ok) {
-          setProfileData(data);
+          // Only set profile data if it's not empty
+          if (data && Object.keys(data).length > 0) {
+            setProfileData(data);
+          } else {
+            setProfileData(null);
+            setError('No profile data available');
+          }
         } else {
           throw new Error(data.error);
         }

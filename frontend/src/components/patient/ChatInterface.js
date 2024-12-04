@@ -224,7 +224,7 @@ function ChatInterface() {
 
   useEffect(() => {
     // Generate a new session ID when the component mounts
-    setSessionId(crypto.randomUUID());
+    setSessionId(uuidv4());
   }, []);
 
   return (

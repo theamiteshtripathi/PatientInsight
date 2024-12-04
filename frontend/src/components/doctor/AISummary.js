@@ -1,120 +1,120 @@
-import React, { useState } from 'react';
-import { Box, Button, Typography, Paper, CircularProgress } from '@mui/material';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import { Document, Page, pdfjs } from 'react-pdf';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Paper, CircularProgress } from '@mui/material';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-// Configure PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+const AISummary = ({ patient }) => {
+  const [loading, setLoading] = useState(true);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [error, setError] = useState(null);
+  const [aiSummary, setAiSummary] = useState(null);
 
-const AISummary = () => {
-  const [showPdf, setShowPdf] = useState(false);
-  const [numPages, setNumPages] = useState(null);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [loading, setLoading] = useState(false);
-  
-  // Use a sample PDF URL that we know works
-  const samplePdfUrl = "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf";
+  useEffect(() => {
+    if (patient?.id) {
+      fetchReportsAndSummary();
+    }
+  }, [patient]);
 
-  const onDocumentLoadSuccess = ({ numPages }) => {
-    setNumPages(numPages);
-    setLoading(false);
+  const fetchReportsAndSummary = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `http://localhost:8000/api/doctor/patient/reports/${patient.id}`,
+        {
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json',
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch reports and summary');
+      }
+
+      const data = await response.json();
+      console.log('Fetched data:', data);
+      setAiSummary(data);
+
+      // If we have a latest report with PDF data
+      if (data.reports && data.reports.length > 0 && data.reports[0].pdf_data) {
+        const pdfBlob = new Blob(
+          [Uint8Array.from(atob(data.reports[0].pdf_data), c => c.charCodeAt(0))],
+          { type: 'application/pdf' }
+        );
+        const url = URL.createObjectURL(pdfBlob);
+        setPdfUrl(url);
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const onLoadError = (error) => {
-    console.error('Error loading PDF:', error);
-    setLoading(false);
-  };
+  // Cleanup URL when component unmounts
+  useEffect(() => {
+    return () => {
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+    };
+  }, [pdfUrl]);
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" p={3}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box p={3}>
+        <Typography color="error">Error: {error}</Typography>
+      </Box>
+    );
+  }
 
   return (
-    <Box sx={{ p: 2 }}>
-      <Paper elevation={3} sx={{ p: 3 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="h6">AI-Generated Summary</Typography>
-          <Button
-            variant="contained"
-            startIcon={<PictureAsPdfIcon />}
-            onClick={() => {
-              setShowPdf(!showPdf);
-              setLoading(true);
-            }}
-            color="primary"
-          >
-            {showPdf ? 'Hide PDF' : 'View PDF Summary'}
-          </Button>
-        </Box>
-
-        {showPdf ? (
-          <Box 
-            sx={{ 
-              mt: 2, 
-              border: '1px solid #ccc', 
-              p: 2,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              '& .react-pdf__Document': {
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
-              }
-            }}
-          >
-            {loading && <CircularProgress sx={{ my: 2 }} />}
-            
-            <Document
-              file={samplePdfUrl}
-              onLoadSuccess={onDocumentLoadSuccess}
-              onLoadError={onLoadError}
-              loading={<CircularProgress />}
-            >
-              <Page 
-                pageNumber={pageNumber} 
-                renderTextLayer={true}
-                renderAnnotationLayer={true}
-              />
-            </Document>
-
-            {numPages && (
-              <Typography sx={{ mt: 2 }}>
-                Page {pageNumber} of {numPages}
-              </Typography>
-            )}
-
-            <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-              <Button 
-                variant="outlined" 
-                disabled={pageNumber <= 1}
-                onClick={() => setPageNumber(pageNumber - 1)}
-              >
-                Previous
-              </Button>
-              <Button 
-                variant="outlined"
-                disabled={pageNumber >= numPages}
-                onClick={() => setPageNumber(pageNumber + 1)}
-              >
-                Next
-              </Button>
-            </Box>
-
-            <Button 
-              variant="contained" 
-              sx={{ mt: 2 }}
-              onClick={() => {
-                console.log('Saving edited PDF...');
-              }}
-            >
-              Save Changes
-            </Button>
-          </Box>
-        ) : (
-          <Typography variant="body1" color="text.secondary">
-            Click the "View PDF Summary" button to view and edit the AI-generated summary in PDF format.
+    <Box>
+      {/* PDF Viewer Section */}
+      {pdfUrl && (
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Patient Report
           </Typography>
-        )}
-      </Paper>
+          <Box sx={{ height: '600px', border: '1px solid #ccc', borderRadius: '4px' }}>
+            <iframe
+              src={pdfUrl}
+              width="100%"
+              height="100%"
+              style={{ border: 'none' }}
+              title="Patient Report"
+            />
+          </Box>
+        </Box>
+      )}
+
+      {/* AI Summary Section */}
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h6" gutterBottom>
+          AI Generated Summary
+        </Typography>
+        <Paper 
+          sx={{ 
+            p: 3, 
+            bgcolor: 'grey.50',
+            whiteSpace: 'pre-line'
+          }}
+        >
+          <Typography>
+            {aiSummary?.ai_summary || 'No AI summary available'}
+          </Typography>
+        </Paper>
+      </Box>
     </Box>
   );
 };

@@ -71,37 +71,59 @@ const PatientOnboardingForm = ({ open, onClose, onSubmit }) => {
   };
 
   const handleSubmit = async () => {
+    // Return early if already submitting to prevent double submission
+    if (isSubmitting) return;
+    
     setIsSubmitting(true);
     setSubmitError(null);
     
     try {
       const user = JSON.parse(localStorage.getItem('user'));
+      
+      // Check if profile already exists by making an API call
+      const checkResponse = await fetch(`http://localhost:8000/api/patient-profile/${user.id}`);
+      if (checkResponse.ok) {
+        throw new Error('Profile already exists');
+      }
+
       const formattedDate = formData.dateOfBirth ? 
         formData.dateOfBirth.format('YYYY-MM-DD') : null;
 
+      // Validate required fields before submission
+      if (!formData.firstName || !formData.lastName || !formattedDate) {
+        throw new Error('Please fill in all required fields');
+      }
+
       const patientData = {
         user_id: user.id,
-        first_name: formData.firstName || '',
-        last_name: formData.lastName || '',
+        first_name: formData.firstName.trim(),
+        last_name: formData.lastName.trim(),
         date_of_birth: formattedDate,
-        gender: formData.gender || '',
-        phone_number: formData.phone || '',
-        address: formData.address || '',
-        blood_type: formData.bloodType || '',
-        height: parseFloat(formData.height) || null,
-        weight: parseFloat(formData.weight) || null,
-        medical_conditions: formData.medicalConditions || '',
-        allergies: formData.allergies || '',
-        emergency_contact_name: formData.emergencyName || '',
-        emergency_contact_relationship: formData.emergencyRelationship || '',
-        emergency_contact_phone: formData.emergencyPhone || '',
+        gender: formData.gender.trim(),
+        phone_number: formData.phone?.trim() || '',
+        address: formData.address?.trim() || '',
+        blood_type: formData.bloodType?.trim() || '',
+        height: formData.height ? parseFloat(formData.height) : null,
+        weight: formData.weight ? parseFloat(formData.weight) : null,
+        medical_conditions: formData.medicalConditions?.trim() || '',
+        allergies: formData.allergies?.trim() || '',
+        emergency_contact_name: formData.emergencyName?.trim() || '',
+        emergency_contact_relationship: formData.emergencyRelationship?.trim() || '',
+        emergency_contact_phone: formData.emergencyPhone?.trim() || '',
         notifications_enabled: Boolean(formData.enableNotifications),
         data_sharing_allowed: Boolean(formData.allowDataSharing)
       };
 
-      console.log('Submitting patient data:', patientData);
+      // Filter out any empty string values as well as null/undefined
+      const cleanedData = Object.fromEntries(
+        Object.entries(patientData).filter(([_, value]) => 
+          value != null && value !== ''
+        )
+      );
 
-      const response = await createPatient(patientData);
+      console.log('Submitting patient data:', cleanedData);
+
+      const response = await createPatient(cleanedData);
       
       if (response) {
         console.log('Patient created successfully:', response);

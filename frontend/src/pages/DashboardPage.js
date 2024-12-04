@@ -28,6 +28,7 @@ function DashboardPage() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [chatKey, setChatKey] = useState(0);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -77,6 +78,7 @@ function DashboardPage() {
   const handleCardClick = (type) => {
     if (type === 'chat') {
       setShowChat(true);
+      setChatKey(prev => prev + 1);
     } else if (type === 'symptoms') {
       navigate('/symptom-checker');
     }
@@ -125,7 +127,7 @@ function DashboardPage() {
               </IconButton>
             </Box>
           </Box>
-          <ChatInterface />
+          <ChatInterface key={chatKey} />
         </Container>
       </MainLayout>
     );

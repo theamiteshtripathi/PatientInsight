@@ -8,8 +8,14 @@ from psycopg2.extras import RealDictCursor
 import os
 from dotenv import load_dotenv
 import io
-import datetime
+from datetime import datetime as dt
 import uuid
+from reportlab.pdfgen import canvas
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.units import inch
 
 chat_routes = Blueprint('chat_routes', __name__)
 chat_instances = {}
@@ -58,55 +64,133 @@ def chat_message():
                 medical_analysis_response = rag_main(summary)
                 medical_analysis = medical_analysis_response['content']
                 
-                # Generate PDF report
-                pdf_file = chat_instance.generate_pdf(summary, medical_analysis)
+                # Create PDF content
+                def create_pdf(output):
+                    doc = SimpleDocTemplate(
+                        output,
+                        pagesize=letter,
+                        rightMargin=72,
+                        leftMargin=72,
+                        topMargin=72,
+                        bottomMargin=72
+                    )
+
+                    # Create styles
+                    styles = getSampleStyleSheet()
+                    title_style = ParagraphStyle(
+                        'CustomTitle',
+                        parent=styles['Heading1'],
+                        fontSize=20,
+                        alignment=1,  # Center alignment
+                        spaceAfter=30
+                    )
+                    
+                    heading_style = ParagraphStyle(
+                        'CustomHeading',
+                        parent=styles['Heading2'],
+                        fontSize=14,
+                        spaceAfter=12,
+                        spaceBefore=12
+                    )
+                    
+                    normal_style = ParagraphStyle(
+                        'CustomNormal',
+                        parent=styles['Normal'],
+                        fontSize=12,
+                        spaceAfter=12
+                    )
+
+                    # Build content
+                    story = []
+                    
+                    # Title
+                    story.append(Paragraph("Medical Analysis Report", title_style))
+                    
+                    # Timestamp
+                    timestamp = dt.now().strftime('%Y-%m-%d %H:%M:%S')
+                    story.append(Paragraph(f"Generated on: {timestamp}", normal_style))
+                    story.append(Spacer(1, 20))
+                    
+                    # Chat Summary
+                    story.append(Paragraph("Chat Summary:", heading_style))
+                    # Clean and format summary text
+                    clean_summary = summary.replace('###', '')\
+                                         .replace('**', '')\
+                                         .replace('- -', '-')\
+                                         .strip()
+                    
+                    for line in clean_summary.split('\n'):
+                        if line.strip():
+                            story.append(Paragraph(line.strip(), normal_style))
+                    
+                    story.append(Spacer(1, 20))
+                    
+                    # Medical Analysis
+                    story.append(Paragraph("Medical Analysis:", heading_style))
+                    # Clean and format medical analysis text
+                    clean_analysis = medical_analysis.replace('###', '')\
+                                                   .replace('**', '')\
+                                                   .replace('- -', '-')\
+                                                   .strip()
+                    
+                    for line in clean_analysis.split('\n'):
+                        if line.strip():
+                            story.append(Paragraph(line.strip(), normal_style))
+
+                    # Build the PDF
+                    doc.build(story)
+
+                # Create PDF for database
+                buffer = BytesIO()
+                create_pdf(buffer)
+                pdf_data = buffer.getvalue()
                 
-                # After generating the chat response, store it in the database
-                try:
-                    conn = get_db_connection()
-                    cur = conn.cursor()
-                    
-                    # Store chat summary as PDF
-                    current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                    report_name = f"Chat_Summary_{current_time}"
-                    
-                    # Convert chat history to bytes for storage
-                    chat_text = "\n".join([f"{msg.get('role', 'unknown')}: {msg.get('content', '')}" 
-                                         for msg in chat_history])
-                    
-                    cur.execute("""
-                        INSERT INTO patient_reports 
-                        (user_id, report_name, report_data, report_type, description)
-                        VALUES (%s, %s, %s, %s, %s)
-                    """, (
-                        user_id,
-                        report_name,
-                        chat_text.encode('utf-8'),  # Convert text to bytes
-                        'chat_summary',
-                        f'AI Chat Conversation Summary - Session {session_id}'
-                    ))
-                    
-                    conn.commit()
-                    print(f"Chat summary stored in database for user {user_id}")
-                    
-                    cur.close()
-                    conn.close()
-                    
-                except Exception as e:
-                    print("Error storing chat summary:", str(e))
+                # Create local file
+                timestamp = dt.now().strftime('%Y-%m-%d_%H-%M-%S')
+                local_filename = f"medical_report_{timestamp}.pdf"
+                reports_dir = os.path.join('backend', 'ml_pipeline', 'reports')
+                os.makedirs(reports_dir, exist_ok=True)
+                local_filepath = os.path.join(reports_dir, local_filename)
+                
+                # Create local PDF file
+                with open(local_filepath, 'wb') as f:
+                    create_pdf(f)
+                
+                # Store in database
+                conn = get_db_connection()
+                cur = conn.cursor(cursor_factory=RealDictCursor)
+                
+                cur.execute("""
+                    INSERT INTO patient_reports 
+                    (user_id, report_name, report_data, report_type, description)
+                    VALUES (%s, %s, %s, %s, %s)
+                    RETURNING id
+                """, (
+                    user_id,
+                    local_filename,
+                    psycopg2.Binary(pdf_data),
+                    'chat_summary',
+                    'AI Chat Conversation Summary'
+                ))
+                
+                report_id = cur.fetchone()['id']
+                conn.commit()
+                
+                cur.close()
+                conn.close()
                 
                 return jsonify({
-                    'status': 'success',
-                    'message': 'Chat ended',
+                    'status': 'chat_ended',
                     'summary': summary,
                     'medical_analysis': medical_analysis,
-                    'pdf_path': pdf_file
+                    'report_id': report_id
                 })
+                
             except Exception as e:
-                return jsonify({
-                    'status': 'error',
-                    'error': f'Error generating report: {str(e)}'
-                }), 500
+                print(f"Error generating summary: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                return jsonify({'status': 'error', 'error': str(e)}), 500
         
         response = chat_instance.chat_pipeline.get_response(message)
         return jsonify({
@@ -271,7 +355,7 @@ def store_report():
         user_id = data.get('user_id')
         report_path = data.get('report_path')
         
-        print(f"Received request - User ID: {user_id}, Report Path: {report_path}")
+        print(f"Attempting to store report - User ID: {user_id}, Path: {report_path}")
         
         if not user_id or not report_path:
             return jsonify({"error": "user_id and report_path are required"}), 400
@@ -280,47 +364,77 @@ def store_report():
             print(f"File not found at path: {report_path}")
             return jsonify({"error": "Report file not found"}), 404
             
-        with open(report_path, 'rb') as file:
-            pdf_data = file.read()
+        try:
+            # Read the PDF file in binary mode
+            with open(report_path, 'rb') as file:
+                pdf_data = file.read()
+                
+            # Verify it's a valid PDF
+            if not pdf_data.startswith(b'%PDF'):
+                print("Warning: File does not appear to be a valid PDF!")
+                
             print(f"Successfully read PDF file, size: {len(pdf_data)} bytes")
             
-        conn = get_db_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        
-        insert_query = """
-        INSERT INTO patient_reports 
-        (user_id, report_name, report_data, report_type, description)
-        VALUES (%s, %s, %s, %s, %s)
-        RETURNING id;
-        """
-        
-        report_name = f"Chat Summary - {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-        
-        print(f"Executing database insert for report: {report_name}")
-        
-        cur.execute(insert_query, (
-            user_id,
-            report_name,
-            pdf_data,
-            'chat_summary',
-            'AI Chat Conversation Summary'
-        ))
-        
-        report_id = cur.fetchone()['id']
-        conn.commit()
-        
-        print(f"Successfully stored report with ID: {report_id}")
-        
-        cur.close()
-        conn.close()
-        
-        return jsonify({
-            "message": "Report stored in database successfully",
-            "report_id": report_id
-        }), 201
-        
+            # Debug: Save first few bytes
+            print(f"First 20 bytes of PDF: {pdf_data[:20]}")
+            
+            conn = get_db_connection()
+            cur = conn.cursor(cursor_factory=RealDictCursor)
+            
+            report_name = f"Chat_Summary_{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+            print(f"Generated report name: {report_name}")
+            
+            # Use psycopg2.Binary for proper binary data handling
+            binary_data = psycopg2.Binary(pdf_data)
+            
+            insert_query = """
+            INSERT INTO patient_reports 
+            (user_id, report_name, report_data, report_type, description)
+            VALUES (%s, %s, %s, %s, %s)
+            RETURNING id;
+            """
+            
+            cur.execute(insert_query, (
+                user_id,
+                report_name,
+                binary_data,
+                'chat_summary',
+                'AI Chat Conversation Summary'
+            ))
+            
+            report_id = cur.fetchone()['id']
+            conn.commit()
+            
+            print(f"Successfully stored report with ID: {report_id}")
+            
+            # Verify the stored data
+            cur.execute("SELECT report_data FROM patient_reports WHERE id = %s", (report_id,))
+            stored_data = cur.fetchone()
+            if stored_data:
+                print(f"Verified stored data size: {len(stored_data['report_data'])} bytes")
+            
+            cur.close()
+            conn.close()
+            
+            # Clean up the temporary file
+            os.remove(report_path)
+            print(f"Cleaned up temporary file: {report_path}")
+            
+            return jsonify({
+                "message": "Report stored successfully",
+                "report_id": report_id
+            }), 201
+            
+        except IOError as e:
+            print(f"Error reading file: {str(e)}")
+            return jsonify({"error": f"Error reading PDF file: {str(e)}"}), 500
+            
+        except psycopg2.Error as e:
+            print(f"Database error: {str(e)}")
+            return jsonify({"error": f"Database error: {str(e)}"}), 500
+            
     except Exception as e:
-        print("Error storing report:", str(e))
+        print(f"Unexpected error: {str(e)}")
         import traceback
         print("Traceback:", traceback.format_exc())
         return jsonify({"error": str(e)}), 500
