@@ -1,0 +1,382 @@
+(PatientInsight) amiteshtripathi@Amiteshs-MacBook-Air backend % python3 app.py
+/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/torchvision/io/image.py:14: UserWarning: Failed to load image Python extension: 'dlopen(/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/torchvision/image.so, 0x0006): Library not loaded: @rpath/libjpeg.9.dylib
+  Referenced from: <367D4265-B20F-34BD-94EB-4F3EE47C385B> /Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/torchvision/image.so
+  Reason: tried: '/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/torchvision/../../../libjpeg.9.dylib' (no such file), '/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/torchvision/../../../libjpeg.9.dylib' (no such file), '/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/lib-dynload/../../libjpeg.9.dylib' (no such file), '/Users/amiteshtripathi/anaconda3/envs/PatientInsight/bin/../lib/libjpeg.9.dylib' (no such file)'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.0.2 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/app.py", line 3, in <module>
+    from routes.chat_routes import chat_routes
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/routes/chat_routes.py", line 3, in <module>
+    from ml_pipeline.chat_integration import ChatIntegration
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/ml_pipeline/chat_integration.py", line 2, in <module>
+    from ml_pipeline.RAG.main import main as rag_main
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/ml_pipeline/RAG/main.py", line 1, in <module>
+    from ml_pipeline.RAG.embeddings import EmbeddingsHandler
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/ml_pipeline/RAG/embeddings.py", line 1, in <module>
+    from sentence_transformers import SentenceTransformer
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/__init__.py", line 14, in <module>
+    from sentence_transformers.cross_encoder.CrossEncoder import CrossEncoder
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/cross_encoder/__init__.py", line 3, in <module>
+    from .CrossEncoder import CrossEncoder
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/cross_encoder/CrossEncoder.py", line 18, in <module>
+    from sentence_transformers.evaluation.SentenceEvaluator import SentenceEvaluator
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/evaluation/__init__.py", line 9, in <module>
+    from .NanoBEIREvaluator import NanoBEIREvaluator
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/evaluation/NanoBEIREvaluator.py", line 11, in <module>
+    from sentence_transformers import SentenceTransformer
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/SentenceTransformer.py", line 33, in <module>
+    from sentence_transformers.model_card import SentenceTransformerModelCardData, generate_model_card
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/model_card.py", line 25, in <module>
+    from transformers.integrations import CodeCarbonCallback
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1766, in __getattr__
+    module = self._get_module(self._class_to_module[name])
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1778, in _get_module
+    return importlib.import_module("." + module_name, self.__name__)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/integrations/integration_utils.py", line 36, in <module>
+    from .. import PreTrainedModel, TFPreTrainedModel
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1766, in __getattr__
+    module = self._get_module(self._class_to_module[name])
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1778, in _get_module
+    return importlib.import_module("." + module_name, self.__name__)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/modeling_utils.py", line 48, in <module>
+    from .loss.loss_utils import LOSS_MAPPING
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/loss/loss_utils.py", line 19, in <module>
+    from .loss_deformable_detr import DeformableDetrForObjectDetectionLoss, DeformableDetrForSegmentationLoss
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/loss/loss_deformable_detr.py", line 4, in <module>
+    from ..image_transforms import center_to_corners_format
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/image_transforms.py", line 50, in <module>
+    import tensorflow as tf
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/__init__.py", line 45, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 8, in <module>
+    from tensorflow._api.v2.__internal__ import autograph
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/_api/v2/__internal__/autograph/__init__.py", line 8, in <module>
+    from tensorflow.python.autograph.core.ag_ctx import control_status_ctx # line: 34
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/autograph/core/ag_ctx.py", line 21, in <module>
+    from tensorflow.python.autograph.utils import ag_logging
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/autograph/utils/__init__.py", line 17, in <module>
+    from tensorflow.python.autograph.utils.context_managers import control_dependency_on_returns
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/autograph/utils/context_managers.py", line 19, in <module>
+    from tensorflow.python.framework import ops
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/framework/ops.py", line 46, in <module>
+    from tensorflow.python import pywrap_tfe
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/pywrap_tfe.py", line 25, in <module>
+    from tensorflow.python._pywrap_tfe import *
+Traceback (most recent call last):
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/numpy/core/_multiarray_umath.py", line 44, in __getattr__
+    raise ImportError(msg)
+ImportError: 
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.0.2 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.0.2 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/app.py", line 3, in <module>
+    from routes.chat_routes import chat_routes
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/routes/chat_routes.py", line 3, in <module>
+    from ml_pipeline.chat_integration import ChatIntegration
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/ml_pipeline/chat_integration.py", line 2, in <module>
+    from ml_pipeline.RAG.main import main as rag_main
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/ml_pipeline/RAG/main.py", line 1, in <module>
+    from ml_pipeline.RAG.embeddings import EmbeddingsHandler
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/ml_pipeline/RAG/embeddings.py", line 1, in <module>
+    from sentence_transformers import SentenceTransformer
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/__init__.py", line 14, in <module>
+    from sentence_transformers.cross_encoder.CrossEncoder import CrossEncoder
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/cross_encoder/__init__.py", line 3, in <module>
+    from .CrossEncoder import CrossEncoder
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/cross_encoder/CrossEncoder.py", line 18, in <module>
+    from sentence_transformers.evaluation.SentenceEvaluator import SentenceEvaluator
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/evaluation/__init__.py", line 9, in <module>
+    from .NanoBEIREvaluator import NanoBEIREvaluator
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/evaluation/NanoBEIREvaluator.py", line 11, in <module>
+    from sentence_transformers import SentenceTransformer
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/SentenceTransformer.py", line 33, in <module>
+    from sentence_transformers.model_card import SentenceTransformerModelCardData, generate_model_card
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/model_card.py", line 25, in <module>
+    from transformers.integrations import CodeCarbonCallback
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1766, in __getattr__
+    module = self._get_module(self._class_to_module[name])
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1778, in _get_module
+    return importlib.import_module("." + module_name, self.__name__)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/integrations/integration_utils.py", line 36, in <module>
+    from .. import PreTrainedModel, TFPreTrainedModel
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1766, in __getattr__
+    module = self._get_module(self._class_to_module[name])
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1778, in _get_module
+    return importlib.import_module("." + module_name, self.__name__)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/modeling_utils.py", line 48, in <module>
+    from .loss.loss_utils import LOSS_MAPPING
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/loss/loss_utils.py", line 19, in <module>
+    from .loss_deformable_detr import DeformableDetrForObjectDetectionLoss, DeformableDetrForSegmentationLoss
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/loss/loss_deformable_detr.py", line 4, in <module>
+    from ..image_transforms import center_to_corners_format
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/image_transforms.py", line 50, in <module>
+    import tensorflow as tf
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/__init__.py", line 45, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 8, in <module>
+    from tensorflow._api.v2.__internal__ import autograph
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/_api/v2/__internal__/autograph/__init__.py", line 8, in <module>
+    from tensorflow.python.autograph.core.ag_ctx import control_status_ctx # line: 34
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/autograph/core/ag_ctx.py", line 21, in <module>
+    from tensorflow.python.autograph.utils import ag_logging
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/autograph/utils/__init__.py", line 17, in <module>
+    from tensorflow.python.autograph.utils.context_managers import control_dependency_on_returns
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/autograph/utils/context_managers.py", line 19, in <module>
+    from tensorflow.python.framework import ops
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/framework/ops.py", line 49, in <module>
+    from tensorflow.python.client import pywrap_tf_session
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/client/pywrap_tf_session.py", line 19, in <module>
+    from tensorflow.python.client._pywrap_tf_session import *
+Traceback (most recent call last):
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/numpy/core/_multiarray_umath.py", line 44, in __getattr__
+    raise ImportError(msg)
+ImportError: 
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.0.2 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+
+
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.0.2 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+Traceback (most recent call last):  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/app.py", line 3, in <module>
+    from routes.chat_routes import chat_routes
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/routes/chat_routes.py", line 3, in <module>
+    from ml_pipeline.chat_integration import ChatIntegration
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/ml_pipeline/chat_integration.py", line 2, in <module>
+    from ml_pipeline.RAG.main import main as rag_main
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/ml_pipeline/RAG/main.py", line 1, in <module>
+    from ml_pipeline.RAG.embeddings import EmbeddingsHandler
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/ml_pipeline/RAG/embeddings.py", line 1, in <module>
+    from sentence_transformers import SentenceTransformer
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/__init__.py", line 14, in <module>
+    from sentence_transformers.cross_encoder.CrossEncoder import CrossEncoder
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/cross_encoder/__init__.py", line 3, in <module>
+    from .CrossEncoder import CrossEncoder
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/cross_encoder/CrossEncoder.py", line 18, in <module>
+    from sentence_transformers.evaluation.SentenceEvaluator import SentenceEvaluator
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/evaluation/__init__.py", line 9, in <module>
+    from .NanoBEIREvaluator import NanoBEIREvaluator
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/evaluation/NanoBEIREvaluator.py", line 11, in <module>
+    from sentence_transformers import SentenceTransformer
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/SentenceTransformer.py", line 33, in <module>
+    from sentence_transformers.model_card import SentenceTransformerModelCardData, generate_model_card
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/model_card.py", line 25, in <module>
+    from transformers.integrations import CodeCarbonCallback
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1766, in __getattr__
+    module = self._get_module(self._class_to_module[name])
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1778, in _get_module
+    return importlib.import_module("." + module_name, self.__name__)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/integrations/integration_utils.py", line 36, in <module>
+    from .. import PreTrainedModel, TFPreTrainedModel
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1766, in __getattr__
+    module = self._get_module(self._class_to_module[name])
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1778, in _get_module
+    return importlib.import_module("." + module_name, self.__name__)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/modeling_utils.py", line 48, in <module>
+    from .loss.loss_utils import LOSS_MAPPING
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/loss/loss_utils.py", line 19, in <module>
+    from .loss_deformable_detr import DeformableDetrForObjectDetectionLoss, DeformableDetrForSegmentationLoss
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/loss/loss_deformable_detr.py", line 4, in <module>
+    from ..image_transforms import center_to_corners_format
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/image_transforms.py", line 50, in <module>
+    import tensorflow as tf
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/__init__.py", line 45, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 8, in <module>
+    from tensorflow._api.v2.__internal__ import autograph
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/_api/v2/__internal__/autograph/__init__.py", line 8, in <module>
+    from tensorflow.python.autograph.core.ag_ctx import control_status_ctx # line: 34
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/autograph/core/ag_ctx.py", line 21, in <module>
+    from tensorflow.python.autograph.utils import ag_logging
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/autograph/utils/__init__.py", line 17, in <module>
+    from tensorflow.python.autograph.utils.context_managers import control_dependency_on_returns
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/autograph/utils/context_managers.py", line 19, in <module>
+    from tensorflow.python.framework import ops
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/framework/ops.py", line 50, in <module>
+    from tensorflow.python.eager import context
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/eager/context.py", line 37, in <module>
+    from tensorflow.python.eager import execute
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/eager/execute.py", line 21, in <module>
+    from tensorflow.python.framework import dtypes
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/framework/dtypes.py", line 21, in <module>
+    import ml_dtypes
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/ml_dtypes/__init__.py", line 32, in <module>
+    from ml_dtypes._finfo import finfo
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/ml_dtypes/_finfo.py", line 19, in <module>
+    from ml_dtypes._ml_dtypes_ext import bfloat16
+Traceback (most recent call last):
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/numpy/core/_multiarray_umath.py", line 44, in __getattr__
+    raise ImportError(msg)
+ImportError: 
+A module that was compiled using NumPy 1.x cannot be run in
+NumPy 2.0.2 as it may crash. To support both 1.x and 2.x
+versions of NumPy, modules must be compiled with NumPy 2.0.
+Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+If you are a user of the module, the easiest solution will be to
+downgrade to 'numpy<2' or try to upgrade the affected module.
+We expect that some modules will need time to support NumPy 2.
+
+
+ImportError: numpy.core._multiarray_umath failed to import
+Traceback (most recent call last):
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1778, in _get_module
+    return importlib.import_module("." + module_name, self.__name__)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/modeling_utils.py", line 48, in <module>
+    from .loss.loss_utils import LOSS_MAPPING
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/loss/loss_utils.py", line 19, in <module>
+    from .loss_deformable_detr import DeformableDetrForObjectDetectionLoss, DeformableDetrForSegmentationLoss
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/loss/loss_deformable_detr.py", line 4, in <module>
+    from ..image_transforms import center_to_corners_format
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/image_transforms.py", line 50, in <module>
+    import tensorflow as tf
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/__init__.py", line 45, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 8, in <module>
+    from tensorflow._api.v2.__internal__ import autograph
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/_api/v2/__internal__/autograph/__init__.py", line 8, in <module>
+    from tensorflow.python.autograph.core.ag_ctx import control_status_ctx # line: 34
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/autograph/core/ag_ctx.py", line 21, in <module>
+    from tensorflow.python.autograph.utils import ag_logging
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/autograph/utils/__init__.py", line 17, in <module>
+    from tensorflow.python.autograph.utils.context_managers import control_dependency_on_returns
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/autograph/utils/context_managers.py", line 19, in <module>
+    from tensorflow.python.framework import ops
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/framework/ops.py", line 50, in <module>
+    from tensorflow.python.eager import context
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/eager/context.py", line 37, in <module>
+    from tensorflow.python.eager import execute
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/eager/execute.py", line 21, in <module>
+    from tensorflow.python.framework import dtypes
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/tensorflow/python/framework/dtypes.py", line 21, in <module>
+    import ml_dtypes
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/ml_dtypes/__init__.py", line 32, in <module>
+    from ml_dtypes._finfo import finfo
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/ml_dtypes/_finfo.py", line 19, in <module>
+    from ml_dtypes._ml_dtypes_ext import bfloat16
+ImportError: numpy.core.umath failed to import
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1778, in _get_module
+    return importlib.import_module("." + module_name, self.__name__)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/integrations/integration_utils.py", line 36, in <module>
+    from .. import PreTrainedModel, TFPreTrainedModel
+  File "<frozen importlib._bootstrap>", line 1412, in _handle_fromlist
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1766, in __getattr__
+    module = self._get_module(self._class_to_module[name])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1780, in _get_module
+    raise RuntimeError(
+RuntimeError: Failed to import transformers.modeling_utils because of the following error (look up to see its traceback):
+numpy.core.umath failed to import
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/app.py", line 3, in <module>
+    from routes.chat_routes import chat_routes
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/routes/chat_routes.py", line 3, in <module>
+    from ml_pipeline.chat_integration import ChatIntegration
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/ml_pipeline/chat_integration.py", line 2, in <module>
+    from ml_pipeline.RAG.main import main as rag_main
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/ml_pipeline/RAG/main.py", line 1, in <module>
+    from ml_pipeline.RAG.embeddings import EmbeddingsHandler
+  File "/Users/amiteshtripathi/Documents/My Projects/PatientInsight/backend/ml_pipeline/RAG/embeddings.py", line 1, in <module>
+    from sentence_transformers import SentenceTransformer
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/__init__.py", line 14, in <module>
+    from sentence_transformers.cross_encoder.CrossEncoder import CrossEncoder
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/cross_encoder/__init__.py", line 3, in <module>
+    from .CrossEncoder import CrossEncoder
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/cross_encoder/CrossEncoder.py", line 18, in <module>
+    from sentence_transformers.evaluation.SentenceEvaluator import SentenceEvaluator
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/evaluation/__init__.py", line 9, in <module>
+    from .NanoBEIREvaluator import NanoBEIREvaluator
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/evaluation/NanoBEIREvaluator.py", line 11, in <module>
+    from sentence_transformers import SentenceTransformer
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/SentenceTransformer.py", line 33, in <module>
+    from sentence_transformers.model_card import SentenceTransformerModelCardData, generate_model_card
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/sentence_transformers/model_card.py", line 25, in <module>
+    from transformers.integrations import CodeCarbonCallback
+  File "<frozen importlib._bootstrap>", line 1412, in _handle_fromlist
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1766, in __getattr__
+    module = self._get_module(self._class_to_module[name])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amiteshtripathi/anaconda3/envs/PatientInsight/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1780, in _get_module
+    raise RuntimeError(
+RuntimeError: Failed to import transformers.integrations.integration_utils because of the following error (look up to see its traceback):
+Failed to import transformers.modeling_utils because of the following error (look up to see its traceback):
+numpy.core.umath failed to import

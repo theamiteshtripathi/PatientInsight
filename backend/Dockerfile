@@ -1,39 +1,36 @@
-# Use Python 3.12 slim as base
+# Use Python 3.12 slim base image
 FROM python:3.12-slim
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1
+# Set working directory
+WORKDIR /backend
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    git \
-    curl \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential gcc g++ \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
-WORKDIR /app
-
-# Copy requirements first for better caching
+# Copy requirements file
 COPY requirements.txt .
 
-# Install Python dependencies
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the backend code
+# Copy the backend directory
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p /app/data/raw /app/data/processed /app/logs
-
-# Expose port for API
+# Expose port 8000
 EXPOSE 8000
 
-# Add entrypoint script
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Set environment variables
+ENV PYTHONPATH=/backend
+ENV PINECONE_API_KEY=pcsk_4Qwjp7_T8V3KY5Mx2nAaqcubgftSUHHSzfSP4JsL3mzXNQfiLSH3R5K7dooq3FBPgnmt2U
+ENV PINECONE_ENVIRONMENT=us-east-1
+ENV PINECONE_INDEX_NAME=patientinsight-rag
+ENV OPENAI_API_KEY=${OPENAI_API_KEY}
+ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+ENV AWS_REGION=us-east-2
 
-ENTRYPOINT ["/entrypoint.sh"]
+# Run the application
+CMD ["python", "run.py"]

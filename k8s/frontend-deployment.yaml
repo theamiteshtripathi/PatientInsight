@@ -8,7 +8,7 @@ metadata:
     app: patient-insight
     tier: frontend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: patient-insight
@@ -19,6 +19,8 @@ spec:
         app: patient-insight
         tier: frontend
     spec:
+      imagePullSecrets:
+        - name: ecr-secret
       containers:
       - name: frontend
         image: 167325058662.dkr.ecr.us-east-2.amazonaws.com/patient-insight-frontend:latest

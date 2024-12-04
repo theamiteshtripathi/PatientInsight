@@ -160,6 +160,45 @@ aws iam attach-role-policy \
     
 
 
+aws eks describe-cluster --name PatientInsightEKSCluster --query "cluster.resourcesVpcConfig"
 
 
-aws eks describe-cluster --name PatientInsightEKSCluster --region us-east-2
+
+
+aws ec2 create-tags \
+    --resources subnet-0a9ad5a1677cdb38e subnet-0fc05a81a4004c2fc subnet-04351713cdf19ae0e\
+    --tags Key=kubernetes.io/role/elb,Value=1
+
+
+
+    subnet-0fc05a81a4004c2fc
+    subnet-04351713cdf19ae0e
+
+aws ec2 create-tags \
+    --resources subnet-0a9ad5a1677cdb38e subnet-0fc05a81a4004c2fc subnet-04351713cdf19ae0e\
+    --tags Key=kubernetes.io/cluster/PatientInsightEKSCluster,Value=shared
+
+
+
+aws ec2 describe-subnets \
+    --subnet-ids subnet-0a9ad5a1677cdb38e subnet-0fc05a81a4004c2fc subnet-04351713cdf19ae0e \
+    --query 'Subnets[*].Tags'
+
+
+
+PRIVATE SUBNETS
+aws ec2 create-tags \
+    --resources subnet-0a9ad5a1677cdb38e subnet-0fc05a81a4004c2fc subnet-04351713cdf19ae0e \
+    --tags Key=kubernetes.io/role/internal-elb,Value=1
+
+
+aws ec2 create-tags \
+    --resources subnet-0a9ad5a1677cdb38e subnet-0fc05a81a4004c2fc subnet-04351713cdf19ae0e \
+    --tags Key=kubernetes.io/cluster/PatientInsightEKSCluster,Value=shared
+
+
+VERYIFY TAGS
+
+aws ec2 describe-subnets \
+    --subnet-ids subnet-0a9ad5a1677cdb38e subnet-0fc05a81a4004c2fc subnet-04351713cdf19ae0e \
+    --query 'Subnets[*].Tags'

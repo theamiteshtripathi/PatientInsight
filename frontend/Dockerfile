@@ -1,32 +1,23 @@
-# Build stage
-FROM node:18-alpine as build
+# Use the official Node.js image as the base
+FROM node:18 as build
 
 # Set working directory
-WORKDIR /app
+WORKDIR /frontend
 
-# Copy package files
+# Copy package files first to leverage Docker cache
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
-# Copy source code
+# Copy the rest of the application
 COPY . .
 
-# Build application
+# Build the application
 RUN npm run build
 
 # Production stage
 FROM nginx:alpine
-
-# Copy custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copy built assets from builder stage
-COPY --from=build /app/build /usr/share/nginx/html
-
-# Expose port
+COPY --from=build /frontend/build /usr/share/nginx/html
 EXPOSE 80
-
-# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
