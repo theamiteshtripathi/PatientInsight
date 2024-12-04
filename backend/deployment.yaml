@@ -18,6 +18,6 @@ spec:
       - name: backend
         image: 167325058662.dkr.ecr.us-east-2.amazonaws.com/backend:latest
         ports:
-        - containerPort: 80
+        - containerPort: 8000
       imagePullSecrets:
       - name: regcred
