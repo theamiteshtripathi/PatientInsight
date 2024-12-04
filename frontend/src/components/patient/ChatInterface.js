@@ -42,7 +42,7 @@ const MessageBubble = styled(Box)(({ theme, isBot }) => ({
   wordWrap: 'break-word'
 }));
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'http://k8s-default-backends-3d835ba603-ad3edaa62e54a151.elb.us-east-2.amazonaws.com/api';
 
 function ChatInterface() {
   const [messages, setMessages] = useState([]);
