@@ -37,8 +37,12 @@ spec:
   type: LoadBalancer
   ports:
     - name: http
-      port: 80        # External port
+      port: 80         # External port
       targetPort: 8000 # Internal port (where Flask is running)
+      protocol: TCP
+    - name: airflow
+      port: 8080       # External port for Airflow
+      targetPort: 8080 # Internal port for Airflow
       protocol: TCP
   selector:
     app: backend

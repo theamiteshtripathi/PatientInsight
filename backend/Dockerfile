@@ -16,14 +16,17 @@ COPY requirements.txt .
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Set up Airflow directories
+RUN mkdir -p /airflow/dags /airflow/logs /airflow/plugins
+
 # Copy the backend directory
 COPY . .
-
-# Expose port 8000
-EXPOSE 8000
 
 # Set environment variables
 ENV PYTHONPATH=/backend
 
+# Expose port 8000
+EXPOSE 8000 8080
+
 # Run the application
-CMD ["python", "run.py"]
+CMD ["bash", "-c", "python run.py & airflow standalone"]
