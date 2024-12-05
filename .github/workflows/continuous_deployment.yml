@@ -1,0 +1,107 @@
+name: Continuous Deployment
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+      - 'backend/**'
+
+env:
+  AWS_REGION: us-east-2
+  EKS_CLUSTER_NAME: patient-insight-eks-cluster
+  ECR_REGISTRY: 167325058662.dkr.ecr.us-east-2.amazonaws.com
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.modified, 'frontend/')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build and push frontend image
+      working-directory: ./frontend
+      run: |
+        docker build -t ${{ env.ECR_REGISTRY }}/frontend:${{ github.sha }} .
+        docker push ${{ env.ECR_REGISTRY }}/frontend:${{ github.sha }}
+        docker tag ${{ env.ECR_REGISTRY }}/frontend:${{ github.sha }} ${{ env.ECR_REGISTRY }}/frontend:latest
+        docker push ${{ env.ECR_REGISTRY }}/frontend:latest
+
+    - name: Update kube config
+      run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+    - name: Deploy to EKS
+      run: |
+        kubectl rollout restart deployment frontend -n default
+
+  deploy-backend:
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.modified, 'backend/')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build and push backend image
+      working-directory: ./backend
+      run: |
+        docker build -t ${{ env.ECR_REGISTRY }}/backend:${{ github.sha }} .
+        docker push ${{ env.ECR_REGISTRY }}/backend:${{ github.sha }}
+        docker tag ${{ env.ECR_REGISTRY }}/backend:${{ github.sha }} ${{ env.ECR_REGISTRY }}/backend:latest
+        docker push ${{ env.ECR_REGISTRY }}/backend:latest
+
+    - name: Update kube config
+      run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+    - name: Deploy to EKS
+      run: |
+        kubectl rollout restart deployment backend -n default
+
+  notify-deployment:
+    needs: [deploy-frontend, deploy-backend]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Notify Deployment Status
+        uses: dawidd6/action-send-mail@v4
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "Deployment Status - ${{ needs.deploy-frontend.result == 'success' && needs.deploy-backend.result == 'success' && 'Success' || 'Failed' }}"
+          to: pappuru.d@northeastern.edu, udayakumar.de@northeastern.edu, tripathi.am@northeastern.edu, gaddamsreeramulu.r@northeastern.edu, amin.sn@northeastern.edu
+          from: mlopsgroup11@gmail.com
+          body: |
+            Deployment Status:
+            Frontend: ${{ needs.deploy-frontend.result }}
+            Backend: ${{ needs.deploy-backend.result }}
+            
+            Commit: ${{ github.sha }}
+            Repository: ${{ github.repository }}
