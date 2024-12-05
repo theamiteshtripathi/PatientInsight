@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Paper,
   TextField,
@@ -48,9 +47,9 @@ const MessageBubble = styled(Box)(({ theme, isBot }) => ({
   wordWrap: 'break-word'
 }));
 
-const API_BASE_URL = 'http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api';
+const API_BASE_URL = 'http://localhost:8000/api';
 
-function ChatInterface() {
+function ChatInterfaceLLM() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -59,7 +58,6 @@ function ChatInterface() {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const [showReportDialog, setShowReportDialog] = useState(false);
-  const navigate = useNavigate();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -85,7 +83,7 @@ function ChatInterface() {
     try {
       setLoading(true);
       setError('');
-      const response = await fetch(`${API_BASE_URL}/chat/start`, {
+      const response = await fetch(`${API_BASE_URL}/chat_llm/start`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -125,7 +123,7 @@ function ChatInterface() {
     try {
       const user = JSON.parse(localStorage.getItem('user'));
       
-      const response = await fetch(`${API_BASE_URL}/chat/message`, {
+      const response = await fetch(`${API_BASE_URL}/chat_llm/message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -170,63 +168,6 @@ function ChatInterface() {
     }
   };
 
-  const handleViewReport = () => {
-    setShowReportDialog(false);
-    navigate('/symptom-checker');
-  };
-
-  const handleGenerateReport = async (chatHistory) => {
-    try {
-      const user = JSON.parse(localStorage.getItem('user'));
-      
-      // First generate the PDF (your existing code)
-      const response = await fetch('http://localhost:8000/api/generate-report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ messages: chatHistory }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate report');
-      }
-
-      const data = await response.json();
-      
-      // Now store the generated PDF in database
-      const storeResponse = await fetch('http://localhost:8000/api/store-report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: user.id,
-          report_path: data.report_path
-        }),
-      });
-
-      if (!storeResponse.ok) {
-        throw new Error('Failed to store report in database');
-      }
-
-      const storeData = await storeResponse.json();
-      console.log('Report stored in database:', storeData);
-      
-      // Show success message
-      alert('Chat report has been generated and saved successfully!');
-
-    } catch (error) {
-      console.error('Error handling report:', error);
-      alert('Failed to handle report. Please try again.');
-    }
-  };
-
-  useEffect(() => {
-    // Generate a new session ID when the component mounts
-    setSessionId(uuidv4());
-  }, []);
-
   return (
     <ChatWrapper>
       <Paper 
@@ -242,7 +183,7 @@ function ChatInterface() {
       >
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h5" component="h1">
-            Medical Chat Assistant
+            Talk About Your Doctor's review Report
           </Typography>
           <Button
             startIcon={<Refresh />}
@@ -335,7 +276,7 @@ function ChatInterface() {
           </Grid>
         </Box>
       </Paper>
-
+      
       <Dialog
         open={showReportDialog}
         onClose={() => setShowReportDialog(false)}
@@ -365,7 +306,7 @@ function ChatInterface() {
             Close
           </Button>
           <Button 
-            onClick={handleViewReport}
+            onClick={() => setShowReportDialog(false)}
             variant="contained"
             color="primary"
             autoFocus
@@ -378,4 +319,4 @@ function ChatInterface() {
   );
 }
 
-export default ChatInterface;
+export default ChatInterfaceLLM; 

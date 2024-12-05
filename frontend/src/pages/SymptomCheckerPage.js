@@ -26,7 +26,7 @@ import {
 } from '@mui/icons-material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
-import ChatInterface from '../components/patient/ChatInterface';
+import ChatInterfaceLLM from '../components/patient/ChatInterfaceLLM';
 
 function SymptomCheckerPage() {
   const [sessionActive, setSessionActive] = useState(false);
@@ -179,7 +179,7 @@ function SymptomCheckerPage() {
         >
           <DialogTitle>AI Health Assistant</DialogTitle>
           <DialogContent sx={{ height: '60vh' }}>
-            <ChatInterface />
+            <ChatInterfaceLLM />
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setShowChat(false)}>Close</Button>
