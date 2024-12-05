@@ -300,38 +300,30 @@ function PatientsPage() {
   // Handle viewing patient details
   const handleViewDetails = async (patient) => {
     try {
-      console.log('Viewing patient:', patient); // Debug log
-
-      // Check if we have a valid user_id
       const userId = patient.user_id || patient.id;
       if (!userId) {
         throw new Error('No valid user ID found');
       }
 
-      // First get the onboarding form data
-      console.log('Fetching onboarding data for user:', userId);
+      // Fetch onboarding data
       const onboardingResponse = await fetch(`http://localhost:8000/api/doctor/patient/onboarding/${userId}`);
       if (!onboardingResponse.ok) {
-        const errorData = await onboardingResponse.json();
-        throw new Error(`Onboarding data error: ${errorData.error || onboardingResponse.statusText}`);
+        throw new Error(`Onboarding data error: ${onboardingResponse.statusText}`);
       }
       const onboardingData = await onboardingResponse.json();
-      console.log('Onboarding data:', onboardingData);
 
-      // Then get the reports
-      console.log('Fetching reports for user:', userId);
+      // Fetch reports
       const reportsResponse = await fetch(`http://localhost:8000/api/doctor/patient/reports/${userId}`);
       if (!reportsResponse.ok) {
-        const errorData = await reportsResponse.json();
-        throw new Error(`Reports data error: ${errorData.error || reportsResponse.statusText}`);
+        throw new Error(`Reports data error: ${reportsResponse.statusText}`);
       }
       const reportsData = await reportsResponse.json();
-      console.log('Reports data:', reportsData);
       
-      // Combine all data
+      // Combine all data and include latest_report_id if reports exist
       const patientDetails = {
         ...patient,
         ...onboardingData,
+        latest_report_id: reportsData.length > 0 ? reportsData[0].id : null,
         reports: reportsData.map(report => ({
           id: report.id,
           name: report.report_name || 'Unnamed Report',
@@ -341,7 +333,6 @@ function PatientsPage() {
         }))
       };
       
-      console.log('Combined patient details:', patientDetails);
       setSelectedPatient(patientDetails);
       setOpenDialog(true);
     } catch (err) {
@@ -606,20 +597,16 @@ function PatientsPage() {
     return (
       <Box>
         {/* PDF Viewer Section */}
-        {patient.latest_report_id && (
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Patient Report
-            </Typography>
-            <PdfViewer 
-              reportId={patient.latest_report_id}
-              onSave={(notes) => {
-                console.log('Notes saved:', notes);
-                // Handle any UI updates after saving
-              }}
-            />
-          </Box>
-        )}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Patient Report
+          </Typography>
+          {patient.latest_report_id ? (
+            <PdfViewer reportId={patient.latest_report_id} />
+          ) : (
+            <Alert severity="info">No report available for this patient</Alert>
+          )}
+        </Box>
 
         {/* AI Summary Section */}
         <Box sx={{ mt: 4 }}>
@@ -676,10 +663,17 @@ function PatientsPage() {
 
     useEffect(() => {
       const loadPdf = async () => {
+        if (!reportId) {
+          setError('No report available');
+          setLoading(false);
+          return;
+        }
+
         try {
           setLoading(true);
           const response = await fetch(`http://localhost:8000/api/doctor/patient/report-pdf/${reportId}`, {
             method: 'GET',
+            credentials: 'include', // Include credentials if needed
             headers: {
               'Accept': 'application/pdf',
             },
@@ -690,7 +684,7 @@ function PatientsPage() {
           }
 
           const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
+          const url = URL.createObjectURL(blob);
           setPdfUrl(url);
           setError(null);
         } catch (err) {
@@ -701,24 +695,29 @@ function PatientsPage() {
         }
       };
 
-      if (reportId) {
-        loadPdf();
-      }
+      loadPdf();
 
-      // Cleanup
       return () => {
         if (pdfUrl) {
-          window.URL.revokeObjectURL(pdfUrl);
+          URL.revokeObjectURL(pdfUrl);
         }
       };
     }, [reportId]);
 
     if (loading) {
-      return <CircularProgress />;
+      return (
+        <Box display="flex" justifyContent="center" alignItems="center" height="300px">
+          <CircularProgress />
+        </Box>
+      );
     }
 
     if (error) {
-      return <Typography color="error">{error}</Typography>;
+      return (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      );
     }
 
     return (
@@ -843,7 +842,36 @@ function PatientsPage() {
                 </TabPanel>
 
                 <TabPanel value={currentTab} index={1}>
-                  <AISummary patient={selectedPatient} />
+                  <Box>
+                    <Typography variant="h6" gutterBottom>
+                      Patient Report
+                    </Typography>
+                    <Paper sx={{ p: 2, bgcolor: 'grey.50', minHeight: '300px' }}>
+                      {selectedPatient?.reports?.[0]?.id ? (
+                        <iframe
+                          src={`http://localhost:8000/api/reports/view/${selectedPatient.reports[0].id}`}
+                          width="100%"
+                          height="500px"
+                          style={{
+                            border: '1px solid #ccc',
+                            borderRadius: '4px'
+                          }}
+                          title="Patient Report"
+                        />
+                      ) : (
+                        <Alert severity="info">No report available for this patient</Alert>
+                      )}
+                    </Paper>
+
+                    <Box sx={{ mt: 4 }}>
+                      <Typography variant="h6" gutterBottom>
+                        AI Generated Summary
+                      </Typography>
+                      <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+                        <Typography>{selectedPatient?.ai_summary || 'No AI summary available'}</Typography>
+                      </Paper>
+                    </Box>
+                  </Box>
                 </TabPanel>
 
                 <TabPanel value={currentTab} index={2}>
