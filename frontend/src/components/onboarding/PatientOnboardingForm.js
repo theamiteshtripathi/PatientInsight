@@ -81,7 +81,7 @@ const PatientOnboardingForm = ({ open, onClose, onSubmit }) => {
       const user = JSON.parse(localStorage.getItem('user'));
       
       // Check if profile already exists by making an API call
-      const checkResponse = await fetch(`http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/patient-profile/${user.id}`);
+      const checkResponse = await fetch(`http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api/patient-profile/${user.id}`);
       if (checkResponse.ok) {
         throw new Error('Profile already exists');
       }
