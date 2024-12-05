@@ -1,11 +1,11 @@
 name: Data pipeline Unittests
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'backend/data_pipeline/**'
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - 'backend/data_pipeline/**'
 
 jobs:
   build:

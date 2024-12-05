@@ -1,12 +1,12 @@
 name: Symptom Analyzer Tests
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'backend/config/config.py'
-      - 'backend/ml_pipeline/**'
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - 'backend/config/config.py'
+#       - 'backend/ml_pipeline/**'
   
 jobs:
   test:

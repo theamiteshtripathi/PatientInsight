@@ -1,0 +1,99 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches:
+      - staging
+
+jobs:
+  test-ml-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12.0
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-mock pytest-xdist
+          pip install -r requirements.txt
+      
+      - name: Run ML Pipeline Tests
+        run: |
+          python backend/ml_pipeline/tests/test_env_variables.py 
+          python -m pytest backend/ml_pipeline/tests/test_retrieval_validation.py 
+          python -m pytest backend/ml_pipeline/tests/test_bias_metrics.py 
+          python backend/ml_pipeline/tests/test_integrated_pipeline.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
+          PINECONE_ENVIRONMENT: ${{ secrets.PINECONE_ENVIRONMENT }}
+          PINECONE_INDEX_NAME: ${{ secrets.PINECONE_INDEX_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+  test-data-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12.0
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Data Pipeline Tests
+        run: |
+          python -m unittest backend/data_pipeline/tests/test_data_download.py
+          python -m unittest backend/data_pipeline/tests/test_data_preprocess.py
+
+  notify:
+    needs: [test-ml-pipeline, test-data-pipeline]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Notify Success
+        if: needs.test-ml-pipeline.result == 'success' && needs.test-data-pipeline.result == 'success'
+        uses: dawidd6/action-send-mail@v4
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "CI Pipeline Passed - Ready to Merge to Staging"
+          to: pappuru.d@northeastern.edu
+          from: mlopsgroup11@gmail.com
+          body: |
+            All tests have passed. The PR can be merged to staging.
+            
+            Pull Request: ${{ github.event.pull_request.html_url }}
+            
+      - name: Notify Failure
+        if: needs.test-ml-pipeline.result == 'failure' || needs.test-data-pipeline.result == 'failure'
+        uses: dawidd6/action-send-mail@v4
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "CI Pipeline Failed"
+          to: pappuru.d@northeastern.edu
+          from: mlopsgroup11@gmail.com
+          body: |
+            Some tests have failed. Please check the logs.
+            
+            Pull Request: ${{ github.event.pull_request.html_url }} 
