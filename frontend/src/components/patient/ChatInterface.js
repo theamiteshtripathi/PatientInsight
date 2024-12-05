@@ -48,7 +48,7 @@ const MessageBubble = styled(Box)(({ theme, isBot }) => ({
   wordWrap: 'break-word'
 }));
 
-const API_BASE_URL = 'http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api';
+const API_BASE_URL = 'http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api';
 
 function ChatInterface() {
   const [messages, setMessages] = useState([]);
@@ -195,7 +195,7 @@ function ChatInterface() {
       const data = await response.json();
       
       // Now store the generated PDF in database
-      const storeResponse = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/store-report', {
+      const storeResponse = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:80/api/store-report', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
