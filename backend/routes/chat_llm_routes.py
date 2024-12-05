@@ -114,4 +114,4 @@ def chat_message():
         })
         
     except Exception as e:
-        return jsonify({'status': 'error', 'error': str(e)}), 500 
+        return jsonify({'status': 'error', 'error': str(e)}), 500

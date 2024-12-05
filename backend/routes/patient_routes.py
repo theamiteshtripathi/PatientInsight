@@ -311,50 +311,34 @@ def get_patient_reports(user_id):
         
         print(f"Fetching reports for user_id: {user_id}")  # Debug log
         
-        # Query both patient_reports and doctor_patient_report tables
+        # Modified query to properly handle UNION
         cur.execute("""
             SELECT 
                 id,
                 user_id,
-                report_data,
                 created_at,
                 report_name,
                 'patient' as report_type
             FROM patient_reports 
-            WHERE user_id = %s 
+            WHERE user_id = %s
             UNION ALL
             SELECT 
                 id,
                 user_id,
-                report_data,
                 created_at,
                 report_name,
                 'doctor' as report_type
             FROM doctor_patient_report 
-            WHERE user_id = %s 
-            ORDER BY created_at DESC
+            WHERE user_id = %s
+            ORDER BY created_at DESC;
         """, (user_id, user_id))
         
         reports = cur.fetchall()
-        print(f"Found {len(reports)} reports")  # Debug log
-        
-        # Process reports
-        processed_reports = []
-        for report in reports:
-            processed_report = {
-                'id': report['id'],
-                'user_id': report['user_id'],
-                'report_name': report['report_name'],
-                'created_at': report['created_at'].isoformat() if report['created_at'] else None,
-                'report_type': report['report_type'],
-                'has_data': report['report_data'] is not None
-            }
-            processed_reports.append(processed_report)
         
         cur.close()
         conn.close()
         
-        return jsonify(processed_reports)
+        return jsonify(reports)
         
     except Exception as e:
         print(f"Error in get_patient_reports: {str(e)}")
