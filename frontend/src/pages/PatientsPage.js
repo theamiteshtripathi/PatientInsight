@@ -37,7 +37,8 @@ import {
   Settings as SettingsIcon,
   Notifications as NotificationIcon,
   Visibility as VisibilityIcon,
-  Assignment as AssignmentIcon
+  Assignment as AssignmentIcon,
+  Clear as ClearIcon
 } from '@mui/icons-material';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import StatusChip from '../components/common/StatusChip';
@@ -248,6 +249,8 @@ function PatientsPage() {
   const [selectedReport, setSelectedReport] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedNotes, setEditedNotes] = useState('');
+  const [doctorPrescription, setDoctorPrescription] = useState('');
+  const [medicineNotes, setMedicineNotes] = useState('');
 
   // Fetch patients data
   useEffect(() => {
@@ -859,10 +862,58 @@ function PatientsPage() {
 
                     <Box sx={{ mt: 4 }}>
                       <Typography variant="h6" gutterBottom>
-                        AI Generated Summary
+                        Doctor's Notes
                       </Typography>
                       <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
-                        <Typography>{selectedPatient?.ai_summary || 'No AI summary available'}</Typography>
+                        <Box sx={{ mb: 3 }}>
+                          <Typography variant="subtitle1" gutterBottom>
+                            Prescription
+                          </Typography>
+                          <TextField
+                            fullWidth
+                            multiline
+                            rows={4}
+                            placeholder="Enter prescription details..."
+                            value={doctorPrescription}
+                            onChange={(e) => setDoctorPrescription(e.target.value)}
+                            sx={{ mb: 2 }}
+                          />
+                        </Box>
+
+                        <Box sx={{ mb: 3 }}>
+                          <Typography variant="subtitle1" gutterBottom>
+                            Medicine Notes
+                          </Typography>
+                          <TextField
+                            fullWidth
+                            multiline
+                            rows={4}
+                            placeholder="Enter medicine notes and instructions..."
+                            value={medicineNotes}
+                            onChange={(e) => setMedicineNotes(e.target.value)}
+                            sx={{ mb: 2 }}
+                          />
+                        </Box>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                          <Button
+                            variant="outlined"
+                            startIcon={<ClearIcon />}
+                            onClick={() => {
+                              setDoctorPrescription('');
+                              setMedicineNotes('');
+                            }}
+                          >
+                            Clear
+                          </Button>
+                          <Button
+                            variant="contained"
+                            startIcon={<SaveIcon />}
+                            onClick={handleSaveNotes}
+                          >
+                            Save Notes
+                          </Button>
+                        </Box>
                       </Paper>
                     </Box>
                   </Box>
