@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Paper,
   TextField,
@@ -9,18 +10,23 @@ import {
   Box,
   CircularProgress,
   Alert,
-  Fade
+  Fade,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Send, Refresh } from '@mui/icons-material';
+import { Send, Refresh, CheckCircleOutline } from '@mui/icons-material';
 import { v4 as uuidv4 } from 'uuid';
 
 const ChatWrapper = styled(Container)(({ theme }) => ({
-  marginTop: theme.spacing(3),
-  marginBottom: theme.spacing(3),
-  height: '90vh',
+  height: '100%',
   display: 'flex',
-  flexDirection: 'column'
+  flexDirection: 'column',
+  padding: '10px',
+  overflow: 'hidden'
 }));
 
 const MessageContainer = styled(Box)(({ theme }) => ({
@@ -48,9 +54,12 @@ function ChatInterface() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [sessionId, setSessionId] = useState('');
+  const [sessionId, setSessionId] = useState(null);
   const [error, setError] = useState('');
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
+  const [showReportDialog, setShowReportDialog] = useState(false);
+  const navigate = useNavigate();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -114,15 +123,18 @@ function ChatInterface() {
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/chat/message`, {
+      const user = JSON.parse(localStorage.getItem('user'));
+      
+      const response = await fetch('http://localhost:8000/api/chat/message', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
         },
         body: JSON.stringify({
-          session_id: sessionId,
-          message: userMessage
+          message: userMessage,
+          chatHistory: messages,
+          user_id: user.id,
+          session_id: sessionId
         }),
       });
       
@@ -137,9 +149,7 @@ function ChatInterface() {
           text: "Chat session ended. Your medical report has been generated.", 
           isBot: true 
         }]);
-        setTimeout(() => {
-          startNewSession();
-        }, 2000);
+        setShowReportDialog(true);
         return;
       }
 
@@ -149,6 +159,7 @@ function ChatInterface() {
       console.error('Error:', error);
     } finally {
       setLoading(false);
+      inputRef.current?.focus();
     }
   };
 
@@ -159,16 +170,74 @@ function ChatInterface() {
     }
   };
 
+  const handleViewReport = () => {
+    setShowReportDialog(false);
+    navigate('/symptom-checker');
+  };
+
+  const handleGenerateReport = async (chatHistory) => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      
+      // First generate the PDF (your existing code)
+      const response = await fetch('http://localhost:8000/api/generate-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messages: chatHistory }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate report');
+      }
+
+      const data = await response.json();
+      
+      // Now store the generated PDF in database
+      const storeResponse = await fetch('http://localhost:8000/api/store-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          report_path: data.report_path
+        }),
+      });
+
+      if (!storeResponse.ok) {
+        throw new Error('Failed to store report in database');
+      }
+
+      const storeData = await storeResponse.json();
+      console.log('Report stored in database:', storeData);
+      
+      // Show success message
+      alert('Chat report has been generated and saved successfully!');
+
+    } catch (error) {
+      console.error('Error handling report:', error);
+      alert('Failed to handle report. Please try again.');
+    }
+  };
+
+  useEffect(() => {
+    // Generate a new session ID when the component mounts
+    setSessionId(uuidv4());
+  }, []);
+
   return (
     <ChatWrapper>
       <Paper 
         elevation={3} 
         sx={{ 
-          p: 3, 
+          p: 2, 
           borderRadius: 2,
           height: '100%',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          overflow: 'hidden'
         }}
       >
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
@@ -193,7 +262,26 @@ function ChatInterface() {
           </Fade>
         )}
         
-        <MessageContainer>
+        <MessageContainer
+          sx={{
+            height: '100%',
+            overflowY: 'auto',
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: '#f1f1f1',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: '#888',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              background: '#555',
+            },
+          }}
+        >
           <Box display="flex" flexDirection="column">
             {messages.map((message, index) => (
               <MessageBubble key={index} isBot={message.isBot}>
@@ -206,10 +294,18 @@ function ChatInterface() {
           </Box>
         </MessageContainer>
         
-        <Box component="form" onSubmit={(e) => e.preventDefault()} sx={{ mt: 'auto' }}>
+        <Box 
+          component="form" 
+          onSubmit={(e) => e.preventDefault()} 
+          sx={{ 
+            mt: 2,
+            flexShrink: 0
+          }}
+        >
           <Grid container spacing={2}>
             <Grid item xs={10}>
               <TextField
+                inputRef={inputRef}
                 fullWidth
                 variant="outlined"
                 placeholder="Type your message... (type 'bye' to end chat)"
@@ -220,6 +316,7 @@ function ChatInterface() {
                 multiline
                 maxRows={4}
                 sx={{ backgroundColor: 'background.paper' }}
+                autoFocus
               />
             </Grid>
             <Grid item xs={2}>
@@ -238,6 +335,45 @@ function ChatInterface() {
           </Grid>
         </Box>
       </Paper>
+
+      <Dialog
+        open={showReportDialog}
+        onClose={() => setShowReportDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 1,
+          color: 'success.main' 
+        }}>
+          <CheckCircleOutline />
+          Report Generated Successfully
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Your medical report has been generated and sent to our medical team for review. 
+            You can track the status of your report in the Symptoms Checker page.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 0 }}>
+          <Button 
+            onClick={() => setShowReportDialog(false)}
+            color="inherit"
+          >
+            Close
+          </Button>
+          <Button 
+            onClick={handleViewReport}
+            variant="contained"
+            color="primary"
+            autoFocus
+          >
+            View Report Status
+          </Button>
+        </DialogActions>
+      </Dialog>
     </ChatWrapper>
   );
 }

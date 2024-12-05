@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Table,
@@ -20,7 +20,8 @@ import {
   TextField,
   Badge,
   Grid,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -38,16 +39,70 @@ import {
   Visibility as VisibilityIcon,
   Assignment as AssignmentIcon
 } from '@mui/icons-material';
+import { PDFDocument, StandardFonts } from 'pdf-lib';
 import StatusChip from '../components/common/StatusChip';
 import MedicalHistory from '../components/patient/Medicalhistory';
 import HealthRecommendations from '../components/patient/HealthRecommendations';
 import AISummary from '../components/doctor/AISummary';
 import DoctorLayout from '../components/layout/DoctorLayout';
+import PdfViewer from '../components/PdfViewer';
 
 const AISummaryReview = ({ patient, onSaveReview }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [doctorSummary, setDoctorSummary] = useState('');
   const [aiSummary] = useState(patient.aiSummary || '');
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const loadPdf = async () => {
+      if (!patient?.reports?.[0]?.id) return;
+      
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Add credentials and more specific headers
+        const response = await fetch(
+          `http://localhost:8000/api/doctor/patient/report-pdf/${patient.reports[0].id}`,
+          {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Accept': 'application/pdf',
+              'Content-Type': 'application/pdf',
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(
+          new Blob([blob], { type: 'application/pdf' })
+        );
+        setPdfUrl(url);
+      } catch (err) {
+        console.error('Error loading PDF:', err);
+        setError(`Failed to load PDF: ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPdf();
+
+    // Cleanup
+    return () => {
+      if (pdfUrl) {
+        window.URL.revokeObjectURL(pdfUrl);
+      }
+    };
+  }, [patient]);
 
   const handleSaveReview = () => {
     onSaveReview({
@@ -62,6 +117,34 @@ const AISummaryReview = ({ patient, onSaveReview }) => {
 
   return (
     <Box sx={{ p: 2 }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h6" gutterBottom>
+          Patient Report
+        </Typography>
+        <Paper sx={{ p: 2, bgcolor: 'grey.50', minHeight: '300px' }}>
+          {loading ? (
+            <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Typography color="error">{error}</Typography>
+          ) : pdfUrl ? (
+            <iframe
+              src={pdfUrl}
+              width="100%"
+              height="500px"
+              style={{
+                border: '1px solid #ccc',
+                borderRadius: '4px'
+              }}
+              title="Patient Report"
+            />
+          ) : (
+            <Typography>No report available</Typography>
+          )}
+        </Paper>
+      </Box>
+
       <Box sx={{ mb: 4 }}>
         <Typography variant="h6" gutterBottom>
           AI-Generated Summary
@@ -150,42 +233,137 @@ const AISummaryReview = ({ patient, onSaveReview }) => {
 };
 
 function PatientsPage() {
-  const [patients, setPatients] = useState([
-    {
-      id: 1,
-      name: 'John Doe',
-      age: 45,
-      condition: 'Diabetes',
-      lastVisit: '2024-03-15',
-      status: 'Pending Review',
-      aiSummary: 'Patient reports increased thirst and fatigue...',
-      contact: {
-        email: 'john.doe@email.com',
-        phone: '123-456-7890'
-      }
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      age: 32,
-      condition: 'Hypertension',
-      lastVisit: '2024-03-14',
-      status: 'Urgent',
-      aiSummary: 'Blood pressure readings consistently high...',
-      contact: {
-        email: 'jane.smith@email.com',
-        phone: '098-765-4321'
-      }
-    }
-  ]);
-
+  const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [currentTab, setCurrentTab] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedPdf, setSelectedPdf] = useState(null);
+  const [pdfEditDialog, setPdfEditDialog] = useState(false);
+  const [medication, setMedication] = useState('');
+  const [doctorNotes, setDoctorNotes] = useState('');
+  const [selectedPdfUrl, setSelectedPdfUrl] = useState(null);
+  const [pdfError, setPdfError] = useState(null);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedNotes, setEditedNotes] = useState('');
 
-  const handleViewDetails = (patient) => {
-    setSelectedPatient(patient);
-    setOpenDialog(true);
+  // Fetch patients data
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/doctor/patients');
+        if (!response.ok) {
+          throw new Error('Failed to fetch patients');
+        }
+        const data = await response.json();
+        
+        // Map the database data to match your UI structure
+        const mappedPatients = data.map(patient => ({
+          id: patient.id,
+          name: `${patient.first_name} ${patient.last_name}`,
+          age: calculateAge(patient.date_of_birth),
+          condition: patient.medical_conditions || 'Not specified',
+          lastVisit: new Date(patient.created_at).toLocaleDateString(),
+          status: patient.status || 'Pending Review',
+          contact: {
+            email: patient.email || '',
+            phone: patient.phone_number || ''
+          }
+        }));
+        
+        setPatients(mappedPatients);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching patients:', err);
+        setError('Failed to load patients');
+        setLoading(false);
+      }
+    };
+
+    fetchPatients();
+  }, []);
+
+  // Calculate age from date of birth
+  const calculateAge = (dob) => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  // Handle viewing patient details
+  const handleViewDetails = async (patient) => {
+    try {
+      // First fetch patient details
+      const detailsResponse = await fetch(`http://localhost:8000/api/doctor/patient/${patient.id}/details`);
+      if (!detailsResponse.ok) {
+        throw new Error(`Failed to fetch patient details: ${detailsResponse.statusText}`);
+      }
+      const detailsData = await detailsResponse.json();
+
+      // Then fetch reports using the working endpoint from PatientsList.js
+      const reportsResponse = await fetch(`http://localhost:8000/api/doctor/patient/${patient.id}/reports`);
+      if (!reportsResponse.ok) {
+        throw new Error(`Failed to fetch reports: ${reportsResponse.statusText}`);
+      }
+      const reportsData = await reportsResponse.json();
+      
+      // Combine the data
+      const patientDetails = {
+        ...patient,
+        ...detailsData,
+        reports: reportsData.map(report => ({
+          id: report.id,
+          name: report.report_name || 'Unnamed Report',
+          type: report.report_type || 'General',
+          date: report.created_at ? new Date(report.created_at).toLocaleDateString() : 'No date',
+          status: report.status || 'Pending Review'
+        }))
+      };
+      
+      setSelectedPatient(patientDetails);
+      setOpenDialog(true);
+    } catch (err) {
+      console.error('Detailed error in handleViewDetails:', err);
+      setError(`Failed to load patient details: ${err.message}`);
+    }
+  };
+
+  // Handle saving review
+  const handleSaveReview = async (reviewData) => {
+    try {
+      const response = await fetch('http://localhost:8000/api/patient/review', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reviewData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save review');
+      }
+
+      // Update local state
+      const updatedPatients = patients.map(p => {
+        if (p.id === reviewData.patientId) {
+          return { ...p, status: 'Reviewed' };
+        }
+        return p;
+      });
+      
+      setPatients(updatedPatients);
+      setOpenDialog(false);
+    } catch (err) {
+      console.error('Error saving review:', err);
+      setError('Failed to save review');
+    }
   };
 
   const handleCloseDialog = () => {
@@ -194,11 +372,369 @@ function PatientsPage() {
     setCurrentTab(0);
   };
 
-  const TabPanel = ({ children, value, index }) => (
-    <div hidden={value !== index}>
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-    </div>
+  const TabPanel = ({ children, value, index }) => {
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`tabpanel-${index}`}
+        aria-labelledby={`tab-${index}`}
+      >
+        {value === index && (
+          <Box sx={{ p: 3 }}>
+            {children}
+          </Box>
+        )}
+      </div>
+    );
+  };
+
+  // Function to view/edit PDF
+  const handleViewPdf = async (reportId) => {
+    try {
+      setPdfError(null);
+      const response = await fetch(`http://localhost:8000/api/doctor/patient/report-pdf/${reportId}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch PDF');
+      }
+      
+      // Create a blob URL from the PDF data
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      setSelectedPdfUrl(url);
+      
+    } catch (err) {
+      console.error('Error loading PDF:', err);
+      setPdfError('Failed to load PDF file');
+    }
+  };
+
+  // Function to edit and save PDF
+  const handleSavePdf = async () => {
+    try {
+      // Load the existing PDF
+      const existingPdfBytes = await selectedPdf.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(existingPdfBytes);
+      
+      // Add a new page for doctor's notes
+      const page = pdfDoc.addPage();
+      const { width, height } = page.getSize();
+      const fontSize = 12;
+      
+      // Embed fonts first
+      const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const helveticaBoldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      
+      // Add content to the new page
+      page.drawText('Doctor\'s Prescription and Notes', {
+        x: 50,
+        y: height - 50,
+        size: 16,
+        font: helveticaBoldFont,
+      });
+      
+      page.drawText('Medications:', {
+        x: 50,
+        y: height - 100,
+        size: fontSize,
+        font: helveticaFont,
+      });
+      
+      // Add medication text with word wrap
+      const medicationLines = medication.split('\n');
+      let yPosition = height - 120;
+      medicationLines.forEach(line => {
+        page.drawText(line, {
+          x: 50,
+          y: yPosition,
+          size: fontSize,
+          font: helveticaFont,
+        });
+        yPosition -= 20;
+      });
+      
+      page.drawText('Doctor\'s Notes:', {
+        x: 50,
+        y: yPosition - 20,
+        size: fontSize,
+        font: helveticaFont,
+      });
+      
+      // Add doctor's notes with word wrap
+      const notesLines = doctorNotes.split('\n');
+      yPosition -= 40;
+      notesLines.forEach(line => {
+        page.drawText(line, {
+          x: 50,
+          y: yPosition,
+          size: fontSize,
+          font: helveticaFont,
+        });
+        yPosition -= 20;
+      });
+      
+      // Add timestamp
+      const timestamp = new Date().toLocaleString();
+      page.drawText(`Generated on: ${timestamp}`, {
+        x: 50,
+        y: 50,
+        size: 10,
+        font: helveticaFont,
+      });
+      
+      // Save the modified PDF
+      const modifiedPdfBytes = await pdfDoc.save();
+      
+      // Create form data to send to server
+      const formData = new FormData();
+      formData.append('pdf', new Blob([modifiedPdfBytes], { type: 'application/pdf' }));
+      formData.append('user_id', selectedPatient.id);
+      
+      // Save to database
+      const saveResponse = await fetch('http://localhost:8000/api/doctor/save-edited-report', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!saveResponse.ok) {
+        throw new Error('Failed to save edited report');
+      }
+      
+      setPdfEditDialog(false);
+      setMedication('');
+      setDoctorNotes('');
+      // Optionally refresh the patient's reports list
+      handleViewDetails(selectedPatient);
+      
+    } catch (err) {
+      console.error('Error saving PDF:', err);
+      setError('Failed to save edited PDF');
+    }
+  };
+
+  // Update your PDF viewer component in the dialog
+  const pdfViewerComponent = (
+    <Box sx={{ width: '100%', height: '500px', mt: 2 }}>
+      {pdfError ? (
+        <Alert severity="error">{pdfError}</Alert>
+      ) : selectedPdfUrl ? (
+        <iframe
+          src={selectedPdfUrl}
+          width="100%"
+          height="100%"
+          title="Patient Report"
+          style={{ border: 'none' }}
+        />
+      ) : (
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            height: '100%' 
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      )}
+    </Box>
   );
+
+  // Clean up the blob URL when dialog closes
+  useEffect(() => {
+    return () => {
+      if (selectedPdfUrl) {
+        URL.revokeObjectURL(selectedPdfUrl);
+      }
+    };
+  }, [selectedPdfUrl]);
+
+  // Function to handle PDF viewing in AI Summary tab
+  const handleViewPatientReport = async (patientId) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`http://localhost:8000/api/doctor/patient/reports/${patientId}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        },
+        mode: 'cors'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch reports');
+      }
+      
+      const reports = await response.json();
+      
+      if (reports && reports.length > 0) {
+        const latestReport = reports[0];
+        setSelectedReport(latestReport);
+        setLoading(false);
+      } else {
+        setSelectedReport(null);
+        setError('No reports available for this patient');
+      }
+    } catch (err) {
+      console.error('Error loading report:', err);
+      setError(`Failed to load patient report: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update the TabPanel content for AI Summary
+  const AISummaryContent = ({ patient }) => {
+    if (!patient) return null;
+
+    return (
+      <Box>
+        {/* PDF Viewer Section */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Patient Report
+          </Typography>
+          {patient.latest_report_id ? (
+            <PdfViewer reportId={patient.latest_report_id} />
+          ) : (
+            <Alert severity="info">No report available for this patient</Alert>
+          )}
+        </Box>
+
+        {/* AI Summary Section */}
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            AI Generated Summary
+          </Typography>
+          <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+            <Typography>{patient.ai_summary || 'No AI summary available'}</Typography>
+          </Paper>
+        </Box>
+      </Box>
+    );
+  };
+
+  // Function to save edited notes
+  const handleSaveNotes = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('notes', editedNotes);
+      formData.append('report_id', selectedReport.id);
+      formData.append('patient_id', selectedPatient.id);
+
+      const response = await fetch('http://localhost:8000/api/doctor/save-report-notes', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save notes');
+      }
+
+      // Reset editing state and refresh the report
+      setIsEditing(false);
+      setEditedNotes('');
+      handleViewPatientReport(selectedPatient.id);
+    } catch (err) {
+      console.error('Error saving notes:', err);
+      setError('Failed to save notes');
+    }
+  };
+
+  // Update useEffect to load report when patient is selected
+  useEffect(() => {
+    if (selectedPatient?.user_id && currentTab === 1) {
+      handleViewPatientReport(selectedPatient.user_id);
+    }
+  }, [selectedPatient, currentTab]);
+
+  // Update the PDF viewer component
+  const PdfViewer = ({ reportId }) => {
+    const [pdfUrl, setPdfUrl] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+      const loadPdf = async () => {
+        if (!reportId) {
+          setError('No report available');
+          setLoading(false);
+          return;
+        }
+
+        try {
+          setLoading(true);
+          const response = await fetch(`http://localhost:8000/api/doctor/patient/report-pdf/${reportId}`, {
+            method: 'GET',
+            credentials: 'include', // Include credentials if needed
+            headers: {
+              'Accept': 'application/pdf',
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          setPdfUrl(url);
+          setError(null);
+        } catch (err) {
+          console.error('Error loading PDF:', err);
+          setError(`Failed to load PDF: ${err.message}`);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      loadPdf();
+
+      return () => {
+        if (pdfUrl) {
+          URL.revokeObjectURL(pdfUrl);
+        }
+      };
+    }, [reportId]);
+
+    if (loading) {
+      return (
+        <Box display="flex" justifyContent="center" alignItems="center" height="300px">
+          <CircularProgress />
+        </Box>
+      );
+    }
+
+    if (error) {
+      return (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      );
+    }
+
+    return (
+      <iframe
+        src={pdfUrl}
+        width="100%"
+        height="600px"
+        style={{
+          border: '1px solid #ccc',
+          borderRadius: '4px'
+        }}
+        title="Patient Report"
+      />
+    );
+  };
+
+  if (loading) {
+    return <Box sx={{ p: 3 }}><CircularProgress /></Box>;
+  }
+
+  if (error) {
+    return <Box sx={{ p: 3 }}><Alert severity="error">{error}</Alert></Box>;
+  }
 
   return (
     <DoctorLayout>
@@ -247,7 +783,10 @@ function PatientsPage() {
                     <IconButton onClick={() => handleViewDetails(patient)}>
                       <VisibilityIcon />
                     </IconButton>
-                    <IconButton color="primary">
+                    <IconButton 
+                      color="primary" 
+                      onClick={() => handleViewPdf(patient.latest_report_id)}
+                    >
                       <AssignmentIcon />
                     </IconButton>
                     <IconButton>
@@ -290,46 +829,101 @@ function PatientsPage() {
                       <Typography variant="h6">Personal Information</Typography>
                       <Typography>Name: {selectedPatient.name}</Typography>
                       <Typography>Age: {selectedPatient.age}</Typography>
-                      <Typography>Email: {selectedPatient.contact.email}</Typography>
-                      <Typography>Phone: {selectedPatient.contact.phone}</Typography>
+                      <Typography>Email: {selectedPatient.contact?.email}</Typography>
+                      <Typography>Phone: {selectedPatient.contact?.phone}</Typography>
                     </Grid>
                   </Grid>
                 </TabPanel>
 
                 <TabPanel value={currentTab} index={1}>
-                  <AISummary />
-                  
-                  <Box sx={{ mt: 4 }}>
-                    <AISummaryReview 
-                      patient={selectedPatient}
-                      onSaveReview={(reviewData) => {
-                        console.log('Saving review:', reviewData);
-                        setPatients(prevPatients => 
-                          prevPatients.map(p => 
-                            p.id === reviewData.patientId 
-                              ? {
-                                  ...p,
-                                  status: 'Reviewed',
-                                  reviewHistory: [...(p.reviewHistory || []), reviewData]
-                                }
-                              : p
-                          )
-                        );
-                      }}
-                    />
+                  <Box>
+                    <Typography variant="h6" gutterBottom>
+                      Patient Report
+                    </Typography>
+                    <Paper sx={{ p: 2, bgcolor: 'grey.50', minHeight: '300px' }}>
+                      {selectedPatient?.reports?.[0]?.id ? (
+                        <iframe
+                          src={`http://localhost:8000/api/reports/view/${selectedPatient.reports[0].id}`}
+                          width="100%"
+                          height="500px"
+                          style={{
+                            border: '1px solid #ccc',
+                            borderRadius: '4px'
+                          }}
+                          title="Patient Report"
+                        />
+                      ) : (
+                        <Alert severity="info">No report available for this patient</Alert>
+                      )}
+                    </Paper>
+
+                    <Box sx={{ mt: 4 }}>
+                      <Typography variant="h6" gutterBottom>
+                        AI Generated Summary
+                      </Typography>
+                      <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+                        <Typography>{selectedPatient?.ai_summary || 'No AI summary available'}</Typography>
+                      </Paper>
+                    </Box>
                   </Box>
                 </TabPanel>
 
                 <TabPanel value={currentTab} index={2}>
-                  <MedicalHistory />
+                  <MedicalHistory patient={selectedPatient} />
                 </TabPanel>
 
                 <TabPanel value={currentTab} index={3}>
-                  <HealthRecommendations />
+                  <HealthRecommendations patient={selectedPatient} />
                 </TabPanel>
               </DialogContent>
             </>
           )}
+        </Dialog>
+
+        <Dialog
+          open={pdfEditDialog}
+          onClose={() => setPdfEditDialog(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>
+            Edit Patient Report
+          </DialogTitle>
+          <DialogContent>
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
+              label="Medications"
+              value={medication}
+              onChange={(e) => setMedication(e.target.value)}
+              margin="normal"
+            />
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
+              label="Doctor's Notes"
+              value={doctorNotes}
+              onChange={(e) => setDoctorNotes(e.target.value)}
+              margin="normal"
+            />
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+              <Button 
+                variant="contained" 
+                color="primary" 
+                onClick={handleSavePdf}
+              >
+                Save Changes
+              </Button>
+              <Button 
+                variant="outlined" 
+                onClick={() => setPdfEditDialog(false)}
+              >
+                Cancel
+              </Button>
+            </Box>
+          </DialogContent>
         </Dialog>
       </Box>
     </DoctorLayout>

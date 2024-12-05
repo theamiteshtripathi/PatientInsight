@@ -6,7 +6,8 @@ import {
   TextField,
   Button,
   Typography,
-  Grid
+  Grid,
+  Alert
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useAuth } from '../context/AuthContext';
@@ -29,99 +30,118 @@ const LoginPaper = styled(Paper)(({ theme }) => ({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { login, currentUser, error, loading } = useAuth();
+  const { login, error, loading, setError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Redirect if already logged in
+  // Clear any existing errors when component mounts
   useEffect(() => {
-    if (currentUser) {
-      if (currentUser.role === 'doctor') {
+    setError(null);
+  }, [setError]);
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (user) {
+      const userData = JSON.parse(user);
+      if (userData.role === 'doctor') {
         navigate('/doctor-dashboard');
       } else {
         navigate('/dashboard');
       }
     }
-  }, [currentUser, navigate]);
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
+
     const success = await login(email, password);
     
     if (success) {
-      // Navigation will be handled by the useEffect above
-      console.log('Login successful');
-    } else {
-      console.error('Login failed');
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user.role === 'doctor') {
+        navigate('/doctor-dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     }
   };
 
   return (
     <LoginContainer maxWidth="sm">
       <LoginPaper elevation={3}>
-        <Typography variant="h4" sx={{ mb: 3 }}>
+        <Typography variant="h4" gutterBottom>
           Login
         </Typography>
+
+        {error && (
+          <Alert 
+            severity="error" 
+            sx={{ width: '100%', mb: 2 }}
+            onClose={() => setError(null)}
+          >
+            {error}
+          </Alert>
+        )}
         
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Email"
-              variant="outlined"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Grid>
-          
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Password"
-              variant="outlined"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Grid>
-          
-          <Grid item xs={12}>
-            <Button
-              fullWidth
-              variant="contained"
-              color="primary"
-              size="large"
-              sx={{ mt: 2 }}
-              onClick={handleSubmit}
-              disabled={loading}
-            >
-              {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
-          </Grid>
-          
-          <Grid item xs={12}>
-            <Typography 
-              variant="body2" 
-              align="center"
-              sx={{ mt: 2 }}
-            >
-              Don't have an account?{' '}
-              <Link 
-                to="/register" 
-                style={{ 
-                  color: '#1976d2',
-                  textDecoration: 'none',
-                  cursor: 'pointer'
-                }}
+        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+                required
+              />
+            </Grid>
+            
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+                required
+              />
+            </Grid>
+            
+            <Grid item xs={12}>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                disabled={loading}
+                sx={{ mt: 2 }}
               >
-                Sign up
-              </Link>
-            </Typography>
+                {loading ? 'Signing in...' : 'Sign In'}
+              </Button>
+            </Grid>
           </Grid>
-        </Grid>
+        </form>
+
+        <Typography variant="body2" sx={{ mt: 2 }}>
+          Don't have an account?{' '}
+          <Link 
+            to="/register" 
+            style={{ 
+              color: '#1976d2',
+              textDecoration: 'none'
+            }}
+          >
+            Sign up
+          </Link>
+        </Typography>
       </LoginPaper>
     </LoginContainer>
   );

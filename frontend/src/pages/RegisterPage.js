@@ -99,11 +99,26 @@ const RegisterPage = () => {
 
     setIsLoading(true);
     try {
-      // Add your API call here
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulated API call
+      const response = await fetch('http://localhost:8000/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Registration failed');
+      }
+
+      // Store user data in localStorage
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
       navigate('/login');
     } catch (error) {
-      setSubmitError('Registration failed. Please try again.');
+      setSubmitError(error.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -280,7 +295,7 @@ const RegisterPage = () => {
                 fullWidth
                 variant="contained"
                 color="primary"
-                disabled={isLoading || Object.keys(errors).length > 0}
+                disabled={isLoading || Object.values(errors).some(error => error)}
                 sx={{ 
                   mt: 2,
                   height: 48,

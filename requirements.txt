@@ -36,3 +36,5 @@ fpdf==1.7.2
 flask==2.2.5
 tf-keras==2.18.0
 langchain-community==0.3.9
+reportlab==4.2.5
+psycopg2-binary==2.9.10

@@ -1,41 +1,137 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { 
+import {
   Container,
   Grid,
   Box,
-  Paper,
   Typography,
   IconButton,
-  Divider,
-  Avatar,
-  useTheme
+  Card,
+  CardContent,
+  CardActionArea,
 } from '@mui/material';
 import {
   Notifications as NotificationsIcon,
   Settings as SettingsIcon,
-  HealthAndSafety as HealthIcon
+  HealthAndSafety as HealthIcon,
+  Chat as ChatIcon,
+  HealthAndSafety as SymptomsIcon,
 } from '@mui/icons-material';
 import MainLayout from '../components/layout/MainLayout';
-import ChatInterface from '../components/patient/ChatInterface';
 import PatientOnboardingForm from '../components/onboarding/PatientOnboardingForm';
+import ChatInterface from '../components/patient/ChatInterface';
 
 function DashboardPage() {
-  const theme = useTheme();
+  const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [chatKey, setChatKey] = useState(0);
 
   useEffect(() => {
-    const hasCompletedOnboarding = localStorage.getItem('onboardingCompleted');
-    if (!hasCompletedOnboarding) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    console.log('User data from localStorage:', user);
+    setUserData(user);
+
+    // Show onboarding form if user doesn't have a profile
+    if (user && !user.hasProfile) {
       setShowOnboarding(true);
     }
   }, []);
 
   const handleOnboardingSubmit = async (formData) => {
-    localStorage.setItem('onboardingCompleted', 'true');
-    setShowOnboarding(false);
+    try {
+      // Add user_id to the form data
+      const dataWithUserId = {
+        ...formData,
+        user_id: userData.id
+      };
+
+      const response = await fetch('http://localhost:8000/api/patientsonboardingform', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataWithUserId),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save profile');
+      }
+
+      // Update user data in localStorage to reflect profile completion
+      const updatedUser = {
+        ...userData,
+        hasProfile: true
+      };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUserData(updatedUser);
+      setShowOnboarding(false);
+
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    }
   };
+
+  const handleCardClick = (type) => {
+    if (type === 'chat') {
+      setShowChat(true);
+      setChatKey(prev => prev + 1);
+    } else if (type === 'symptoms') {
+      navigate('/symptom-checker');
+    }
+  };
+
+  if (showChat) {
+    return (
+      <MainLayout>
+        <Container maxWidth="xl" sx={{ height: 'calc(100vh - 64px)', py: 2 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            bgcolor: '#0066cc',
+            p: 2,
+            borderRadius: '20px',
+            mb: 3
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <HealthIcon sx={{ 
+                fontSize: 45, 
+                color: '#ffffff',
+                bgcolor: 'rgba(255, 255, 255, 0.1)',
+                p: 1,
+                borderRadius: '50%'
+              }} />
+              <Box>
+                <Typography variant="h5" sx={{ fontWeight: 600, color: '#ffffff' }}>
+                  Welcome Back, {userData ? `${userData.first_name} ${userData.last_name}` : 'Guest'}
+                </Typography>
+                <Typography variant="subtitle2" sx={{ color: '#ffffff', opacity: 0.9 }}>
+                  Let's take care of your health today
+                </Typography>
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 0.5 }}>
+              <IconButton 
+                size="small" 
+                sx={{ color: '#ffffff' }}
+                onClick={() => setShowChat(false)}
+              >
+                <NotificationsIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+              <IconButton size="small" sx={{ color: '#ffffff' }}>
+                <SettingsIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+            </Box>
+          </Box>
+          <ChatInterface key={chatKey} />
+        </Container>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -45,89 +141,116 @@ function DashboardPage() {
         onSubmit={handleOnboardingSubmit}
       />
       
-      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-        {/* Welcome Section */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12}>
-            <Paper 
-              elevation={0}
-              sx={{ 
-                p: 3, 
-                background: 'linear-gradient(135deg, #1976d2 0%, #0f4c81 100%)',
-                borderRadius: '20px',
-                color: 'white',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Avatar 
-                  sx={{ 
-                    width: 60, 
-                    height: 60, 
-                    bgcolor: 'rgba(255,255,255,0.2)',
-                    border: '2px solid white'
-                  }}
-                >
-                  <HealthIcon sx={{ fontSize: 30 }} />
-                </Avatar>
-                <Box>
-                  <Typography variant="h4" sx={{ fontWeight: 600 }}>
-                    Welcome Back, [Patient Name]
-                  </Typography>
-                  <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
-                    Let's take care of your health today
-                  </Typography>
-                </Box>
-              </Box>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <IconButton sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.1)', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' } }}>
-                  <NotificationsIcon />
-                </IconButton>
-                <IconButton sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.1)', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' } }}>
-                  <SettingsIcon />
-                </IconButton>
-              </Box>
-            </Paper>
-          </Grid>
-        </Grid>
+      <Container maxWidth="xl" sx={{ height: 'calc(100vh - 64px)', py: 2 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          bgcolor: '#0066cc',
+          p: 2,
+          borderRadius: '20px',
+          mb: 3
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <HealthIcon sx={{ 
+              fontSize: 45, 
+              color: '#ffffff',
+              bgcolor: 'rgba(255, 255, 255, 0.1)',
+              p: 1,
+              borderRadius: '50%'
+            }} />
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 600, color: '#ffffff' }}>
+                Welcome Back, {userData ? `${userData.first_name} ${userData.last_name}` : 'Guest'}
+              </Typography>
+              <Typography variant="subtitle2" sx={{ color: '#ffffff', opacity: 0.9 }}>
+                Let's take care of your health today
+              </Typography>
+            </Box>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <IconButton size="small" sx={{ color: '#ffffff' }}>
+              <NotificationsIcon sx={{ fontSize: 20 }} />
+            </IconButton>
+            <IconButton size="small" sx={{ color: '#ffffff' }}>
+              <SettingsIcon sx={{ fontSize: 20 }} />
+            </IconButton>
+          </Box>
+        </Box>
 
-        {/* Main Chat Interface */}
-        <Grid container>
-          <Grid item xs={12}>
-            <Paper 
-              elevation={0}
+        <Grid container spacing={3} sx={{ mt: 2 }}>
+          <Grid item xs={12} md={6}>
+            <Card 
               sx={{ 
-                p: 3, 
-                height: 'auto', 
-                display: 'flex',
-                flexDirection: 'column',
+                height: '300px',
                 borderRadius: '20px',
-                bgcolor: '#ffffff',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+                transition: 'transform 0.2s',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)'
+                }
               }}
             >
-              <Box sx={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center', 
-                mb: 2 
-              }}>
-                <Typography variant="h5" sx={{ 
-                  fontWeight: 600,
-                  background: 'linear-gradient(135deg, #1976d2 0%, #0f4c81 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent'
+              <CardActionArea 
+                onClick={() => handleCardClick('chat')}
+                sx={{ height: '100%' }}
+              >
+                <CardContent sx={{ 
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  gap: 2
                 }}>
-                  AI Health Assistant
-                </Typography>
-              </Box>
-              <Divider sx={{ mb: 2 }} />
-              <Box sx={{ flexGrow: 1, display: 'flex' }}>
-                <ChatInterface />
-              </Box>
-            </Paper>
+                  <ChatIcon sx={{ fontSize: 60, color: '#0066cc' }} />
+                  <Typography variant="h5" component="h2" sx={{ fontWeight: 600 }}>
+                    AI Health Assistant
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary">
+                    Chat with our AI assistant about your health concerns
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Card 
+              sx={{ 
+                height: '300px',
+                borderRadius: '20px',
+                transition: 'transform 0.2s',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)'
+                }
+              }}
+            >
+              <CardActionArea 
+                onClick={() => handleCardClick('symptoms')}
+                sx={{ height: '100%' }}
+              >
+                <CardContent sx={{ 
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  gap: 2
+                }}>
+                  <SymptomsIcon sx={{ fontSize: 60, color: '#0066cc' }} />
+                  <Typography variant="h5" component="h2" sx={{ fontWeight: 600 }}>
+                    Symptoms Checker
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary">
+                    Check your symptoms and get instant health insights
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+            </Card>
           </Grid>
         </Grid>
       </Container>

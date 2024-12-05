@@ -12,24 +12,52 @@ export function AuthProvider({ children }) {
       setLoading(true);
       setError(null);
       
-      // Dummy authentication logic for testing
+      // Check for doctor/patient local login first
       if (email === 'doctor@example.com' && password === 'doctor123') {
-        setCurrentUser({
+        const doctorUser = {
           id: '1',
           name: 'Dr. Smith',
           role: 'doctor'
-        });
+        };
+        setCurrentUser(doctorUser);
+        localStorage.setItem('user', JSON.stringify(doctorUser));
         return true;
       } else if (email === 'patient@example.com' && password === 'patient123') {
-        setCurrentUser({
+        const patientUser = {
           id: '2',
           name: 'John Doe',
           role: 'patient'
-        });
+        };
+        setCurrentUser(patientUser);
+        localStorage.setItem('user', JSON.stringify(patientUser));
         return true;
       }
+
+      // If not a local user, try database login
+      const response = await fetch('http://localhost:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Invalid credentials');
+      }
+
+      // Set the logged-in user data
+      const dbUser = {
+        ...data.user,
+        role: 'patient' // Default role for database users
+      };
       
-      throw new Error('Invalid credentials');
+      setCurrentUser(dbUser);
+      localStorage.setItem('user', JSON.stringify(dbUser));
+      return true;
+
     } catch (err) {
       setError(err.message);
       return false;
@@ -38,24 +66,37 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logout = async () => {
-    try {
-      setCurrentUser(null);
-      localStorage.removeItem('token');
-      sessionStorage.removeItem('user');
-      return true;
-    } catch (error) {
-      console.error('Logout failed:', error);
-      return false;
-    }
+  const logout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('user');
+    return true;
   };
 
+  // Check for existing login on app load
+  React.useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setCurrentUser(JSON.parse(storedUser));
+    }
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ currentUser, loading, error, login, logout }}>
+    <AuthContext.Provider 
+      value={{ 
+        currentUser, 
+        loading, 
+        error, 
+        login, 
+        logout,
+        setError // Export setError to clear errors when needed
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
+
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
