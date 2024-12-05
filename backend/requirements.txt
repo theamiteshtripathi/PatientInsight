@@ -35,3 +35,4 @@ flask-cors==5.0.0
 fpdf==1.7.2
 flask==2.2.5
 tf-keras==2.18.0
+reportlab==4.2.5
