@@ -65,7 +65,7 @@ const AISummaryReview = ({ patient, onSaveReview }) => {
         
         // Add credentials and more specific headers
         const response = await fetch(
-          `http://localhost:8000/api/doctor/patient/report-pdf/${patient.reports[0].id}`,
+          `http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/doctor/patient/report-pdf/${patient.reports[0].id}`,
           {
             method: 'GET',
             credentials: 'include',
@@ -253,7 +253,7 @@ function PatientsPage() {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/doctor/patients');
+        const response = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/doctor/patients');
         if (!response.ok) {
           throw new Error('Failed to fetch patients');
         }
@@ -301,14 +301,14 @@ function PatientsPage() {
   const handleViewDetails = async (patient) => {
     try {
       // First fetch patient details
-      const detailsResponse = await fetch(`http://localhost:8000/api/doctor/patient/${patient.id}/details`);
+      const detailsResponse = await fetch(`http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/doctor/patient/${patient.id}/details`);
       if (!detailsResponse.ok) {
         throw new Error(`Failed to fetch patient details: ${detailsResponse.statusText}`);
       }
       const detailsData = await detailsResponse.json();
 
       // Then fetch reports using the working endpoint from PatientsList.js
-      const reportsResponse = await fetch(`http://localhost:8000/api/doctor/patient/${patient.id}/reports`);
+      const reportsResponse = await fetch(`http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/doctor/patient/${patient.id}/reports`);
       if (!reportsResponse.ok) {
         throw new Error(`Failed to fetch reports: ${reportsResponse.statusText}`);
       }
@@ -338,7 +338,7 @@ function PatientsPage() {
   // Handle saving review
   const handleSaveReview = async (reviewData) => {
     try {
-      const response = await fetch('http://localhost:8000/api/patient/review', {
+      const response = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/patient/review', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -393,7 +393,7 @@ function PatientsPage() {
   const handleViewPdf = async (reportId) => {
     try {
       setPdfError(null);
-      const response = await fetch(`http://localhost:8000/api/doctor/patient/report-pdf/${reportId}`);
+      const response = await fetch(`http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/doctor/patient/report-pdf/${reportId}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch PDF');
@@ -492,7 +492,7 @@ function PatientsPage() {
       formData.append('user_id', selectedPatient.id);
       
       // Save to database
-      const saveResponse = await fetch('http://localhost:8000/api/doctor/save-edited-report', {
+      const saveResponse = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/doctor/save-edited-report', {
         method: 'POST',
         body: formData,
       });
@@ -554,7 +554,7 @@ function PatientsPage() {
   const handleViewPatientReport = async (patientId) => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8000/api/doctor/patient/reports/${patientId}`, {
+      const response = await fetch(`http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/doctor/patient/reports/${patientId}`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json'
@@ -623,7 +623,7 @@ function PatientsPage() {
       formData.append('report_id', selectedReport.id);
       formData.append('patient_id', selectedPatient.id);
 
-      const response = await fetch('http://localhost:8000/api/doctor/save-report-notes', {
+      const response = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/doctor/save-report-notes', {
         method: 'POST',
         body: formData
       });
@@ -665,7 +665,7 @@ function PatientsPage() {
 
         try {
           setLoading(true);
-          const response = await fetch(`http://localhost:8000/api/doctor/patient/report-pdf/${reportId}`, {
+          const response = await fetch(`http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/doctor/patient/report-pdf/${reportId}`, {
             method: 'GET',
             credentials: 'include', // Include credentials if needed
             headers: {
@@ -843,7 +843,7 @@ function PatientsPage() {
                     <Paper sx={{ p: 2, bgcolor: 'grey.50', minHeight: '300px' }}>
                       {selectedPatient?.reports?.[0]?.id ? (
                         <iframe
-                          src={`http://localhost:8000/api/reports/view/${selectedPatient.reports[0].id}`}
+                          src={`http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/reports/view/${selectedPatient.reports[0].id}`}
                           width="100%"
                           height="500px"
                           style={{

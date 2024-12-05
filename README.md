@@ -56,7 +56,7 @@ To use PatientInsight, follow these steps:
    airflow scheduler
    ```
 
-6. Access the Airflow web interface at `http://localhost:8080` and enable the `patient_insight_pipeline` DAG.
+6. Access the Airflow web interface at `http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8080` and enable the `patient_insight_pipeline` DAG.
 
 7. Run the application:
    ```bash

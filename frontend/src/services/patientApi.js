@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000/api' || 'http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api';
 
 export const createPatient = async (patientData) => {
   try {

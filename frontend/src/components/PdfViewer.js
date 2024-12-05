@@ -14,7 +14,7 @@ import { Edit as EditIcon, Save as SaveIcon } from '@mui/icons-material';
 
 const handleSaveNotes = async (reportId, notes) => {
   try {
-    const response = await fetch('http://localhost:8000/api/doctor/save-report-notes', {
+    const response = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/doctor/save-report-notes', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -61,7 +61,7 @@ const PdfViewer = ({ reportId, onSave }) => {
       setError(null);
       
       const response = await fetch(
-        `http://localhost:8000/api/doctor/patient/report-pdf/${reportId}`,
+        `http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/doctor/patient/report-pdf/${reportId}`,
         {
           method: 'GET',
           credentials: 'include',
