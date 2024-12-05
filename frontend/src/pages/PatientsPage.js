@@ -300,30 +300,24 @@ function PatientsPage() {
   // Handle viewing patient details
   const handleViewDetails = async (patient) => {
     try {
-      const userId = patient.user_id || patient.id;
-      if (!userId) {
-        throw new Error('No valid user ID found');
+      // First fetch patient details
+      const detailsResponse = await fetch(`http://localhost:8000/api/doctor/patient/${patient.id}/details`);
+      if (!detailsResponse.ok) {
+        throw new Error(`Failed to fetch patient details: ${detailsResponse.statusText}`);
       }
+      const detailsData = await detailsResponse.json();
 
-      // Fetch onboarding data
-      const onboardingResponse = await fetch(`http://localhost:8000/api/doctor/patient/onboarding/${userId}`);
-      if (!onboardingResponse.ok) {
-        throw new Error(`Onboarding data error: ${onboardingResponse.statusText}`);
-      }
-      const onboardingData = await onboardingResponse.json();
-
-      // Fetch reports
-      const reportsResponse = await fetch(`http://localhost:8000/api/doctor/patient/reports/${userId}`);
+      // Then fetch reports using the working endpoint from PatientsList.js
+      const reportsResponse = await fetch(`http://localhost:8000/api/doctor/patient/${patient.id}/reports`);
       if (!reportsResponse.ok) {
-        throw new Error(`Reports data error: ${reportsResponse.statusText}`);
+        throw new Error(`Failed to fetch reports: ${reportsResponse.statusText}`);
       }
       const reportsData = await reportsResponse.json();
       
-      // Combine all data and include latest_report_id if reports exist
+      // Combine the data
       const patientDetails = {
         ...patient,
-        ...onboardingData,
-        latest_report_id: reportsData.length > 0 ? reportsData[0].id : null,
+        ...detailsData,
         reports: reportsData.map(report => ({
           id: report.id,
           name: report.report_name || 'Unnamed Report',
