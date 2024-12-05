@@ -36,8 +36,8 @@ jobs:
     - name: Build and push frontend image
       working-directory: ./frontend
       run: |
-        docker buildx build --platform linux/amd64 -t ${{ env.ECR_REGISTRY }}/frontend:latest .
-        docker push ${{ env.ECR_REGISTRY }}/frontend:latest
+        docker buildx build --platform linux/amd64 -t 167325058662.dkr.ecr.us-east-2.amazonaws.com/frontend:latest .
+        docker push 167325058662.dkr.ecr.us-east-2.amazonaws.com/frontend:latest
 
     - name: Update kube config
       run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
@@ -79,8 +79,8 @@ jobs:
     - name: Build and push backend image
       working-directory: ./backend
       run: |
-        docker buildx build --platform linux/amd64 -t ${{ env.ECR_REGISTRY }}/backend:latest .
-        docker push ${{ env.ECR_REGISTRY }}/backend:latest
+        docker buildx build --platform linux/amd64 -t 167325058662.dkr.ecr.us-east-2.amazonaws.com/backend:latest .
+        docker push 167325058662.dkr.ecr.us-east-2.amazonaws.com/backend:latest
 
     - name: Update kube config
       run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
