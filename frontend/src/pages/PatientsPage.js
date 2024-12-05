@@ -64,6 +64,7 @@ const AISummaryReview = ({ patient, onSaveReview }) => {
         setLoading(true);
         setError(null);
         
+        
         // Add credentials and more specific headers
         const response = await fetch(
           `http://localhost:8000/api/doctor/patient/report-pdf/${patient.reports[0].id}`,
