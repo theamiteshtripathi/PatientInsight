@@ -35,8 +35,12 @@ def send_custom_email(**context):
             if task_start_time and task_end_time
             else "N/A"
         )
-        html_content += f"<li>Task <strong>{task_id}</strong>: {task_state}, Execution Time: {task_execution_time:.2f} seconds</li>"
-
+        try:
+            task_execution_time = float(task_execution_time)
+            formatted_time = f"{task_execution_time:.2f} seconds"
+        except ValueError:
+            formatted_time = "Unknown"
+        html_content += f"<li>Task <strong>{task_id}</strong>: {task_state}, Execution Time: {formatted_time}</li>"
     # Close the HTML list
     html_content += "</ul>"
 

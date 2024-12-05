@@ -11,5 +11,13 @@ app.register_blueprint(chat_routes)
 def health_check():
     return {"status": "healthy", "message": "API is running"}
 
+@app.errorhandler(404)
+def not_found(error):
+    return {"error": "Not Found"}, 404
+
+@app.errorhandler(500)
+def server_error(error):
+    return {"error": "Internal Server Error"}, 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
