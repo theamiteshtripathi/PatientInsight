@@ -16,7 +16,7 @@ env:
 jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.modified, 'frontend/')
+    #if: contains(github.event.head_commit.modified, 'frontend/')
     
     steps:
     - name: Checkout code
@@ -50,7 +50,7 @@ jobs:
 
   deploy-backend:
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.modified, 'backend/')
+    #if: contains(github.event.head_commit.modified, 'backend/')
     
     steps:
     - name: Checkout code
