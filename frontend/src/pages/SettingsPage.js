@@ -29,7 +29,7 @@ function SettingsPage() {
         const user = JSON.parse(localStorage.getItem('user'));
         setUserData(user);
 
-        const response = await fetch(`http://localhost:8000/api/patient-profile/${user.id}`);
+        const response = await fetch(`http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/patient-profile/${user.id}`);
         
         if (response.status === 404) {
           // Profile doesn't exist
@@ -71,7 +71,7 @@ function SettingsPage() {
   const handleSave = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8000/api/patient-profile/${userData.id}`, {
+      const response = await fetch(`http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/patient-profile/${userData.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

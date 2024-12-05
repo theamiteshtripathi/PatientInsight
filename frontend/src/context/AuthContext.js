@@ -34,7 +34,7 @@ export function AuthProvider({ children }) {
       }
 
       // If not a local user, try database login
-      const response = await fetch('http://localhost:8000/api/login', {
+      const response = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
