@@ -5,7 +5,7 @@ from langchain.prompts import PromptTemplate
 from backend.config.config import Config
  
 def chat():
-    # Initialize OpenAI LLM
+    # Initialize OpenAI LLMs
     llm = ChatOpenAI(
         model_name="gpt-3.5-turbo",
         temperature=0.7,
