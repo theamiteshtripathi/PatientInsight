@@ -1,5 +1,5 @@
 // const API_CONFIG = {
-//     BASE_URL: 'http://localhost:8000',
+//     BASE_URL: 'http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000',
 //     ENDPOINTS: {
 //         CHAT_START: '/api/chat/start',
 //         CHAT_MESSAGE: '/api/chat/message'

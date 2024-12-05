@@ -180,7 +180,7 @@ function ChatInterface() {
       const user = JSON.parse(localStorage.getItem('user'));
       
       // First generate the PDF (your existing code)
-      const response = await fetch('http://localhost:8000/api/generate-report', {
+      const response = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/generate-report', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -195,7 +195,7 @@ function ChatInterface() {
       const data = await response.json();
       
       // Now store the generated PDF in database
-      const storeResponse = await fetch('http://localhost:8000/api/store-report', {
+      const storeResponse = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/store-report', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

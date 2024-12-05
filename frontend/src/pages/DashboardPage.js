@@ -49,7 +49,7 @@ function DashboardPage() {
         user_id: userData.id
       };
 
-      const response = await fetch('http://localhost:8000/api/patientsonboardingform', {
+      const response = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/patientsonboardingform', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

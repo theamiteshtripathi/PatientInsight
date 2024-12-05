@@ -19,7 +19,7 @@ const AISummary = ({ patient }) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:8000/api/doctor/patient/reports/${patient.id}`,
+        `http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8000/api/doctor/patient/reports/${patient.id}`,
         {
           credentials: 'include',
           headers: {
