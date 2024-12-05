@@ -183,7 +183,7 @@ function ChatInterfaceLLM() {
       >
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h5" component="h1">
-            Talk About Your Medical Report
+            Talk About Your Doctor's review Report
           </Typography>
           <Button
             startIcon={<Refresh />}
