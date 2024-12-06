@@ -25,5 +25,5 @@ ENV PYTHONPATH=/backend
 # Expose port 8000
 EXPOSE 8000
 
-# Run the applicationn
+# Run the application
 CMD ["python", "run.py"]
