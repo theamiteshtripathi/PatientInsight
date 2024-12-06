@@ -746,7 +746,7 @@ function PatientsPage() {
         }));
         formData.append('user_id', patientId);
 
-        const response = await fetch('http://localhost:8000/api/doctor/save-report-notes', {
+        const response = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api/doctor/save-report-notes', {
           method: 'POST',
           body: formData
         });
