@@ -52,8 +52,8 @@ def chat_message():
         # Generate a session ID if not provided
         session_id = data.get('session_id') or str(uuid.uuid4())
         
-        if session_id not in chat_instances:
-            return jsonify({'status': 'error', 'error': 'Chat session not found'}), 404
+        # if session_id not in chat_instances:
+        #     return jsonify({'status': 'error', 'error': 'Chat session not found'}), 404
             
         chat_instance = chat_instances[session_id]
         

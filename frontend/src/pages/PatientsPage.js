@@ -37,7 +37,8 @@ import {
   Settings as SettingsIcon,
   Notifications as NotificationIcon,
   Visibility as VisibilityIcon,
-  Assignment as AssignmentIcon
+  Assignment as AssignmentIcon,
+  Clear as ClearIcon
 } from '@mui/icons-material';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import StatusChip from '../components/common/StatusChip';
@@ -248,6 +249,8 @@ function PatientsPage() {
   const [selectedReport, setSelectedReport] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedNotes, setEditedNotes] = useState('');
+  const [doctorPrescription, setDoctorPrescription] = useState('');
+  const [medicineNotes, setMedicineNotes] = useState('');
 
   // Fetch patients data
   useEffect(() => {
@@ -647,7 +650,7 @@ function PatientsPage() {
     if (selectedPatient?.user_id && currentTab === 1) {
       handleViewPatientReport(selectedPatient.user_id);
     }
-  }, [selectedPatient, currentTab]);
+  }, [selectedPatient?.user_id, currentTab]);
 
   // Update the PDF viewer component
   const PdfViewer = ({ reportId }) => {
@@ -727,6 +730,100 @@ function PatientsPage() {
       />
     );
   };
+
+  // Separate the notes form into its own component
+  const DoctorNotesForm = React.memo(({ patientId }) => {
+    const [doctorPrescription, setDoctorPrescription] = useState('');
+    const [medicineNotes, setMedicineNotes] = useState('');
+
+    const handleSaveNotes = async (e) => {
+      e.preventDefault();
+      try {
+        const formData = new FormData();
+        formData.append('notes', JSON.stringify({
+          prescription: doctorPrescription,
+          medicineNotes: medicineNotes
+        }));
+        formData.append('user_id', patientId);
+
+        const response = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api/doctor/save-report-notes', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to save notes');
+        }
+
+        alert('Notes saved successfully');
+      } catch (error) {
+        console.error('Error saving notes:', error);
+        alert('Failed to save notes');
+      }
+    };
+
+    return (
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h6" gutterBottom>
+          Doctor's Notes
+        </Typography>
+        <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+          <form onSubmit={handleSaveNotes}>
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                Prescription
+              </Typography>
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                placeholder="Enter prescription details..."
+                value={doctorPrescription}
+                onChange={(e) => setDoctorPrescription(e.target.value)}
+                sx={{ mb: 2 }}
+              />
+            </Box>
+
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                Medicine Notes
+              </Typography>
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                placeholder="Enter medicine notes and instructions..."
+                value={medicineNotes}
+                onChange={(e) => setMedicineNotes(e.target.value)}
+                sx={{ mb: 2 }}
+              />
+            </Box>
+
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+              <Button
+                type="button"
+                variant="outlined"
+                startIcon={<ClearIcon />}
+                onClick={() => {
+                  setDoctorPrescription('');
+                  setMedicineNotes('');
+                }}
+              >
+                Clear
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                startIcon={<SaveIcon />}
+              >
+                Save Notes
+              </Button>
+            </Box>
+          </form>
+        </Paper>
+      </Box>
+    );
+  });
 
   if (loading) {
     return <Box sx={{ p: 3 }}><CircularProgress /></Box>;
@@ -857,14 +954,10 @@ function PatientsPage() {
                       )}
                     </Paper>
 
-                    <Box sx={{ mt: 4 }}>
-                      <Typography variant="h6" gutterBottom>
-                        AI Generated Summary
-                      </Typography>
-                      <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
-                        <Typography>{selectedPatient?.ai_summary || 'No AI summary available'}</Typography>
-                      </Paper>
-                    </Box>
+                    {/* Doctor Notes Form */}
+                    {selectedPatient && (
+                      <DoctorNotesForm patientId={selectedPatient.id} />
+                    )}
                   </Box>
                 </TabPanel>
 
