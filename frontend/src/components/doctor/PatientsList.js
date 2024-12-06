@@ -29,7 +29,7 @@ function PatientsList() {
 
   const fetchPatients = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/doctor/patients');
+      const response = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api/doctor/patients');
       if (!response.ok) {
         throw new Error('Failed to fetch patients');
       }
@@ -42,7 +42,7 @@ function PatientsList() {
 
   const handleViewDetails = async (patientId) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/doctor/patient/${patientId}/details`);
+      const response = await fetch(`http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api/doctor/patient/${patientId}/details`);
       const data = await response.json();
       setSelectedPatient(data);
       setOpenDetails(true);
@@ -53,7 +53,7 @@ function PatientsList() {
 
   const handleViewSummary = async (patientId) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/doctor/patient/${patientId}/reports`);
+      const response = await fetch(`http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api/doctor/patient/${patientId}/reports`);
       const data = await response.json();
       setPatientReports(data);
       setOpenSummary(true);
@@ -160,7 +160,7 @@ function PatientsList() {
         <DialogContent>
           {selectedReportId && (
             <iframe
-              src={`http://localhost:8000/api/reports/view/${selectedReportId}`}
+              src={`http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api/reports/view/${selectedReportId}`}
               width="100%"
               height="600px"
               title="PDF Viewer"

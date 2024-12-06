@@ -12,7 +12,7 @@ from backend.config.config import Config
 #     # Start MLflow server if not already running
 #     try:
 #         import requests
-#         requests.get("http://localhost:8050")
+#         requests.get("http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8050")
 #     except requests.exceptions.ConnectionError:
 #         print("Starting MLflow server...")
 #         subprocess.Popen([
