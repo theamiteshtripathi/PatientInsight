@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Load environment variables
+# Load environment variabless
 load_dotenv()
 
 # Access AWS credentials
