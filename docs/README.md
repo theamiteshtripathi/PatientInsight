@@ -104,6 +104,8 @@ The pod architecture can be categorized into three main groups:
 3. **Monitoring and Observability Stack**
    We implement a comprehensive monitoring solution through CloudWatch agents, Fluent Bit for logging, and Grafana for metrics visualization, ensuring complete observability of our application stack.
 
+
+
 ### Service Architecture and Network Communication
 
 ![Services](Images/Services.png)
@@ -165,6 +167,46 @@ The deployment includes a comprehensive monitoring stack:
 - Custom health checks and readiness probes for service monitoring
 
 This robust monitoring setup ensures operational visibility and enables proactive issue resolution.
+
+### Prometheus Implementation
+![Prometheus](Images/Prometheus.png)
+
+We utilize Amazon Managed Service for Prometheus for metrics collection and storage, configured through a dedicated workspace (ws-16414bce-3756-40fc-8f4f-218915a2a049). The service automatically scrapes metrics from our EKS cluster, including:
+- Pod performance metrics
+- Node resource utilization
+- API endpoint response times
+- Custom application metrics
+- Model inference latencies
+
+### Grafana Dashboards
+Our Grafana implementation provides intuitive visualization of system metrics through custom dashboards:
+
+1. **Kubernetes Cluster Overview**
+   - Node resource utilization
+   - Pod health status
+   - Container metrics
+   - Network performance
+
+2. **Application Performance**
+   - API response times
+   - Request rates
+   - Error rates
+   - Service latencies
+
+3. **Model Performance**
+   - Inference times
+   - Model throughput
+   - Memory usage
+   - GPU utilization
+
+### Integration Points
+The monitoring stack is fully integrated with our infrastructure:
+- Direct metric collection from EKS cluster
+- Custom metric endpoints for application monitoring
+- Automated alerting based on defined thresholds
+- Real-time visualization of system health
+
+This comprehensive monitoring solution ensures complete visibility into our system's operational status while enabling quick identification and resolution of potential issues.
 
 ### Conclusion
 Our Kubernetes infrastructure represents a well-architected solution that balances scalability, reliability, and operational efficiency. The combination of strategic pod distribution, sophisticated load balancing, and comprehensive monitoring creates a resilient platform capable of supporting our healthcare application's demanding requirements while maintaining security and performance standards.
