@@ -1,6 +1,8 @@
 # PatientInsight: Cloud Deployment Architecture Report
 
-## Video Submission Link: https://drive.google.com/drive/folders/19H8RAABVZ1dCw0p4YTw2ry5hKUAxjPj8?usp=sharing
+### Video Submission Link: https://drive.google.com/drive/folders/19H8RAABVZ1dCw0p4YTw2ry5hKUAxjPj8?usp=sharing
+
+### Ml Pipeline Readme: https://github.com/theamiteshtripathi/PatientInsight/blob/stage/backend/ml_pipeline/README.md
 
 ## Executive Summary
 PatientInsight is deployed as a cloud-native solution leveraging Amazon Web Services (AWS) as the primary cloud provider. This deployment strategy enables scalable, reliable, and secure delivery of our medical symptom analysis pipeline.
