@@ -79,7 +79,7 @@ Both repositories are configured with AES-256 encryption, ensuring the security 
 ![EKS](Images/EKS.png)
 The production environment operates on a dedicated EKS cluster named `patient-insight-eks-cluster`. This cluster represents our commitment to container orchestration excellence, running on Kubernetes version 1.31. The cluster architecture is designed with both performance and cost-efficiency in mind, implementing a sophisticated node group configuration that balances resource availability with operational costs.
 
-![Node Group](Images/Node group.png)
+![Node Group](Images/NodeGroup.png)
 
 Our node group configuration exemplifies this balance:
 - We utilize c4.xlarge instances, providing robust computational resources for our containerized workloads
@@ -138,7 +138,7 @@ This service configuration creates a robust networking layer that supports both 
 
 ### Load Balancing Strategy
 
-![Load Balancing](Images/Load Balancer.png)
+![Load Balancing](Images/LoadBalancer.png)
 
 Our load balancing architecture implements a dual-layer approach using AWS Network Load Balancers:
 
@@ -311,7 +311,7 @@ This monitoring approach ensures system reliability while leveraging the strengt
 
 ## Logging and Monitoring Infrastructure
 
-![Cloud Watch](Images/Cloud Watch.png)
+![Cloud Watch](Images/CloudWatch.png)
 
 ### Overview
 Our application implements comprehensive logging through Amazon CloudWatch, providing centralized log management and monitoring capabilities across all components of our healthcare system. The logging infrastructure captures detailed operational data from our EKS cluster, Lambda functions, and SageMaker endpoints, enabling real-time monitoring and troubleshooting of our medical analysis pipeline.
