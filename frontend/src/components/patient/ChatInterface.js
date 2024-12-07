@@ -244,6 +244,7 @@ function ChatInterface() {
           flexDirection: 'column',
           overflow: 'hidden'
         }}
+        
       >
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h5" component="h1">
