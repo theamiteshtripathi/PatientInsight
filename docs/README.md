@@ -60,6 +60,155 @@ PatientInsight is implemented as a cloud deployment, utilizing AWS's comprehensi
 
 This cloud-based architecture provides the foundation for our healthcare analytics system, ensuring high availability, scalability, and robust security measures while maintaining operational efficiency.
 
+## Deployment Replication Guide
+
+### Prerequisites Setup
+
+This are all the prerequisites that you need to setup before deploying the cloning this repository and running the deployment script which does not require any manual intervention.
+
+#### 1. AWS Account and CLI Configuration
+```bash
+# Install AWS CLI
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+# Configure AWS CLI
+aws configure
+# Enter your AWS Access Key ID
+# Enter your AWS Secret Access Key
+# Region: us-east-2
+# Output format: json
+```
+
+#### 2. Required Tools Installation
+```bash
+# Install Docker
+sudo apt-get update
+sudo apt-get install docker.io
+sudo usermod -aG docker $USER
+
+# Install kubectl
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+# Install eksctl
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin
+```
+
+### Infrastructure Setup
+
+#### 1. Create EKS Cluster
+```bash
+eksctl create cluster \
+    --name patient-insight-eks-cluster \
+    --region us-east-2 \
+    --node-type c4.xlarge \
+    --nodes-min 2 \
+    --nodes-max 4 \
+    --with-oidc \
+    --ssh-access \
+    --ssh-public-key your-key-name \
+    --managed
+```
+
+#### 2. Create ECR Repositories
+```bash
+# Create repositories for frontend and backend
+aws ecr create-repository --repository-name frontend
+aws ecr create-repository --repository-name backend
+```
+
+### Application Deployment
+
+Here you clone the repository and configure the environment variable, and then run the deployment script **deploy.sh** which does not require any manual intervention.
+
+#### 1. Clone Repository
+```bash
+git clone https://github.com/your-repo/PatientInsight.git
+cd PatientInsight
+```
+
+#### 2. Environment Configuration
+Create a `.env` file in the root directory:
+```env
+AWS_REGION=us-east-2
+OPENAI_API_KEY=your_openai_key
+PINECONE_API_KEY=your_pinecone_key
+PINECONE_ENVIRONMENT=your_environment
+PINECONE_INDEX_NAME=your_index
+AWS_ACCESS_KEY_ID=your_aws_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret
+```
+
+#### 3. Automated Deployment
+```bash
+# Make the deployment script executable
+chmod +x deploy.sh
+
+# Run the deployment script
+./deploy.sh
+```
+
+### Validation Steps
+
+The deployment script will output the pods, nodes status(check if that is running fine), along with that it also outputs the frontend and backend URLs which you can use to access the application. 
+
+You can copy the frontend External IP and paste it in the browser to access the application.
+
+### Troubleshooting Guide If you face any issues:
+
+#### Common Issues and Solutions
+
+1. **Pod Startup Issues**
+```bash
+# Check pod details
+kubectl describe pod <pod-name>
+
+# Check pod logs
+kubectl logs <pod-name>
+```
+
+2. **Service Connection Issues**
+```bash
+# Verify service endpoints
+kubectl get endpoints
+
+# Check service details
+kubectl describe service <service-name>
+```
+
+3. **Image Pull Errors**
+```bash
+# Verify ECR authentication
+aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin $ECR_REGISTRY
+
+# Check pod events
+kubectl get events --sort-by='.lastTimestamp'
+```
+
+### Cleanup Instructions
+```bash
+# Delete services
+kubectl delete service frontend-service backend-service
+
+# Delete deployments
+kubectl delete deployment frontend backend
+
+# Delete cluster
+eksctl delete cluster --name patient-insight-eks-cluster --region us-east-2
+```
+
+### Security Considerations
+- Regularly rotate AWS access keys
+- Use AWS Secrets Manager for sensitive information
+- Implement network policies in EKS
+- Monitor CloudWatch logs for security events
+- Keep all tools and dependencies updated
+
+For additional support or troubleshooting, please refer to our project documentation or create an issue in the GitHub repository.
+
 
 ## Kubernetes Infrastructure and Deployment Architecture
 

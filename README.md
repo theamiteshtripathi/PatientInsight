@@ -2,25 +2,60 @@
 
 ![Banner Placeholder](assets/BannerImg.webp)
 
-**PatientInsight** is an advanced AI-driven tool designed to provide patients with meaningful insights into their medical reports and prescriptions. By simplifying complex data, it enhances the user experience and helps doctors prioritize urgent cases efficiently.
+# PatientInsight: Medical Symptom Analysis System
 
-## Overview
+PatientInsight is a cloud-native healthcare system that combines conversational AI with sophisticated medical case analysis to provide comprehensive symptom analysis and treatment recommendations.
 
-With the increasing complexity of medical information, patients often struggle to understand their reports and prescriptions. **PatientInsight** addresses this gap by leveraging machine learning and AI to provide easy-to-understand summaries and actionable insights.
+## System Architecture
+![Healthcare System Pipeline](backend/ml_pipeline/images/Flowchart.png)
 
-Key features include:
-- **Report Summarization**: Converts complex medical data into simple, patient-friendly language.
-- **Urgency Detection**: Automatically identifies critical reports and notifies healthcare providers to prioritize urgent patients.
-- **Prescription Insights**: Offers detailed explanations and guidance on prescriptions.
-- **Custom Notifications**: Alerts patients and doctors about important findings and follow-up actions.
+The system operates in two main phases:
+1. A specialized medical chatbot (HealthcarechatLLM) conducts structured symptom collection with real-time emergency detection
+2. A Retrieval-Augmented Generation (RAG) model analyzes symptoms against historical cases for medical insights
 
-## Features
+## Cloud Infrastructure
+- **Cloud Provider**: AWS
+- **Core Services**:
+  - Amazon EKS for Kubernetes orchestration
+  - Amazon SageMaker for model serving
+  - Amazon S3 for data storage
+  - Pinecone for vector database
+  - MLflow for experiment tracking
 
-1. **Patient-Friendly Summaries**: Simplifies technical jargon in medical reports.
-2. **AI-Powered Urgency Detection**: Alerts doctors about critical cases that require immediate attention.
-3. **Prescription Explanations**: Breaks down medication information into understandable terms for patients.
-4. **Interactive Dashboard**: Provides a visual representation of patient data and insights.
-5. **Integration with EHR**: Seamless integration with existing electronic health records systems for doctors.
+## Key Features
+- Real-time emergency detection
+- Bias detection and fairness monitoring
+- Comprehensive MLflow experiment tracking
+- Automated CI/CD pipeline with extensive testing
+- Kubernetes-based deployment with auto-scaling
+
+## Documentation
+- [Cloud Deployment Architecture](docs/README.MD)
+- [ML Pipeline Documentation](backend/ml_pipeline/README.md)
+- [Data Pipeline Documentation](backend/data_pipeline/README.md)
+
+## Video Demo
+[Project Demo Video](https://drive.google.com/drive/folders/19H8RAABVZ1dCw0p4YTw2ry5hKUAxjPj8?usp=sharing)
+
+## Deployment
+The system is deployed on AWS EKS with:
+- Frontend Service: `k8s-default-frontend-83b9bf328b-4645da8feaa0ec6e.elb.us-east-2.amazonaws.com`
+- Backend Service: `k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com`
+- MLflow Dashboard: `http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8050`
+
+## Monitoring
+- Prometheus metrics collection
+- Grafana dashboards for visualization
+- CloudWatch for centralized logging
+- Automated email alerts for system events
+
+## Testing
+Comprehensive testing framework including:
+- Unit tests for individual components
+- Integration tests for system coherence
+- Bias detection tests for fairness
+- Retrieval validation for accuracy
+
 
 ## Installation
 
