@@ -62,6 +62,7 @@ create_notes_table()
 @notes_bp.route('/api/notes/save', methods=['POST'])
 @cross_origin()
 def save_doctor_notes():
+    conn = None
     try:
         data = request.json
         user_id = data.get('user_id')
@@ -69,60 +70,84 @@ def save_doctor_notes():
         prescription = data.get('prescription')
         medicine_notes = data.get('medicine_notes')
 
-        print("Received data:", {
+        print("Attempting to save notes with data:", {
             "user_id": user_id,
             "report_id": report_id,
-            "prescription": prescription,
-            "medicine_notes": medicine_notes
+            "prescription": prescription[:50] + "...",  # Print first 50 chars
+            "medicine_notes": medicine_notes[:50] + "..."
         })
 
-        if not report_id:
-            return jsonify({"error": "Report ID is required"}), 400
+        if not all([user_id, report_id, prescription, medicine_notes]):
+            return jsonify({"error": "All fields are required"}), 400
 
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
 
-        # First check if a record exists
+        # Debug: Check if user and report exist
+        cur.execute("""
+            SELECT EXISTS(SELECT 1 FROM users WHERE id = %s) as user_exists,
+                   EXISTS(SELECT 1 FROM patient_reports WHERE id = %s) as report_exists
+        """, (user_id, report_id))
+        exists_check = cur.fetchone()
+        print("Existence check:", exists_check)
+
+        # Check for existing note
         cur.execute("""
             SELECT id FROM doctor_notes 
             WHERE user_id = %s AND report_id = %s
         """, (user_id, report_id))
         
         existing_note = cur.fetchone()
+        print("Existing note check:", existing_note)
         
-        if existing_note:
-            # Update existing record
-            cur.execute("""
-                UPDATE doctor_notes 
-                SET prescription = %s,
-                    medicine_notes = %s,
-                    updated_at = CURRENT_TIMESTAMP
-                WHERE user_id = %s AND report_id = %s
-                RETURNING id
-            """, (prescription, medicine_notes, user_id, report_id))
-        else:
-            # Insert new record
-            cur.execute("""
-                INSERT INTO doctor_notes 
-                (user_id, report_id, prescription, medicine_notes)
-                VALUES (%s, %s, %s, %s)
-                RETURNING id
-            """, (user_id, report_id, prescription, medicine_notes))
+        try:
+            if existing_note:
+                # Update existing record
+                cur.execute("""
+                    UPDATE doctor_notes 
+                    SET prescription = %s,
+                        medicine_notes = %s,
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE user_id = %s AND report_id = %s
+                    RETURNING id, user_id, report_id
+                """, (prescription, medicine_notes, user_id, report_id))
+                print("Updating existing note")
+            else:
+                # Insert new record
+                cur.execute("""
+                    INSERT INTO doctor_notes 
+                    (user_id, report_id, prescription, medicine_notes)
+                    VALUES (%s, %s, %s, %s)
+                    RETURNING id, user_id, report_id
+                """, (user_id, report_id, prescription, medicine_notes))
+                print("Inserting new note")
 
-        notes_id = cur.fetchone()['id']
-        conn.commit()
-        
-        cur.close()
-        conn.close()
+            result = cur.fetchone()
+            print("Operation result:", result)
+            
+            conn.commit()
+            print("Transaction committed successfully")
 
-        return jsonify({
-            'message': 'Notes saved successfully',
-            'notes_id': notes_id
-        }), 200
+            return jsonify({
+                'message': 'Notes saved successfully',
+                'notes_id': result['id']
+            }), 200
+
+        except Exception as e:
+            print("Database operation failed:", str(e))
+            conn.rollback()
+            raise e
 
     except Exception as e:
-        print('Error saving doctor notes:', str(e))
+        print("Error saving doctor notes:", str(e))
+        if conn:
+            conn.rollback()
         return jsonify({'error': str(e)}), 500
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
 
 @notes_bp.route('/api/notes/<int:patient_id>', methods=['GET'])
 @cross_origin()
