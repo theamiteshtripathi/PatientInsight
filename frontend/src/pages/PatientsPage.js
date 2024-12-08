@@ -737,57 +737,63 @@ function PatientsPage() {
     const [doctorPrescription, setDoctorPrescription] = useState('');
     const [medicineNotes, setMedicineNotes] = useState('');
     const [saveStatus, setSaveStatus] = useState(null);
+    const [existingNoteId, setExistingNoteId] = useState(null);
 
     useEffect(() => {
-      const fetchExistingNotes = async () => {
-        try {
-          console.log('Fetching notes for:', { patientId, reportId }); // Debug log
-          const response = await fetch(`http://localhost:8000/api/notes/${patientId}?report_id=${reportId}`);
-          if (response.ok) {
-            const data = await response.json();
-            setDoctorPrescription(data.prescription || '');
-            setMedicineNotes(data.medicine_notes || '');
-          }
-        } catch (error) {
-          console.error('Error fetching existing notes:', error);
-        }
-      };
+        const fetchExistingNotes = async () => {
+            try {
+                console.log('Fetching notes for:', { patientId, reportId }); // Debug log
+                const response = await fetch(`http://localhost:8000/api/notes/${patientId}?report_id=${reportId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.id) {
+                        setExistingNoteId(data.id); // Store the note ID if it exists
+                    }
+                    setDoctorPrescription(data.prescription || '');
+                    setMedicineNotes(data.medicine_notes || '');
+                }
+            } catch (error) {
+                console.error('Error fetching existing notes:', error);
+            }
+        };
 
-      if (patientId && reportId) {
-        fetchExistingNotes();
-      }
+        if (patientId && reportId) {
+            fetchExistingNotes();
+        }
     }, [patientId, reportId]);
 
     const handleSaveNotes = async (e) => {
-      e.preventDefault();
-      try {
-        setSaveStatus('saving');
-        
-        // Add reportId to the request body
-        const response = await fetch('http://localhost:8000/api/notes/save', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            user_id: patientId,
-            report_id: reportId,  // Include report_id in the request
-            prescription: doctorPrescription,
-            medicine_notes: medicineNotes
-          })
-        });
+        e.preventDefault();
+        try {
+            setSaveStatus('saving');
+            
+            const response = await fetch('http://localhost:8000/api/notes/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: patientId,
+                    report_id: reportId,
+                    prescription: doctorPrescription,
+                    medicine_notes: medicineNotes,
+                    note_id: existingNoteId // Include the existing note ID if it exists
+                })
+            });
 
-        if (!response.ok) {
-          throw new Error('Failed to save notes');
+            if (!response.ok) {
+                throw new Error('Failed to save notes');
+            }
+
+            const data = await response.json();
+            setExistingNoteId(data.notes_id); // Update the note ID after saving
+            setSaveStatus('success');
+            setTimeout(() => setSaveStatus(null), 3000);
+        } catch (error) {
+            console.error('Error saving notes:', error);
+            setSaveStatus('error');
+            setTimeout(() => setSaveStatus(null), 3000);
         }
-
-        setSaveStatus('success');
-        setTimeout(() => setSaveStatus(null), 3000);
-      } catch (error) {
-        console.error('Error saving notes:', error);
-        setSaveStatus('error');
-        setTimeout(() => setSaveStatus(null), 3000);
-      }
     };
 
     return (

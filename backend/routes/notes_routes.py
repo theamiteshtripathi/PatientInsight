@@ -23,19 +23,35 @@ def create_notes_table():
     conn = get_db_connection()
     cur = conn.cursor()
     try:
+        # First, drop the existing table if it exists
         cur.execute("""
-            CREATE TABLE IF NOT EXISTS doctor_notes (
+            DROP TABLE IF EXISTS doctor_notes CASCADE;
+        """)
+        
+        # Create the table with the correct constraints
+        cur.execute("""
+            CREATE TABLE doctor_notes (
                 id SERIAL PRIMARY KEY,
                 user_id INTEGER REFERENCES users(id),
+                report_id INTEGER REFERENCES patient_reports(id),
                 prescription TEXT,
                 medicine_notes TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
+
+        # Add the unique constraint
+        cur.execute("""
+            ALTER TABLE doctor_notes 
+            ADD CONSTRAINT unique_user_report 
+            UNIQUE (user_id, report_id)
+        """)
+        
         conn.commit()
     except Exception as e:
-        print(f"Error creating table: {str(e)}")
+        print(f"Error creating/updating table: {str(e)}")
+        conn.rollback()
     finally:
         cur.close()
         conn.close()
@@ -66,30 +82,16 @@ def save_doctor_notes():
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
 
-        # Verify the user_id and report_id exist in patient_reports
-        cur.execute("""
-            SELECT user_id 
-            FROM patient_reports 
-            WHERE id = %s AND user_id = %s
-        """, (report_id, user_id))
-        
-        result = cur.fetchone()
-        if not result:
-            print(f"No report found for user_id {user_id} and report_id {report_id}")
-            cur.close()
-            conn.close()
-            return jsonify({"error": "Report not found"}), 404
-
-        # Check if notes exist for this user and report
+        # First check if a record exists
         cur.execute("""
             SELECT id FROM doctor_notes 
             WHERE user_id = %s AND report_id = %s
         """, (user_id, report_id))
         
-        existing_notes = cur.fetchone()
+        existing_note = cur.fetchone()
         
-        if existing_notes:
-            # Update existing notes
+        if existing_note:
+            # Update existing record
             cur.execute("""
                 UPDATE doctor_notes 
                 SET prescription = %s,
@@ -99,9 +101,10 @@ def save_doctor_notes():
                 RETURNING id
             """, (prescription, medicine_notes, user_id, report_id))
         else:
-            # Insert new notes
+            # Insert new record
             cur.execute("""
-                INSERT INTO doctor_notes (user_id, report_id, prescription, medicine_notes)
+                INSERT INTO doctor_notes 
+                (user_id, report_id, prescription, medicine_notes)
                 VALUES (%s, %s, %s, %s)
                 RETURNING id
             """, (user_id, report_id, prescription, medicine_notes))
@@ -130,9 +133,9 @@ def get_patient_notes(patient_id):
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
-        # Get notes directly using user_id and report_id
+        # Get notes including the ID
         cur.execute("""
-            SELECT prescription, medicine_notes 
+            SELECT id, prescription, medicine_notes 
             FROM doctor_notes 
             WHERE user_id = %s AND report_id = %s
         """, (patient_id, report_id))
@@ -144,7 +147,7 @@ def get_patient_notes(patient_id):
 
         if notes:
             return jsonify(notes), 200
-        return jsonify({'prescription': '', 'medicine_notes': ''}), 200
+        return jsonify({'id': None, 'prescription': '', 'medicine_notes': ''}), 200
 
     except Exception as e:
         print('Error fetching patient notes:', str(e))
