@@ -733,33 +733,60 @@ function PatientsPage() {
   };
 
   // Separate the notes form into its own component
-  const DoctorNotesForm = React.memo(({ patientId }) => {
+  const DoctorNotesForm = React.memo(({ patientId, reportId }) => {
     const [doctorPrescription, setDoctorPrescription] = useState('');
     const [medicineNotes, setMedicineNotes] = useState('');
+    const [saveStatus, setSaveStatus] = useState(null);
+
+    useEffect(() => {
+      const fetchExistingNotes = async () => {
+        try {
+          console.log('Fetching notes for:', { patientId, reportId }); // Debug log
+          const response = await fetch(`http://localhost:8000/api/notes/${patientId}?report_id=${reportId}`);
+          if (response.ok) {
+            const data = await response.json();
+            setDoctorPrescription(data.prescription || '');
+            setMedicineNotes(data.medicine_notes || '');
+          }
+        } catch (error) {
+          console.error('Error fetching existing notes:', error);
+        }
+      };
+
+      if (patientId && reportId) {
+        fetchExistingNotes();
+      }
+    }, [patientId, reportId]);
 
     const handleSaveNotes = async (e) => {
       e.preventDefault();
       try {
-        const formData = new FormData();
-        formData.append('notes', JSON.stringify({
-          prescription: doctorPrescription,
-          medicineNotes: medicineNotes
-        }));
-        formData.append('user_id', patientId);
-
-        const response = await fetch('http://localhost:8000/api/doctor/save-report-notes', {
+        setSaveStatus('saving');
+        
+        // Add reportId to the request body
+        const response = await fetch('http://localhost:8000/api/notes/save', {
           method: 'POST',
-          body: formData
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: patientId,
+            report_id: reportId,  // Include report_id in the request
+            prescription: doctorPrescription,
+            medicine_notes: medicineNotes
+          })
         });
 
         if (!response.ok) {
           throw new Error('Failed to save notes');
         }
 
-        alert('Notes saved successfully');
+        setSaveStatus('success');
+        setTimeout(() => setSaveStatus(null), 3000);
       } catch (error) {
         console.error('Error saving notes:', error);
-        alert('Failed to save notes');
+        setSaveStatus('error');
+        setTimeout(() => setSaveStatus(null), 3000);
       }
     };
 
@@ -800,6 +827,17 @@ function PatientsPage() {
               />
             </Box>
 
+            {saveStatus && (
+              <Alert 
+                severity={saveStatus === 'success' ? 'success' : 'error'}
+                sx={{ mb: 2 }}
+              >
+                {saveStatus === 'success' 
+                  ? 'Notes saved successfully!' 
+                  : 'Failed to save notes. Please try again.'}
+              </Alert>
+            )}
+
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
               <Button
                 type="button"
@@ -816,8 +854,9 @@ function PatientsPage() {
                 type="submit"
                 variant="contained"
                 startIcon={<SaveIcon />}
+                disabled={saveStatus === 'saving'}
               >
-                Save Notes
+                {saveStatus === 'saving' ? 'Saving...' : 'Save Notes'}
               </Button>
             </Box>
           </form>
@@ -956,8 +995,11 @@ function PatientsPage() {
                     </Paper>
 
                     {/* Doctor Notes Form */}
-                    {selectedPatient && (
-                      <DoctorNotesForm patientId={selectedPatient.id} />
+                    {selectedPatient && selectedPatient.reports && selectedPatient.reports[0] && (
+                      <DoctorNotesForm 
+                        patientId={selectedPatient.user_id}
+                        reportId={selectedPatient.reports[0].id}  // Pass the report ID
+                      />
                     )}
                   </Box>
                 </TabPanel>

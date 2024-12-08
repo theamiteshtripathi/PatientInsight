@@ -108,45 +108,54 @@ def get_patient_details(patient_id):
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
-        # Get patient onboarding details
+        # Modified query to return both user ID and onboarding form ID
         cur.execute("""
-            SELECT * FROM patientsonboardingform 
-            WHERE user_id = %s
+            SELECT 
+                u.id as user_id,
+                p.*
+            FROM users u
+            LEFT JOIN patientsonboardingform p ON u.id = p.user_id
+            WHERE u.id = %s
         """, (patient_id,))
         
         details = cur.fetchone()
         cur.close()
         conn.close()
         
+        if not details:
+            return jsonify({"error": "Patient not found"}), 404
+            
         return jsonify(details), 200
         
     except Exception as e:
         print("Error:", str(e))
         return jsonify({"error": str(e)}), 500
 
-@doctor_bp.route('/api/doctor/patient/<int:patient_id>/reports', methods=['GET'])
+@doctor_bp.route('/api/doctor/patient/<int:user_id>/reports', methods=['GET'])
 @cross_origin()
-def get_patient_reports(patient_id):
+def get_patient_reports(user_id):
     try:
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
-        # Get patient reports
+        # Updated table name from doctor_patient_report to patient_reports
         cur.execute("""
             SELECT id, report_name, created_at, report_type, description 
             FROM patient_reports 
             WHERE user_id = %s 
             ORDER BY created_at DESC
-        """, (patient_id,))
+        """, (user_id,))
         
         reports = cur.fetchall()
+        print(f"Fetching reports for user_id: {user_id}")
+        
         cur.close()
         conn.close()
         
         return jsonify(reports), 200
         
     except Exception as e:
-        print("Error:", str(e))
+        print("Error in get_patient_reports:", str(e))
         return jsonify({"error": str(e)}), 500
 
 @doctor_bp.route('/test', methods=['GET'])
