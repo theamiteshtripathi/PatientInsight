@@ -83,13 +83,19 @@ function ChatInterfaceLLM() {
     try {
       setLoading(true);
       setError('');
+      
+      const user = JSON.parse(localStorage.getItem('user'));
+      
       const response = await fetch(`${API_BASE_URL}/chat_llm/start`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({ session_id: newSessionId }),
+        body: JSON.stringify({ 
+          session_id: newSessionId,
+          user_id: user?.id
+        }),
       });
 
       const data = await response.json();

@@ -4,27 +4,61 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from backend.config.config import Config
+import psycopg2
+from psycopg2.extras import RealDictCursor
+import os
 
 chat_llm_bp = Blueprint('chat_llm', __name__)
 
 # Store chat sessions
 chat_sessions = {}
 
-def create_llm_chain():
+def get_db_connection():
+    return psycopg2.connect(
+        host=os.getenv('PATIENT_DB_HOST'),
+        database=os.getenv('PATIENT_DB_NAME'),
+        user=os.getenv('PATIENT_DB_USER'),
+        password=os.getenv('PATIENT_DB_PASSWORD'),
+        port=os.getenv('PATIENT_DB_PORT')
+    )
+
+def get_user_medical_data(user_id):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        
+        # Get the latest record for the user
+        cur.execute("""
+            SELECT medicine_notes, prescription 
+            FROM doctor_notes 
+            WHERE user_id = %s 
+            ORDER BY created_at DESC 
+            LIMIT 1
+        """, (user_id,))
+        
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        
+        if result:
+            return result['medicine_notes'], result['prescription']
+        return None, None
+    except Exception as e:
+        print(f"Database error: {str(e)}")
+        return None, None
+
+def create_llm_chain(user_id):
     llm = ChatOpenAI(
         model_name="gpt-3.5-turbo",
         temperature=0.7,
         openai_api_key=Config.OPENAI_API_KEY
     )
     
-    medical_report = """- Blood Pressure: 140/90 mmHg
-    - Cholesterol Levels: LDL - 160 mg/dL, HDL - 40 mg/dL
-    - Blood Sugar: Fasting - 110 mg/dL
-    - Heart Rate: 85 bpm"""
- 
-    doctor_note = """Blood pressure is slightly elevated, and your LDL cholesterol levels are high, 
-    which puts you at risk for cardiovascular issues. You should consider lifestyle changes like 
-    a healthier diet and more exercise. Follow up after 3 months."""
+    # Fetch user's medical data
+    medical_notes, prescription = get_user_medical_data(user_id)
+    
+    if not medical_notes or not prescription:
+        raise Exception("No medical data found for this user")
     
     template = """You are a medical AI assistant who is an expert in healthcare domain, specifically designed to help patients understand their medical reports and test results. Use precise medical terminology while still aiming to make the explanation clear and accessible to a general audience.
  
@@ -41,8 +75,8 @@ def create_llm_chain():
     6. For sensitive medical information, remind the patient to verify important details with their healthcare provider.
  
     Medical Context:
-    Medical Report: {medical_report}
-    Doctor's Note: {doctor_note}
+    Medical Report: {medical_notes}
+    Doctor's Note: {prescription}
  
     Previous conversation:
     {chat_history}
@@ -51,7 +85,7 @@ def create_llm_chain():
     Assistant: """
     
     prompt = PromptTemplate(
-        input_variables=["medical_report", "doctor_note", "chat_history", "user_input"],
+        input_variables=["medical_notes", "prescription", "chat_history", "user_input"],
         template=template
     )
     
@@ -62,22 +96,24 @@ def create_llm_chain():
         prompt=prompt,
         memory=memory,
         verbose=True
-    ), medical_report, doctor_note
+    ), medical_notes, prescription
 
 @chat_llm_bp.route('/chat_llm/start', methods=['POST'])
 def start_chat():
     try:
         data = request.get_json()
         session_id = data.get('session_id')
+        user_id = data.get('user_id')  # Add user_id to request
         
-        if not session_id:
-            return jsonify({'status': 'error', 'error': 'Session ID is required'}), 400
+        if not session_id or not user_id:
+            return jsonify({'status': 'error', 'error': 'Session ID and User ID are required'}), 400
             
-        chain, medical_report, doctor_note = create_llm_chain()
+        chain, medical_notes, prescription = create_llm_chain(user_id)
         chat_sessions[session_id] = {
             'chain': chain,
-            'medical_report': medical_report,
-            'doctor_note': doctor_note
+            'medical_report': medical_notes,
+            'doctor_note': prescription,
+            'user_id': user_id  # Store user_id in session
         }
         
         return jsonify({
@@ -104,8 +140,9 @@ def chat_message():
             
         response = session['chain'].predict(
             user_input=user_message,
-            medical_report=session['medical_report'],
-            doctor_note=session['doctor_note']
+            medical_notes=session['medical_report'],
+            prescription=session['doctor_note'],
+            chat_history=""
         )
         
         return jsonify({

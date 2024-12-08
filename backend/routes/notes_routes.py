@@ -24,9 +24,9 @@ def create_notes_table():
     cur = conn.cursor()
     try:
         # First, drop the existing table if it exists
-        cur.execute("""
-            DROP TABLE IF EXISTS doctor_notes CASCADE;
-        """)
+        # cur.execute("""
+        #     DROP TABLE IF EXISTS doctor_notes CASCADE;
+        # """)
         
         # Create the table with the correct constraints
         cur.execute("""
