@@ -385,10 +385,10 @@ Our Lambda implementation adheres to AWS security best practices, operating with
 ### Conclusion
 The integration of AWS Lambda in our data processing pipeline represents an efficient, automated approach to handling medical data updates. This serverless architecture ensures that our medical analysis system remains current with minimal operational overhead, while maintaining high standards of data processing and security.
 
-## Model Deployment and Serving with Amazon SageMaker
+## Amazon SageMaker
 
 ### Overview
-Our project leverages Amazon SageMaker for model serving and experiment tracking, focusing on the deployment of our specialized medical interaction model (OpenBioLLM) and comprehensive MLflow integration. This infrastructure supports our medical analysis pipeline, where users can interact with generated doctor reports through a sophisticated question-answering system.
+Our project leverages Amazon SageMaker for model serving(Pretrained model which does not require finetuning or retraining) and experiment tracking, focusing on the deployment of our specialized medical interaction model (OpenBioLLM) and comprehensive MLflow integration. This infrastructure supports our medical analysis pipeline, where users can interact with generated doctor reports through a sophisticated question-answering system.
 
 ### Model Deployment Strategy
 ![Endpoint](Images/Endpoints.png)
@@ -449,23 +449,64 @@ This automated pipeline ensures that our medical analysis system remains current
 
 ## Model and Data Drift Monitoring
 
+**Since we will be using a pretrained model, we will not be able to retrain the model if there is a model decay. We will be using the pretrained model to generate doctor reports and we will be monitoring the data drift and retrieval performance.**
+
+So by retrival performance, we mean the performance of the RAG system. We set a threshold of 0.5 for the retrieval score. If the retrieval score is below 0.5, we will be sending an alert to the team. We also have a lambda fucntion that generates the embeddings and stores it in the vector database whenever the new data is uploaded to the S3 bucket.
+
+More details about the monitoring system can be found below: 
+
 ### Overview
-Our system implements targeted monitoring for data drift and model performance, specifically designed for our pre-trained model architecture. While we utilize pre-trained models (GPT and OpenBioLLM) that we can't retrain, we focus on monitoring embedding quality and data distribution changes to ensure system reliability.
+Our healthcare chatbot system implements robust monitoring strategies to ensure reliable performance and early detection of potential issues in the production environment. The monitoring system focuses on two critical aspects: data drift detection and retrieval performance monitoring, complemented by an automated data pipeline for continuous improvement.
 
-### Data Drift Detection
+### Data Drift Detection Strategy
 
-#### Age Distribution Monitoring
-We track changes in patient age distributions as a key demographic indicator:
-- Continuous monitoring of age statistics in incoming data
-- Comparison with baseline distribution
-- Automated alerts for significant distribution shifts
-- Integration with our Lambda-triggered embedding updates
+### Age Distribution Monitoring
+Our primary data drift detection mechanism focuses on monitoring the age distribution of incoming patients. The system maintains a baseline distribution derived from our training dataset (PMC-Patients dataset) and continuously compares it with the current patient population using the Kolmogorov-Smirnov test. This statistical approach helps identify significant shifts in patient demographics that could impact model performance.
 
-Example threshold configuration:
-```python
-AGE_DRIFT_THRESHOLD = 0.15  # 15% deviation from baseline
-ALERT_FREQUENCY = "daily"
-```
+When the KS test returns a p-value below 0.05, indicating a significant deviation from the baseline distribution, the system automatically triggers an alert. This early warning system enables proactive investigation of demographic shifts and their potential impact on model recommendations.
+
+### Retrieval Performance Monitoring
+The system's RAG (Retrieval-Augmented Generation) component is monitored through continuous analysis of retrieval scores. These scores indicate how well the system matches current patient cases with similar historical cases in our knowledge base. Low retrieval scores might indicate:
+- Previously unseen medical conditions
+- Edge cases not well-represented in our training data
+- Potential gaps in our knowledge base
+
+The monitoring system tracks both average and minimum retrieval scores, triggering alerts when scores fall below configured thresholds (currently set at 0.5). This helps maintain high-quality medical recommendations and identifies areas where the knowledge base might need enhancement.
+
+### Automated Data Pipeline and Continuous Learning
+
+Our system features an automated data pipeline implemented through AWS Lambda functions. When new medical data is uploaded to our S3 bucket, the pipeline automatically:
+1. Triggers preprocessing of the new data
+2. Generates embeddings for the processed information
+3. Updates the Pinecone vector database with new embeddings
+
+This automation ensures that our knowledge base remains current and continuously improves as new medical cases are added. The Lambda function's event-driven architecture provides a scalable and maintenance-free solution for data updates.
+
+### Alert System and Response Protocol
+
+![Low Retrieval Score](Images/EmailReceived.png)
+
+![Age distribution drift](Images/EmailReceived1.png)
+
+The monitoring system uses a sophisticated email-based alert mechanism that notifies relevant stakeholders when:
+- Significant data drift is detected
+- Retrieval scores fall below acceptable thresholds
+- Data pipeline processing encounters issues
+
+Alerts include detailed information about the detected issues, including:
+- Statistical measures of detected drift
+- Specific retrieval scores that triggered the alert
+- Timestamp and context of the issue
+
+### Continuous Improvement
+
+The system implements several triggers for model retraining consideration:
+1. Significant age distribution drift (p-value < 0.05)
+2. Consistently low retrieval scores
+3. Substantial new data accumulation (>20% of original training data)
+
+These triggers help maintain optimal model performance and ensure the system evolves with changing patient populations and medical knowledge.
+
 
 ### Model Performance Monitoring
 
@@ -482,6 +523,7 @@ Our system already maintains freshness through automated processes:
 - Automatic embedding generation and storage
 - Seamless integration with Pinecone vector database
 - Real-time updates to the retrieval system
+- With the new embeddings, we will be able to generate more accurate doctor reports as the retrival score might improve.
 
 ### Implementation Benefits
 1. **Continuous Adaptation**
