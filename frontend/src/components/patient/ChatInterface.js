@@ -69,52 +69,62 @@ function ChatInterface() {
     scrollToBottom();
   }, [messages]);
 
-  const startNewSession = () => {
-    const newSessionId = uuidv4();
-    setSessionId(newSessionId);
-    setMessages([]);
-    setError('');
-    startChat(newSessionId);
-  };
-
   useEffect(() => {
-    startNewSession();
+    const initializeChat = async () => {
+      const newSessionId = uuidv4();
+      setSessionId(newSessionId);
+      await startChat(newSessionId);
+    };
+
+    initializeChat();
+
+    return () => {
+      // Cleanup if needed
+    };
   }, []);
 
   const startChat = async (newSessionId) => {
     try {
       setLoading(true);
       setError('');
+      
       const response = await fetch(`${API_BASE_URL}/chat/start`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({ session_id: newSessionId }),
+        body: JSON.stringify({ 
+          session_id: newSessionId,
+          user_id: JSON.parse(localStorage.getItem('user'))?.id
+        }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
       
-      if (!response.ok) {
-        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+      if (data.status === 'error') {
+        throw new Error(data.error);
       }
 
-      if (data.status === 'error') {
-        setError(data.error);
-      } else {
-        setMessages([{ text: data.message, isBot: true }]);
-      }
+      setMessages([{ text: data.message, isBot: true }]);
+      return true;
+
     } catch (error) {
       setError(`Error starting chat: ${error.message}`);
       console.error('Error:', error);
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
   const handleSend = async () => {
-    if (!input.trim() || loading) return;
+    if (!input.trim() || loading || !sessionId) return;
 
     const userMessage = input.trim();
     setInput('');
@@ -133,7 +143,7 @@ function ChatInterface() {
         body: JSON.stringify({
           message: userMessage,
           chatHistory: messages,
-          user_id: user.id,
+          user_id: user?.id,
           session_id: sessionId
         }),
       });
@@ -222,11 +232,6 @@ function ChatInterface() {
     }
   };
 
-  useEffect(() => {
-    // Generate a new session ID when the component mounts
-    setSessionId(uuidv4());
-  }, []);
-
   return (
     <ChatWrapper>
       <Paper 
@@ -239,6 +244,7 @@ function ChatInterface() {
           flexDirection: 'column',
           overflow: 'hidden'
         }}
+        
       >
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h5" component="h1">
@@ -246,7 +252,7 @@ function ChatInterface() {
           </Typography>
           <Button
             startIcon={<Refresh />}
-            onClick={startNewSession}
+            onClick={startChat}
             disabled={loading}
             variant="outlined"
           >

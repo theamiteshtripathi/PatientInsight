@@ -38,6 +38,22 @@ class Config:
     #HF
     HUGGING_FACE_TOKEN = "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"
 
+    # Monitoring
+    RETRIEVAL_SCORE_THRESHOLD = 0.5
+    AGE_DRIFT_CHECK_INTERVAL = 24 * 60 * 60  # 24 hours in seconds
+    MONITORING_ENABLED = True
+
+    PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    MODEL_ARTIFACTS_PATH = os.path.join(PROJECT_ROOT, "model_artifacts")
+
+    # Email Alert Settings
+    SMTP_SERVER = os.getenv('SMTP_SERVER', 'smtp.gmail.com') 
+    SMTP_PORT = int(os.getenv('SMTP_PORT', 587)) 
+    SMTP_USERNAME = os.getenv('SMTP_USERNAME')  
+    SMTP_PASSWORD = os.getenv('SMTP_PASSWORD') 
+    ALERT_EMAIL_FROM = os.getenv('ALERT_EMAIL_FROM')  
+    ALERT_EMAIL_TO = os.getenv('ALERT_EMAIL_TO') 
+
     @classmethod
     def validate_env_vars(cls):
         required_vars = [
