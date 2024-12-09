@@ -333,7 +333,7 @@ We utilize Amazon Managed Service for Prometheus for metrics collection and stor
 
 ![Kubernetes Cluster Monitoring](Images/Grafana1.png)
 
-![Dashboard 2: Other Monitoring Metrics](Images/Grafana2.png)
+![Dashboard 2: Other Monitoring Metrics](Images/Grafana2.jpeg)
 
 Our Grafana implementation provides intuitive visualization of system metrics through custom dashboards:
 
