@@ -64,6 +64,7 @@ const AISummaryReview = ({ patient, onSaveReview }) => {
         setLoading(true);
         setError(null);
         
+        
         // Add credentials and more specific headers
         const response = await fetch(
           `http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api/doctor/patient/report-pdf/${patient.reports[0].id}`,
@@ -732,34 +733,68 @@ function PatientsPage() {
   };
 
   // Separate the notes form into its own component
-  const DoctorNotesForm = React.memo(({ patientId }) => {
+  const DoctorNotesForm = React.memo(({ patientId, reportId }) => {
     const [doctorPrescription, setDoctorPrescription] = useState('');
     const [medicineNotes, setMedicineNotes] = useState('');
+    const [saveStatus, setSaveStatus] = useState(null);
+    const [existingNoteId, setExistingNoteId] = useState(null);
+
+
+    useEffect(() => {
+        const fetchExistingNotes = async () => {
+            try {
+                console.log('Fetching notes for:', { patientId, reportId }); // Debug log
+                const response = await fetch(`http://localhost:8000/api/notes/${patientId}?report_id=${reportId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.id) {
+                        setExistingNoteId(data.id); // Store the note ID if it exists
+                    }
+                    setDoctorPrescription(data.prescription || '');
+                    setMedicineNotes(data.medicine_notes || '');
+                }
+            } catch (error) {
+                console.error('Error fetching existing notes:', error);
+            }
+        };
+
+        if (patientId && reportId) {
+            fetchExistingNotes();
+        }
+    }, [patientId, reportId]);
 
     const handleSaveNotes = async (e) => {
-      e.preventDefault();
-      try {
-        const formData = new FormData();
-        formData.append('notes', JSON.stringify({
-          prescription: doctorPrescription,
-          medicineNotes: medicineNotes
-        }));
-        formData.append('user_id', patientId);
+        e.preventDefault();
+        try {
+            setSaveStatus('saving');
+            
+            const response = await fetch('http://localhost:8000/api/notes/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: patientId,
+                    report_id: reportId,
+                    prescription: doctorPrescription,
+                    medicine_notes: medicineNotes,
+                    note_id: existingNoteId // Include the existing note ID if it exists
+                })
+            });
 
-        const response = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api/doctor/save-report-notes', {
-          method: 'POST',
-          body: formData
-        });
+            if (!response.ok) {
+                throw new Error('Failed to save notes');
+            }
 
-        if (!response.ok) {
-          throw new Error('Failed to save notes');
+            const data = await response.json();
+            setExistingNoteId(data.notes_id); // Update the note ID after saving
+            setSaveStatus('success');
+            setTimeout(() => setSaveStatus(null), 3000);
+        } catch (error) {
+            console.error('Error saving notes:', error);
+            setSaveStatus('error');
+            setTimeout(() => setSaveStatus(null), 3000);
         }
-
-        alert('Notes saved successfully');
-      } catch (error) {
-        console.error('Error saving notes:', error);
-        alert('Failed to save notes');
-      }
     };
 
     return (
@@ -799,6 +834,17 @@ function PatientsPage() {
               />
             </Box>
 
+            {saveStatus && (
+              <Alert 
+                severity={saveStatus === 'success' ? 'success' : 'error'}
+                sx={{ mb: 2 }}
+              >
+                {saveStatus === 'success' 
+                  ? 'Notes saved successfully!' 
+                  : 'Failed to save notes. Please try again.'}
+              </Alert>
+            )}
+
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
               <Button
                 type="button"
@@ -815,8 +861,9 @@ function PatientsPage() {
                 type="submit"
                 variant="contained"
                 startIcon={<SaveIcon />}
+                disabled={saveStatus === 'saving'}
               >
-                Save Notes
+                {saveStatus === 'saving' ? 'Saving...' : 'Save Notes'}
               </Button>
             </Box>
           </form>
@@ -955,8 +1002,11 @@ function PatientsPage() {
                     </Paper>
 
                     {/* Doctor Notes Form */}
-                    {selectedPatient && (
-                      <DoctorNotesForm patientId={selectedPatient.id} />
+                    {selectedPatient && selectedPatient.reports && selectedPatient.reports[0] && (
+                      <DoctorNotesForm 
+                        patientId={selectedPatient.user_id}
+                        reportId={selectedPatient.reports[0].id}  // Pass the report ID
+                      />
                     )}
                   </Box>
                 </TabPanel>

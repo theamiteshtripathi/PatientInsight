@@ -1,6 +1,8 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.trigger_rule import TriggerRule
+from airflow.models import Variable
+from airflow.decorators import dag, task
 from datetime import datetime, timedelta
 import sys
 import os
@@ -23,6 +25,7 @@ from backend.data_pipeline.scripts.download import download_pmc_patients_dataset
 from backend.data_pipeline.scripts.preprocess import preprocess_pmc_patients
 from backend.data_pipeline.scripts.stats_generation import generate_stats
 from backend.data_pipeline.scripts.email_notification import send_custom_email
+from backend.ml_pipeline.RAG.setup_embeddings import setup
 
 default_args = {
     'owner': 'airflow',
@@ -50,6 +53,8 @@ download_task = PythonOperator(
     python_callable=download_pmc_patients_dataset,
     op_kwargs={
         'output_dir': 'backend/data_pipeline/data/raw/',
+        'bucket_name': "{{ dag_run.conf.get('bucket_name', 'manual_trigger') }}",
+        'object_key': "{{ dag_run.conf.get('object_key', 'manual_trigger') }}"
     },
     retries=2,
     retry_delay=timedelta(minutes=1),
@@ -76,6 +81,12 @@ stats_generation = PythonOperator(
     dag=dag,
 )
 
+embeddings_generator = PythonOperator(
+    task_id='generate_embeddings',
+    python_callable=setup,
+    dag=dag,
+)
+
 email_task = PythonOperator(
     task_id="send_email",
     python_callable=send_custom_email,
@@ -85,7 +96,7 @@ email_task = PythonOperator(
 )
 
 # Set dependencies
-download_task >> preprocess_task >> stats_generation >> email_task
+download_task >> preprocess_task >> [stats_generation, embeddings_generator] >> email_task
 
 if __name__ == "__main__":
     from airflow.utils.dag_cycle_tester import check_cycle

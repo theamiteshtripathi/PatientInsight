@@ -311,27 +311,19 @@ def get_patient_reports(user_id):
         
         print(f"Fetching reports for user_id: {user_id}")  # Debug log
         
-        # Modified query to properly handle UNION
+        # Modified query to only use patient_reports table
         cur.execute("""
             SELECT 
                 id,
                 user_id,
                 created_at,
                 report_name,
-                'patient' as report_type
+                report_type,
+                description
             FROM patient_reports 
             WHERE user_id = %s
-            UNION ALL
-            SELECT 
-                id,
-                user_id,
-                created_at,
-                report_name,
-                'doctor' as report_type
-            FROM doctor_patient_report 
-            WHERE user_id = %s
-            ORDER BY created_at DESC;
-        """, (user_id, user_id))
+            ORDER BY created_at DESC
+        """, (user_id,))
         
         reports = cur.fetchall()
         

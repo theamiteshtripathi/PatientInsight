@@ -1,4 +1,5 @@
 import os
+import boto3
 from dotenv import load_dotenv
 import requests
 import time
@@ -12,7 +13,7 @@ load_dotenv()
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
-def download_pmc_patients_dataset(output_dir: str) -> None:
+def download_pmc_patients_dataset(output_dir: str, bucket_name: str, object_key: str) -> None:
     # Start time
     start_time = time.time()
 
@@ -25,23 +26,32 @@ def download_pmc_patients_dataset(output_dir: str) -> None:
     try:
         # Create output directory if it doesn't exist
         os.makedirs(output_dir, exist_ok=True)
-        
-        url = "https://huggingface.co/datasets/zhengyun21/PMC-Patients/resolve/main/PMC-Patients.csv"
-        output_path = os.path.join(output_dir, "PMC-Patients.csv")
-        response = requests.get(url)
-        response.raise_for_status()
-        
-        print("Downloading dataset")
-        with open(output_path, "wb") as f:
-            f.write(response.content)
-        
-        print(f"Dataset downloaded to: {output_path}")
-        print("Download completed successfully")
+        if object_key == "manual_trigger":
+            print("Dowonloading from website url")
+            url = "https://huggingface.co/datasets/zhengyun21/PMC-Patients/resolve/main/PMC-Patients.csv"
+            output_path = os.path.join(output_dir, "PMC-Patients.csv")
+            response = requests.get(url)
+            response.raise_for_status()
+            
+            print("Downloading dataset from url")
+            with open(output_path, "wb") as f:
+                f.write(response.content)
+            
+            print(f"Dataset downloaded to: {output_path}")
+            print("Download completed successfully")
+        else:
+            s3_client = boto3.client('s3')
+            #trigger download from s3 bucket
+            print(f"Download data from s3 bucket: {str(bucket_name)}")
+            output_path = os.path.join(output_dir, object_key)
+            # Download the file
+            s3_client.download_file(bucket_name, object_key, output_path)
+            print(f"File downloaded successfully to {output_dir}")
+
         
     except Exception as e:
         print(f"Download failed: {str(e)}")
         raise
-
     if os.path.exists(output_path):
         print('Download file exists. Successfully exiting the script')
     else:
@@ -55,4 +65,6 @@ def download_pmc_patients_dataset(output_dir: str) -> None:
 if __name__ == "__main__":
     print("Starting process to download data")
     output_dir = "backend/data_pipeline/data/raw"
-    download_pmc_patients_dataset(output_dir)
+    bucket_name = "patient-insight-datasets"
+    object_key = "manual_trigger"
+    download_pmc_patients_dataset(output_dir, bucket_name, object_key)

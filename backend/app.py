@@ -5,6 +5,7 @@ from backend.routes.patient_routes import patient_bp
 from backend.routes.auth_routes import auth_bp
 from backend.routes.doctor_routes import doctor_bp
 from backend.routes.chat_llm_routes import chat_llm_bp
+from backend.routes.notes_routes import notes_bp
 
 app = Flask(__name__)
 CORS(app, resources={
@@ -22,6 +23,7 @@ app.register_blueprint(chat_routes)
 app.register_blueprint(patient_bp)
 app.register_blueprint(doctor_bp)
 app.register_blueprint(chat_llm_bp, url_prefix='/api')
+app.register_blueprint(notes_bp)
 
 @app.route('/')
 def health_check():
