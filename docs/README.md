@@ -330,6 +330,11 @@ We utilize Amazon Managed Service for Prometheus for metrics collection and stor
 - Model inference latencies
 
 ### Grafana Dashboards
+
+![Kubernetes Cluster Monitoring](Images/Grafana1.png)
+
+![Dashboard 2: Other Monitoring Metrics](Images/Grafana2.png)
+
 Our Grafana implementation provides intuitive visualization of system metrics through custom dashboards:
 
 1. **Kubernetes Cluster Overview**
@@ -365,6 +370,8 @@ Our Kubernetes infrastructure represents a well-architected solution that balanc
 
 ## Automated Data Processing with AWS Lambda
 
+![Lambda Function Diagram](Images/LambdaFunction.png)
+
 ### Overview
 Our project implements an automated data processing pipeline using AWS Lambda, designed to streamline the handling of new medical datasets. This serverless solution automatically triggers our data processing workflows whenever new data is uploaded to our S3 storage bucket, ensuring continuous updates to our medical analysis system.
 
@@ -372,6 +379,9 @@ Our project implements an automated data processing pipeline using AWS Lambda, d
 The core of our automation is a Lambda function that monitors our S3 bucket for new dataset uploads. When new medical data arrives, the function automatically initiates our Airflow DAG (Directed Acyclic Graph), which orchestrates the entire data processing pipeline. This event-driven approach eliminates the need for manual intervention in our data processing workflow, ensuring immediate handling of new information.
 
 ### Data Processing Workflow
+
+![DAG Run](Images/DAG.png)
+
 Upon triggering, the Lambda function initiates a series of data processing steps through our Airflow pipeline. The workflow begins with comprehensive data preprocessing, where the raw medical data is cleaned, standardized, and validated. Following this, the pipeline generates statistical analyses and reports, providing insights into the new dataset's characteristics and quality metrics.
 
 ### Vector Database Integration
