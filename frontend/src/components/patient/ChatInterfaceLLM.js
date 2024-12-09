@@ -137,7 +137,7 @@ function ChatInterfaceLLM() {
         body: JSON.stringify({
           message: userMessage,
           chatHistory: messages,
-          user_id: user.id,
+          user_id: user?.id,
           session_id: sessionId
         }),
       });
