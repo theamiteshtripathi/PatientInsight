@@ -268,7 +268,7 @@ def get_patient_report_pdf(report_id):
         response = make_response(bytes(report_data))
         response.headers['Content-Type'] = 'application/pdf'
         response.headers['Content-Disposition'] = f'inline; filename="{report_name}"'
-        response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+        response.headers['Access-Control-Allow-Origin'] = 'http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com'
         
         cur.close()
         conn.close()

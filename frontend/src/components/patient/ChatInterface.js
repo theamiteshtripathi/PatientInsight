@@ -48,7 +48,7 @@ const MessageBubble = styled(Box)(({ theme, isBot }) => ({
   wordWrap: 'break-word'
 }));
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api';
 
 function ChatInterface() {
   const [messages, setMessages] = useState([]);
@@ -190,7 +190,7 @@ function ChatInterface() {
       const user = JSON.parse(localStorage.getItem('user'));
       
       // First generate the PDF (your existing code)
-      const response = await fetch('http://localhost:8000/api/generate-report', {
+      const response = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api/generate-report', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -205,7 +205,7 @@ function ChatInterface() {
       const data = await response.json();
       
       // Now store the generated PDF in database
-      const storeResponse = await fetch('http://localhost:8000/api/store-report', {
+      const storeResponse = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:80/api/store-report', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
