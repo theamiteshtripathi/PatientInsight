@@ -31,7 +31,7 @@ jobs:
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v2
+      uses: aws-actions/amazon-ecr-login@v2 
 
     - name: Build and push frontend image
       working-directory: ./frontend
@@ -40,7 +40,9 @@ jobs:
         docker push 167325058662.dkr.ecr.us-east-2.amazonaws.com/frontend:latest
 
     - name: Update kube config
-      run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+      run: |
+        aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+        aws eks get-token --cluster-name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
     
     - name: Deploy the image to container
       working-directory: ./frontend
@@ -83,7 +85,9 @@ jobs:
         docker push 167325058662.dkr.ecr.us-east-2.amazonaws.com/backend:latest
 
     - name: Update kube config
-      run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+      run: |
+        aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+        aws eks get-token --cluster-name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
     
     - name: Deploy the image to container
       working-directory: ./backend
