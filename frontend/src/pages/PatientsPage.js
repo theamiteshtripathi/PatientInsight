@@ -744,7 +744,7 @@ function PatientsPage() {
         const fetchExistingNotes = async () => {
             try {
                 console.log('Fetching notes for:', { patientId, reportId }); // Debug log
-                const response = await fetch(`http://localhost:8000/api/notes/${patientId}?report_id=${reportId}`);
+                const response = await fetch(`http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api/notes/${patientId}?report_id=${reportId}`);
                 if (response.ok) {
                     const data = await response.json();
                     if (data.id) {
@@ -768,7 +768,7 @@ function PatientsPage() {
         try {
             setSaveStatus('saving');
             
-            const response = await fetch('http://localhost:8000/api/notes/save', {
+            const response = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api/notes/save', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
