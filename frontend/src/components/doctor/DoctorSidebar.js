@@ -64,11 +64,11 @@ function DoctorSidebar() {
   const { logout } = useAuth();
 
   const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/doctor-dashboard' },
-    { text: 'Patients', icon: <PatientsIcon />, path: '/doctor/patients', component: PatientsPage },
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/doctor/dashboard' },
+    { text: 'Patients', icon: <PatientsIcon />, path: '/doctor/patients' },
     { text: 'Appointments', icon: <CalendarTodayIcon />, path: '/doctor/appointments' },
-    { text: 'Medical Reports', icon: <ReportsIcon />, path: '/doctor/reports', component: MedicalReports },
-    { text: 'Chat', icon: <MessagesIcon />, path: '/doctor/chat', component: DoctorChat },
+    { text: 'Medical Reports', icon: <ReportsIcon />, path: '/doctor/medical-reports' },
+    { text: 'Chat', icon: <MessagesIcon />, path: '/doctor/chat' },
     { text: 'Settings', icon: <SettingsIcon />, path: '/doctor/settings' },
   ];
 

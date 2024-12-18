@@ -7,7 +7,9 @@ import {
   Box,
   styled,
   IconButton,
-  Tooltip
+  Tooltip,
+  ToggleButton,
+  ToggleButtonGroup
 } from '@mui/material';
 import {
   PeopleAlt,
@@ -49,12 +51,30 @@ const IconWrapper = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
 }));
 
+const FilterToggleGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+  backgroundColor: '#fff',
+  '& .MuiToggleButton-root': {
+    padding: theme.spacing(1, 2),
+    border: 'none',
+    borderRadius: theme.spacing(2),
+    margin: theme.spacing(0, 0.5),
+    '&.Mui-selected': {
+      backgroundColor: theme.palette.primary.main,
+      color: '#fff',
+      '&:hover': {
+        backgroundColor: theme.palette.primary.dark,
+      }
+    }
+  }
+}));
+
 function DoctorDashboardPage() {
   const [stats, setStats] = useState({
     total_patients: 0,
     total_appointments: 0,
     pending_reports: 0
   });
+  const [timeFilter, setTimeFilter] = useState('all');
 
   useEffect(() => {
     fetchDashboardStats();
@@ -67,6 +87,12 @@ function DoctorDashboardPage() {
       setStats(data);
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
+    }
+  };
+
+  const handleFilterChange = (event, newFilter) => {
+    if (newFilter !== null) {
+      setTimeFilter(newFilter);
     }
   };
 
@@ -163,7 +189,32 @@ function DoctorDashboardPage() {
                   background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)'
                 }}
               >
-                <PatientsList />
+                <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#2c3e50' }}>
+                    Patients List
+                  </Typography>
+                  <FilterToggleGroup
+                    value={timeFilter}
+                    exclusive
+                    onChange={handleFilterChange}
+                    aria-label="report timeframe"
+                    size="small"
+                  >
+                    <ToggleButton value="all">
+                      All
+                    </ToggleButton>
+                    <ToggleButton value="24h">
+                      Last 24h
+                    </ToggleButton>
+                    <ToggleButton value="week">
+                      Last Week
+                    </ToggleButton>
+                    <ToggleButton value="month">
+                      Last Month
+                    </ToggleButton>
+                  </FilterToggleGroup>
+                </Box>
+                <PatientsList timeFilter={timeFilter} />
               </Paper>
             </Grid>
 
