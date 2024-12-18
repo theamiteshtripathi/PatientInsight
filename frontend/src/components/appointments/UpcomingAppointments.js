@@ -19,6 +19,17 @@ import {
   NavigateNext as NextIcon,
   Schedule as ClockIcon
 } from '@mui/icons-material';
+import styled from '@emotion/styled';
+
+const StyledChip = styled(Chip)(({ theme }) => ({
+  height: '24px',
+  fontSize: '0.75rem',
+  padding: '0 8px',
+  marginLeft: theme.spacing(1),
+  '& .MuiChip-label': {
+    padding: '0 6px',
+  }
+}));
 
 function UpcomingAppointments() {
   const upcomingAppointments = [
@@ -54,7 +65,17 @@ function UpcomingAppointments() {
       <List>
         {upcomingAppointments.map((appointment, index) => (
           <React.Fragment key={appointment.id}>
-            <ListItem>
+            <Box 
+              sx={{ 
+                display: 'flex',
+                alignItems: 'flex-start',
+                mb: 2,
+                '& .appointment-info': {
+                  flex: 1,
+                  minWidth: 0
+                }
+              }}
+            >
               <ListItemIcon>
                 {appointment.type === 'virtual' ? (
                   <VideoIcon color="primary" />
@@ -62,25 +83,18 @@ function UpcomingAppointments() {
                   <PersonIcon color="primary" />
                 )}
               </ListItemIcon>
-              <ListItemText
-                primary={appointment.doctor}
-                secondary={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <ClockIcon fontSize="small" color="action" />
-                    <Typography variant="body2">
-                      {appointment.date} at {appointment.time}
-                    </Typography>
-                  </Box>
-                }
+              <Box className="appointment-info" sx={{ ml: 2 }}>
+                <Typography variant="subtitle1">{appointment.doctor}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {appointment.date} at {appointment.time}
+                </Typography>
+              </Box>
+              <StyledChip
+                label={appointment.status}
+                color={appointment.status === 'confirmed' ? 'success' : 'warning'}
+                size="small"
               />
-              <ListItemSecondaryAction>
-                <Chip
-                  label={appointment.status}
-                  size="small"
-                  color={appointment.status === 'confirmed' ? 'success' : 'warning'}
-                />
-              </ListItemSecondaryAction>
-            </ListItem>
+            </Box>
             {index < upcomingAppointments.length - 1 && (
               <Divider variant="inset" component="li" />
             )}
