@@ -95,7 +95,7 @@ function ChatInterface() {
           'Accept': 'application/json'
         },
         body: JSON.stringify({ 
-          session_id: newSessionId,
+          session_id: sessionId,
           user_id: JSON.parse(localStorage.getItem('user'))?.id
         }),
       });
@@ -252,7 +252,7 @@ function ChatInterface() {
           </Typography>
           <Button
             startIcon={<Refresh />}
-            onClick={startChat}
+            onClick={() => startChat()}
             disabled={loading}
             variant="outlined"
           >
