@@ -31,5 +31,5 @@ COPY --from=build /frontend/build /usr/share/nginx/html
 # Expose port 80 to make the app accessible
 EXPOSE 80
 
-# Run Nginx in the foreground
+# Run Nginx in the foregroundd
 CMD ["nginx", "-g", "daemon off;"]

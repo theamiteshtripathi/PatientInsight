@@ -16,7 +16,7 @@ env:
 jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.modified, 'frontend/')
+    #if: contains(github.event.head_commit.modified, 'frontend/')
     
     steps:
     - name: Checkout code
@@ -31,26 +31,37 @@ jobs:
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v2
+      uses: aws-actions/amazon-ecr-login@v2 
 
     - name: Build and push frontend image
       working-directory: ./frontend
       run: |
-        docker build -t ${{ env.ECR_REGISTRY }}/frontend:${{ github.sha }} .
-        docker push ${{ env.ECR_REGISTRY }}/frontend:${{ github.sha }}
-        docker tag ${{ env.ECR_REGISTRY }}/frontend:${{ github.sha }} ${{ env.ECR_REGISTRY }}/frontend:latest
-        docker push ${{ env.ECR_REGISTRY }}/frontend:latest
+        docker buildx build --platform linux/amd64 -t 167325058662.dkr.ecr.us-east-2.amazonaws.com/frontend:latest .
+        docker push 167325058662.dkr.ecr.us-east-2.amazonaws.com/frontend:latest
 
     - name: Update kube config
-      run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
-
+      run: |
+        aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+        aws eks get-token --cluster-name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+    
+    - name: Deploy the image to container
+      working-directory: ./frontend
+      run: |
+        kubectl apply -f deployment.yaml
+    
+    - name: Start the service
+      working-directory: ./frontend
+      run: |
+        kubectl apply -f service.yaml
+    
     - name: Deploy to EKS
+      working-directory: ./frontend
       run: |
         kubectl rollout restart deployment frontend -n default
 
   deploy-backend:
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.modified, 'backend/')
+    #if: contains(github.event.head_commit.modified, 'backend/')
     
     steps:
     - name: Checkout code
@@ -70,15 +81,26 @@ jobs:
     - name: Build and push backend image
       working-directory: ./backend
       run: |
-        docker build -t ${{ env.ECR_REGISTRY }}/backend:${{ github.sha }} .
-        docker push ${{ env.ECR_REGISTRY }}/backend:${{ github.sha }}
-        docker tag ${{ env.ECR_REGISTRY }}/backend:${{ github.sha }} ${{ env.ECR_REGISTRY }}/backend:latest
-        docker push ${{ env.ECR_REGISTRY }}/backend:latest
+        docker buildx build --platform linux/amd64 -t 167325058662.dkr.ecr.us-east-2.amazonaws.com/backend:latest .
+        docker push 167325058662.dkr.ecr.us-east-2.amazonaws.com/backend:latest
 
     - name: Update kube config
-      run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
-
+      run: |
+        aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+        aws eks get-token --cluster-name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+    
+    - name: Deploy the image to container
+      working-directory: ./backend
+      run: |
+        kubectl apply -f deployment.yaml
+    
+    - name: Start the service
+      working-directory: ./backend
+      run: |
+        kubectl apply -f service.yaml
+    
     - name: Deploy to EKS
+      working-directory: ./backend
       run: |
         kubectl rollout restart deployment backend -n default
 

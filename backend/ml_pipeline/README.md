@@ -345,7 +345,7 @@ The system implements comprehensive experiment tracking using MLflow to monitor,
 #### 1. Experiment Management
 - Centralizes all experiments under "healthcare-chat-rag-system"
 - Tracks individual conversation sessions as separate runs
-- Provides web interface for experiment visualization at `http://localhost:8050`
+- Provides web interface for experiment visualization at `http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8050`
 
 #### 2. Metrics Tracking
 The system automatically logs key performance indicators:
@@ -377,7 +377,7 @@ The MLflow integration is handled by two key components:
 - Initializes local MLflow server
 - Creates necessary directory structure
 - Manages server configuration
-- Provides access at `http://localhost:8050`
+- Provides access at `http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com:8050`
 
 2. **Experiment Tracking** (`mlflow_experiment_tracker.py`):
 - Manages experiment lifecycle

@@ -82,7 +82,7 @@ function DoctorDashboardPage() {
 
   const fetchDashboardStats = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/doctor/dashboard-stats');
+      const response = await fetch('http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api/doctor/dashboard-stats');
       const data = await response.json();
       setStats(data);
     } catch (error) {
