@@ -15,7 +15,7 @@ import {
   Paper
 } from '@mui/material';
 
-function PatientsList() {
+function PatientsList({ timeFilter }) {
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [openDetails, setOpenDetails] = useState(false);
@@ -25,11 +25,11 @@ function PatientsList() {
 
   useEffect(() => {
     fetchPatients();
-  }, []);
+  }, [timeFilter]);
 
   const fetchPatients = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/doctor/patients');
+      const response = await fetch(`http://localhost:8000/api/doctor/patients?timeframe=${timeFilter}`);
       if (!response.ok) {
         throw new Error('Failed to fetch patients');
       }
@@ -69,7 +69,6 @@ function PatientsList() {
   return (
     <>
       <Typography variant="h6" gutterBottom>
-        Patients List
       </Typography>
       <TableContainer>
         <Table>

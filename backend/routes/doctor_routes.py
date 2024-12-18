@@ -62,11 +62,12 @@ def get_dashboard_stats():
 @cross_origin()
 def get_patients():
     try:
+        timeframe = request.args.get('timeframe', 'all')
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
-        # Get all users except the first one (doctor)
-        cur.execute("""
+        # Base query with common joins
+        base_query = """
             SELECT 
                 u.id,
                 u.first_name,
@@ -86,11 +87,22 @@ def get_patients():
             FROM users u
             LEFT JOIN patientsonboardingform p ON u.id = p.user_id
             WHERE u.id != 1
-            ORDER BY u.first_name, u.last_name
-        """)
+        """
+
+        # Add timeframe filter
+        if timeframe != 'all':
+            if timeframe == '24h':
+                base_query += " AND EXISTS (SELECT 1 FROM patient_reports pr WHERE pr.user_id = u.id AND pr.created_at >= NOW() - INTERVAL '24 hours')"
+            elif timeframe == 'week':
+                base_query += " AND EXISTS (SELECT 1 FROM patient_reports pr WHERE pr.user_id = u.id AND pr.created_at >= NOW() - INTERVAL '7 days')"
+            elif timeframe == 'month':
+                base_query += " AND EXISTS (SELECT 1 FROM patient_reports pr WHERE pr.user_id = u.id AND pr.created_at >= NOW() - INTERVAL '30 days')"
+
+        # Add ordering
+        base_query += " ORDER BY u.first_name, u.last_name"
         
+        cur.execute(base_query)
         patients = cur.fetchall()
-        print(f"Found {len(patients)} patients")  # Debug log
         
         cur.close()
         conn.close()
