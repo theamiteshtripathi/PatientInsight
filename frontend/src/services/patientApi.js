@@ -1,5 +1,6 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:80/api' || 'http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://k8s-default-backends-848a823787-ea2281742964f835.elb.us-east-2.amazonaws.com/api';
 
+// 'http://127.0.0.1:80/api' 
 export const createPatient = async (patientData) => {
   try {
     const response = await fetch(`${API_BASE_URL}/patientsonboardingform`, {
