@@ -1,10 +1,10 @@
-# PatientInsight
+# Medify AI
 
 ![Banner Placeholder](assets/BannerImg.webp)
 
-# PatientInsight: Medical Symptom Analysis System
+# Medify AI: Medical Symptom Analysis System
 
-PatientInsight is a cloud-native healthcare system that combines conversational AI with sophisticated medical case analysis to provide comprehensive symptom analysis and treatment recommendations.
+Medify AI is a cloud-native healthcare system that combines conversational AI with sophisticated medical case analysis to provide comprehensive symptom analysis and treatment recommendations.
 
 ## System Architecture
 ![Healthcare System Pipeline](backend/ml_pipeline/images/Flowchart.png)
